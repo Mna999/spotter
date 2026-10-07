@@ -29,6 +29,13 @@
             {
               "client_id": "217340150232-lu0s2ge3se12aucf506r6s0nls1j18qe.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "217340150232-nj0cs7or8tbnngumjgdtrak4phhdmr5p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.spotter"
+              }
             }
           ]
         }
