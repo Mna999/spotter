@@ -1,4 +1,6 @@
-class BodyMetrics {
+import 'package:equatable/equatable.dart';
+
+class BodyMetrics extends Equatable {
   double bmi;
   double ree;
   double tdee;
@@ -9,6 +11,10 @@ class BodyMetrics {
     required this.ree,
     required this.tdee,
   });
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [bmi, ree, tdee, macroTargets];
 }
 
 class MacroTargets {

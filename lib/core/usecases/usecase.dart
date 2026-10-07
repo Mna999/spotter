@@ -32,3 +32,11 @@ class SignUpParams extends Equatable {
   @override
   List<Object?> get props => [email, password, name];
 }
+
+class ResetParams extends Equatable {
+  String email;
+
+  ResetParams({required this.email});
+  @override
+  List<Object?> get props => [email];
+}

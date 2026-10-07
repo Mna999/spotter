@@ -1,4 +1,6 @@
-class UserProfile {
+import 'package:equatable/equatable.dart';
+
+class UserProfile extends Equatable {
   String uid;
   bool isMale;
   int age;
@@ -17,6 +19,19 @@ class UserProfile {
     required this.weeklyTargetMin,
     required this.weight,
   });
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [
+    uid,
+    age,
+    experienceLevel,
+    height,
+    isMale,
+    trainingDays,
+    weeklyTargetMin,
+    weight,
+  ];
 }
 
 enum ExperienceLevel { beginner, intermediate, advanced }
