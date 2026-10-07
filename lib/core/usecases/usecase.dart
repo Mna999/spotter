@@ -11,3 +11,24 @@ class NoParams extends Equatable {
   // TODO: implement props
   List<Object?> get props => [];
 }
+
+class SignInParams extends Equatable {
+  String email;
+  String password;
+  SignInParams({required this.email, required this.password});
+  @override
+  List<Object?> get props => [email, password];
+}
+
+class SignUpParams extends Equatable {
+  String email;
+  String password;
+  String name;
+  SignUpParams({
+    required this.email,
+    required this.password,
+    required this.name,
+  });
+  @override
+  List<Object?> get props => [email, password, name];
+}
