@@ -4,11 +4,11 @@ import 'package:spotter/core/usecases/usecase.dart';
 import 'package:spotter/features/auth/domain/entities/user_account.dart';
 import 'package:spotter/features/auth/domain/repositories/auth_repo.dart';
 
-class SignUpUseCase implements UseCase<UserAccount, SignUpParams> {
+class SignInUseCase implements UseCase<UserAccount, SignInParams> {
   AuthRepo authRepo;
-  SignUpUseCase({required this.authRepo});
+  SignInUseCase({required this.authRepo});
   @override
-  Future<Either<Failure, UserAccount>> call(SignUpParams params) async {
-    return await authRepo.register(params);
+  Future<Either<Failure, UserAccount>> call(SignInParams params) async {
+    return await authRepo.signIn(params);
   }
 }

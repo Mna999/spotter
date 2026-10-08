@@ -4,11 +4,12 @@ import 'package:spotter/core/usecases/usecase.dart';
 import 'package:spotter/features/auth/domain/entities/user_account.dart';
 import 'package:spotter/features/auth/domain/repositories/auth_repo.dart';
 
-class SignUpUseCase implements UseCase<UserAccount, SignUpParams> {
+class RestoreSessionUseCase implements UseCase<UserAccount?, NoParams> {
   AuthRepo authRepo;
-  SignUpUseCase({required this.authRepo});
+  RestoreSessionUseCase({required this.authRepo});
+
   @override
-  Future<Either<Failure, UserAccount>> call(SignUpParams params) async {
-    return await authRepo.register(params);
+  Future<Either<Failure, UserAccount?>> call(NoParams params) async {
+    return await authRepo.currentSession();
   }
 }
