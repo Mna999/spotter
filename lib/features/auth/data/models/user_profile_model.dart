@@ -1,5 +1,6 @@
 // data/models/user_profile_model.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:spotter/core/constants.dart';
 import 'package:spotter/features/auth/domain/entities/user_profile.dart';
 
 class UserProfileModel extends UserProfile {
@@ -35,7 +36,7 @@ class UserProfileModel extends UserProfile {
     'experience': experienceLevel.name, 
     'trainingDays': trainingDays,
     'weeklyTargetMin': weeklyTargetMin,
-    'schemaVersion': 1,
+    'schemaVersion': SCHEMA_VERSION,
     'updatedAt': FieldValue.serverTimestamp(),
   };
 }

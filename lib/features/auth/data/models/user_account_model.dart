@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:spotter/core/constants.dart';
 import 'package:spotter/features/auth/domain/entities/user_account.dart';
 
 class UserAccountModel extends UserAccount {
@@ -16,6 +17,8 @@ class UserAccountModel extends UserAccount {
       'displayName': displayName,
       'email': email,
       'createdAt': FieldValue.serverTimestamp(),
+      'schemaVersion': SCHEMA_VERSION,
+      'updatedAt': FieldValue.serverTimestamp(),
     };
   }
 

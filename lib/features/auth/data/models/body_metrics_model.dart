@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:spotter/core/constants.dart';
 import 'package:spotter/features/auth/domain/entities/body_metrics.dart';
 
 class BodyMetricsModel extends BodyMetrics {
@@ -26,5 +27,6 @@ class BodyMetricsModel extends BodyMetrics {
     'tdee': tdee,
     'macroTargets': macroTargets.toJson(),
     'updatedAt': FieldValue.serverTimestamp(),
+    'schemaVersion': SCHEMA_VERSION,
   };
 }
