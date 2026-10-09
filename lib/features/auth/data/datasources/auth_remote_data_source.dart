@@ -131,7 +131,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final googleUser = await googleSignIn.authenticate();
 
       // 2. v7: `authentication` is synchronous and only carries the idToken,
-      //    which is all Firebase needs
+      //    which is all+ Firebase needs
       final idToken = googleUser.authentication.idToken;
       if (idToken == null) {
         throw AuthException(code: 'google-missing-id-token');
