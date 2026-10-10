@@ -27,3 +27,9 @@ final class AuthError extends AuthState {
 
   AuthError({required this.message});
 }
+
+final class VerificationEmailSent extends AuthState {}
+
+final class EmailVerified extends AuthState {}
+
+final class EmailNotVerified extends AuthState {}

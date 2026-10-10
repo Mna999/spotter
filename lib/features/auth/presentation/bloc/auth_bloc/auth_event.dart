@@ -27,3 +27,7 @@ final class PasswordResetRequested extends AuthEvent {
 final class SignOutRequested extends AuthEvent {}
 
 final class AccountDeletionRequested extends AuthEvent {}
+
+final class VerificationEmailRequested extends AuthEvent {}
+
+final class VerificationCheckRequested extends AuthEvent {}

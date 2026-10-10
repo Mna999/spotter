@@ -11,4 +11,6 @@ abstract class AuthRepo {
   Future<Either<Failure, UserAccount?>> currentSession();
   Future<Either<Failure, Unit>> signOut();
   Future<Either<Failure, Unit>> deleteAccount();
+  Future<Either<Failure, Unit>> verifyAccount();
+  Future<Either<Failure, bool>> checkEmailVerified();
 }

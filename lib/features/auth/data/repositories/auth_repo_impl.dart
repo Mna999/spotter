@@ -102,4 +102,27 @@ class AuthRepoImpl implements AuthRepo {
       );
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> checkEmailVerified() async {
+    try {
+      return Right(await authRemoteDataSource.checkVerified());
+    } on AuthException catch (e) {
+      return Left(
+        AuthFailure(message: ExceptionHandler.authExceptionHandler(e.code)),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> verifyAccount() async {
+    try {
+      await authRemoteDataSource.verifyAccount();
+      return const Right(unit);
+    } on AuthException catch (e) {
+      return Left(
+        AuthFailure(message: ExceptionHandler.authExceptionHandler(e.code)),
+      );
+    }
+  }
 }

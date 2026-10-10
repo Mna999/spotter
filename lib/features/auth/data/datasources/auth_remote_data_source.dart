@@ -24,6 +24,10 @@ abstract class AuthRemoteDataSource {
   Future<void> signOut();
 
   Future<void> deleteAccount();
+
+  Future<void> verifyAccount();
+
+  Future<bool> checkVerified();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -51,8 +55,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     User? user = firebaseAuth.currentUser;
     if (user == null) throw AuthException(code: 'user-not-found');
     try {
-      await user.delete();
       await firebaseFirestore.collection('users').doc(user.uid).delete();
+      await user.delete();
     } on FirebaseAuthException catch (e) {
       throw AuthException(code: e.code);
     }
@@ -181,6 +185,32 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       await firebaseAuth.signOut();
       await googleSignIn.signOut();
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(code: e.code);
+    } on GoogleSignInException catch (e) {
+      throw AuthException(code: 'google-${e.code.name}');
+    }
+  }
+
+  @override
+  Future<void> verifyAccount() async {
+    User? user = firebaseAuth.currentUser;
+    if (user == null) throw AuthException(code: 'no-current-user');
+    if (user.emailVerified) return;
+    try {
+      await firebaseAuth.currentUser!.sendEmailVerification();
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(code: e.code);
+    }
+  }
+
+  @override
+  Future<bool> checkVerified() async {
+    User? user = firebaseAuth.currentUser;
+    if (user == null) throw AuthException(code: 'no-current-user');
+    try {
+      await user.reload();
+      return firebaseAuth.currentUser?.emailVerified ?? false;
     } on FirebaseAuthException catch (e) {
       throw AuthException(code: e.code);
     }
