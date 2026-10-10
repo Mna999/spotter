@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:spotter/core/theme/app_theme.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:spotter/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:spotter/firebase_options.dart';
@@ -21,8 +22,11 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [BlocProvider<AuthBloc>(create: (_) => sl<AuthBloc>())],
       child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
+        debugShowCheckedModeBanner: false,
+        title: 'Spotter',
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: ThemeMode.dark,
         home: const SignInScreen(),
       ),
     );
