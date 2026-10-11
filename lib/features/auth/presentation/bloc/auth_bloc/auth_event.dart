@@ -19,6 +19,8 @@ final class SignInSubmitted extends AuthEvent {
   SignInSubmitted({required this.signInParams});
 }
 
+final class GoogleSignInSubmitted extends AuthEvent {}
+
 final class PasswordResetRequested extends AuthEvent {
   ResetParams resetParams;
   PasswordResetRequested({required this.resetParams});
@@ -28,6 +30,10 @@ final class SignOutRequested extends AuthEvent {}
 
 final class AccountDeletionRequested extends AuthEvent {}
 
-final class VerificationEmailRequested extends AuthEvent {}
+final class VerificationEmailRequested extends AuthEvent {
+  final UserAccount userAccount;
+
+  VerificationEmailRequested({required this.userAccount});
+}
 
 final class VerificationCheckRequested extends AuthEvent {}

@@ -34,6 +34,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.verifyAccountUseCase,
     required this.checkEmailVerifiedUseCase,
   }) : super(AuthInitial()) {
+    
     on<SessionRestoreRequested>((event, emit) async {
       emit(AuthLoading());
       final res = await restoreSessionUseCase(NoParams());
@@ -57,6 +58,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInSubmitted>((event, emit) async {
       emit(AuthLoading());
       final res = await signInUseCase(event.signInParams);
+      res.fold((failure) => emit(AuthError(message: failure.message)), (user) {
+        emit(Authenticated(userAccount: user));
+      });
+    });
+
+    on<GoogleSignInSubmitted>((event, emit) async {
+      emit(AuthLoading());
+      final res = await signInUseCase.signInWithGoogle();
       res.fold(
         (failure) => emit(AuthError(message: failure.message)),
         (user) => emit(Authenticated(userAccount: user)),
@@ -91,11 +100,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<VerificationEmailRequested>((event, emit) async {
-      emit(AuthLoading());
       final res = await verifyAccountUseCase(NoParams());
       res.fold(
         (failure) => emit(AuthError(message: failure.message)),
-        (_) => emit(VerificationEmailSent()),
+        (_) => emit(
+          Authenticated(
+            userAccount: event.userAccount,
+            verificationEmailSent: true,
+          ),
+        ),
       );
     });
 

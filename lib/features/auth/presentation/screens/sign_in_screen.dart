@@ -1,7 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:spotter/core/input_converter/input_validator.dart';
+import 'package:spotter/core/route/routing.dart';
+import 'package:spotter/core/snack_bar_builder.dart';
+import 'package:spotter/core/usecases/usecase.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
+import 'package:spotter/features/auth/presentation/screens/home_screen.dart';
+import 'package:spotter/features/auth/presentation/screens/reset_password_screen.dart';
+import 'package:spotter/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:spotter/features/auth/presentation/widgets/info_tile.dart';
 import 'package:spotter/features/auth/presentation/widgets/text_form_title.dart';
 
@@ -16,16 +25,31 @@ class _SignInScreenState extends State<SignInScreen> {
   GlobalKey<FormState> formKey = GlobalKey();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
   bool isObscure = true;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final AuthBloc authBloc = context.read<AuthBloc>();
     final text = Theme.of(context).textTheme;
     final cs = Theme.of(context).colorScheme;
     return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is AuthError)
+          SnackBarBuilder.showSnackBar(context, state.message, true, cs);
+        if (state is Authenticated)
+          Routing.routeReplacement(const HomeScreen(), context);
+      },
 
       builder: (context, state) {
+        bool isLoading = state is AuthLoading ? true : false;
         return Scaffold(
           appBar: AppBar(title: Text('Sign In', style: text.headlineMedium)),
           body: Form(
@@ -122,6 +146,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       TextFormField(
                         keyboardType: TextInputType.emailAddress,
                         controller: emailController,
+                        validator: (value) {
+                          return InputValidator.validateEmail(value);
+                        },
                         decoration: const InputDecoration(
                           prefixIcon: Icon(Icons.alternate_email_rounded),
                           hintText: 'karim.fouad@example.com',
@@ -139,6 +166,9 @@ class _SignInScreenState extends State<SignInScreen> {
                         keyboardType: TextInputType.visiblePassword,
                         obscureText: isObscure,
                         controller: passwordController,
+                        validator: (value) {
+                          return InputValidator.validatePassword(value);
+                        },
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.lock_outline_rounded),
                           suffixIcon: IconButton(
@@ -152,14 +182,21 @@ class _SignInScreenState extends State<SignInScreen> {
                                   : Icons.visibility_off,
                             ),
                           ),
-                          hintText: 'karim.fouad@example.com',
+                          hintText: '•••••••••••••••',
                         ),
                       ),
                       const SizedBox(height: 5),
                       Align(
                         alignment: Alignment.centerRight,
                         child: InkWell(
-                          onTap: () {},
+                          onTap: !isLoading
+                              ? () {
+                                  Routing.routePush(
+                                    const ResetPasswordScreen(),
+                                    context,
+                                  );
+                                }
+                              : null,
                           child: Text(
                             'Forgot Password?',
 
@@ -171,7 +208,21 @@ class _SignInScreenState extends State<SignInScreen> {
                       SizedBox(
                         width: constraints.maxWidth,
                         child: FilledButton.icon(
-                          onPressed: () {},
+                          onPressed: !isLoading
+                              ? () {
+                                  if (formKey.currentState!.validate()) {
+                                    authBloc.add(
+                                      SignInSubmitted(
+                                        signInParams: SignInParams(
+                                          email: emailController.text.trim(),
+                                          password: passwordController.text,
+                                        ),
+                                      ),
+                                    );
+                                  } else
+                                    log('not valid');
+                                }
+                              : null,
                           label: const Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
@@ -201,7 +252,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       SizedBox(
                         width: constraints.maxWidth,
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: !isLoading
+                              ? () => authBloc.add(GoogleSignInSubmitted())
+                              : null,
                           label: const Text('  Continue With Google'),
                           style: OutlinedButton.styleFrom(
                             backgroundColor: cs.surfaceContainerLow,
@@ -226,7 +279,14 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       const SizedBox(height: 5),
                       InkWell(
-                        onTap: () {},
+                        onTap: !isLoading
+                            ? () {
+                                Routing.routeReplacement(
+                                  const SignUpScreen(),
+                                  context,
+                                );
+                              }
+                            : null,
                         child: Text(
                           'Create Account >',
                           style: text.titleSmall!,

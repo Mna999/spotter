@@ -11,4 +11,8 @@ class SignInUseCase implements UseCase<UserAccount, SignInParams> {
   Future<Either<Failure, UserAccount>> call(SignInParams params) async {
     return await authRepo.signIn(params);
   }
+
+  Future<Either<Failure, UserAccount>> signInWithGoogle() {
+    return authRepo.signInWithGoogle();
+  }
 }

@@ -6,24 +6,26 @@ class TextFormTitle extends StatelessWidget {
     required this.text,
     required this.cs,
     required this.title,
-    required this.isRequired,
+    this.isRequired,
   });
 
   final TextTheme text;
   final ColorScheme cs;
   final String title;
-  final bool isRequired;
+  final bool? isRequired;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(title),
-        const Spacer(),
-        Text(
-          isRequired ? 'REQUIRED' : 'OPTIONAL',
-          style: text.labelMedium!.copyWith(color: cs.onSurfaceVariant),
-        ),
+        Text(title, style: text.labelMedium),
+        if (isRequired != null) ...[
+          const Spacer(),
+          Text(
+            isRequired! ? 'REQUIRED' : 'OPTIONAL',
+            style: text.labelMedium!.copyWith(color: cs.onSurfaceVariant),
+          ),
+        ],
       ],
     );
   }

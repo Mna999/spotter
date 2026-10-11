@@ -13,9 +13,15 @@ final class AuthLoading extends AuthState {}
 
 final class Authenticated extends AuthState {
   UserAccount userAccount;
-  Authenticated({required this.userAccount});
+  final bool verificationEmailSent;
+
+  Authenticated({
+    required this.userAccount,
+    this.verificationEmailSent = false,
+  });
+
   @override
-  List<Object> get props => [userAccount];
+  List<Object> get props => [userAccount, verificationEmailSent];
 }
 
 final class UnAuthenticated extends AuthState {}
@@ -28,7 +34,7 @@ final class AuthError extends AuthState {
   AuthError({required this.message});
 }
 
-final class VerificationEmailSent extends AuthState {}
+//final class VerificationEmailSent extends AuthState {}
 
 final class EmailVerified extends AuthState {}
 

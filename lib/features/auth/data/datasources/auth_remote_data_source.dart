@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -75,6 +77,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         password: password,
       );
       User authUser = cred.user!;
+      await cred.user!.updateDisplayName(name);
       UserAccountModel user = UserAccountModel(
         createdAt: authUser.metadata.creationTime ?? DateTime.now(),
         displayName: name,
@@ -123,6 +126,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       return user;
     } on FirebaseAuthException catch (e) {
+      log('signIn failed: ${e.code} | ${e.message}');
       throw AuthException(code: e.code);
     }
   }
@@ -160,14 +164,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       return user;
     } on GoogleSignInException catch (e) {
+      log('google error: ${e.code.name} | ${e.description} | ${e.details}');
       if (e.code == GoogleSignInExceptionCode.canceled) {
         throw AuthException(code: 'google-sign-in-canceled');
       }
-      // clientConfigurationError, interrupted, unknownError, ...
       throw AuthException(code: 'google-${e.code.name}');
     } on FirebaseAuthException catch (e) {
       // account-exists-with-different-credential, invalid-credential,
       // user-disabled, operation-not-allowed, network-request-failed, ...
+
       throw AuthException(code: e.code);
     } on FirebaseException catch (e) {
       // Firestore write failed: roll back the brand-new Auth account
