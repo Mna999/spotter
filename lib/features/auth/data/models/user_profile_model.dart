@@ -13,6 +13,9 @@ class UserProfileModel extends UserProfile {
     required super.experienceLevel,
     required super.trainingDays,
     required super.weeklyTargetMin,
+    required super.activityLevel,
+    required super.equipmentAccess,
+    required super.goal,
   });
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
@@ -25,6 +28,9 @@ class UserProfileModel extends UserProfile {
       experienceLevel: ExperienceLevel.values.byName(json['experience']),
       trainingDays: (json['trainingDays'] as num).toInt(),
       weeklyTargetMin: (json['weeklyTargetMin'] as num).toInt(),
+      activityLevel: json['activityLevel'],
+      equipmentAccess: json['equipmentAccess'],
+      goal: json['goal'],
     );
   }
 
@@ -33,10 +39,13 @@ class UserProfileModel extends UserProfile {
     'age': age,
     'height': height,
     'weight': weight,
-    'experience': experienceLevel.name, 
+    'experience': experienceLevel.name,
     'trainingDays': trainingDays,
     'weeklyTargetMin': weeklyTargetMin,
     'schemaVersion': SCHEMA_VERSION,
+    'activityLevel': activityLevel,
+    'equipmentAccess': equipmentAccess,
+    'goal': goal,
     'updatedAt': FieldValue.serverTimestamp(),
   };
 }

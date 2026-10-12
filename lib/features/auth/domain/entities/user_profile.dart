@@ -6,7 +6,10 @@ class UserProfile extends Equatable {
   int age;
   double height;
   double weight;
+  ActivityLevel activityLevel;
   ExperienceLevel experienceLevel;
+  EquipmentAccess equipmentAccess;
+  Goal goal;
   int trainingDays;
   int weeklyTargetMin;
   UserProfile({
@@ -18,6 +21,9 @@ class UserProfile extends Equatable {
     required this.uid,
     required this.weeklyTargetMin,
     required this.weight,
+    required this.activityLevel,
+    required this.equipmentAccess,
+    required this.goal,
   });
 
   @override
@@ -31,6 +37,9 @@ class UserProfile extends Equatable {
     trainingDays,
     weeklyTargetMin,
     weight,
+    activityLevel,
+    equipmentAccess,
+    goal
   ];
 }
 

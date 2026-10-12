@@ -17,7 +17,7 @@ class BodyMetrics extends Equatable {
   List<Object?> get props => [bmi, ree, tdee, macroTargets];
 }
 
-class MacroTargets {
+class MacroTargets extends Equatable {
   final int calories;
   final int proteinG;
   final int fatG;
@@ -29,7 +29,9 @@ class MacroTargets {
     required this.fatG,
     required this.carbsG,
   });
-
+  @override
+  // TODO: implement props
+  List<Object?> get props => [calories, proteinG, fatG, carbsG];
   // Atwater general factors (kcal/g): https://www.fao.org/4/AA040E/AA040E08.htm
   static const double _kcalPerGProtein = 4;
   static const double _kcalPerGCarb = 4;
