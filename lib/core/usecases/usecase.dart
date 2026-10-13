@@ -68,6 +68,7 @@ class OnboardingParams extends Equatable {
   final ActivityLevel activityLevel;
   final EquipmentAccess equipmentAccess;
   final int trainingDays;
+  final int weeklyTargetMin;
 
   const OnboardingParams({
     required this.uid,
@@ -80,6 +81,7 @@ class OnboardingParams extends Equatable {
     required this.activityLevel,
     required this.equipmentAccess,
     required this.trainingDays,
+    required this.weeklyTargetMin,
   });
 
   @override
@@ -94,6 +96,7 @@ class OnboardingParams extends Equatable {
     activityLevel,
     equipmentAccess,
     trainingDays,
+    weeklyTargetMin,
   ];
 }
 
@@ -139,7 +142,6 @@ class MetricsParams extends Equatable {
     goal,
   ];
 }
-
 
 class ProfileParams extends Equatable {
   final String uid;

@@ -9,6 +9,6 @@ class GetUserProfileUseCase implements UseCase<UserProfile?, ProfileParams> {
   GetUserProfileUseCase({required this.profileRepo});
   @override
   Future<Either<Failure, UserProfile?>> call(ProfileParams params) {
-    return profileRepo.get(params.uid);
+    return profileRepo.get(uid: params.uid);
   }
 }

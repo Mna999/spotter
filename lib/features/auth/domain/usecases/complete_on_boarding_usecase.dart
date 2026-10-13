@@ -13,6 +13,7 @@ class CompleteOnBoardingUseCase
     return profileRepo.create(
       uid: params.uid,
       isMale: params.isMale,
+      weeklyTargetMin: params.weeklyTargetMin,
       age: params.age,
       height: params.height,
       weight: params.weight,

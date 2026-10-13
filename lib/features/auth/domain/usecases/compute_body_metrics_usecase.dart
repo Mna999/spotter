@@ -28,6 +28,6 @@ class ComputeBodyMetricsUseCase implements UseCase<BodyMetrics, MetricsParams> {
         weightKg: params.weight,
       ),
     );
-    return profileRepo.saveMetrics(uid: params.uid, metrics: metrics);
+    return profileRepo.saveMetrics(metrics: metrics, uid: params.uid);
   }
 }

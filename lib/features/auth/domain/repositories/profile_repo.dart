@@ -10,13 +10,14 @@ abstract class ProfileRepo {
     required int age,
     required double height,
     required double weight,
+    required int weeklyTargetMin,
     required ExperienceLevel experienceLevel,
     required Goal goal,
     required ActivityLevel activityLevel,
     required EquipmentAccess equipmentAccess,
     required int trainingDays,
   });
-  Future<Either<Failure, UserProfile?>> get(String uid);
+  Future<Either<Failure, UserProfile?>> get({required String uid});
   Future<Either<Failure, UserProfile>> update({
     required String uid,
     required bool isMale,
@@ -30,7 +31,7 @@ abstract class ProfileRepo {
     required int trainingDays,
   });
   Future<Either<Failure, BodyMetrics>> saveMetrics({
-    required String uid,
     required BodyMetrics metrics,
+    required String uid,
   });
 }
