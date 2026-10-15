@@ -24,6 +24,7 @@ abstract class ProfileRepo {
     required int age,
     required double height,
     required double weight,
+    required int weeklyTargetMin,
     required ExperienceLevel experienceLevel,
     required Goal goal,
     required ActivityLevel activityLevel,
