@@ -46,8 +46,6 @@ class ProfileRepoImpl implements ProfileRepo {
           trainingDays: trainingDays,
         ),
       );
-
-      // TODO: implement local caching
     } on ServerException catch (e) {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
@@ -57,18 +55,18 @@ class ProfileRepoImpl implements ProfileRepo {
 
   @override
   Future<Either<Failure, UserProfile?>> get({required String uid}) async {
-    if (await networkInfo.isConnected) {
-      try {
-        return Right(await profileRemoteDataSource.get(uid: uid));
-      } on ServerException catch (e) {
-        return Left(
-          ServerFailure(
-            message: ExceptionHandler.serverExceptionHandler(e.code),
-          ),
-        );
-      }
-    } else {
-      throw UnimplementedError();
+    try {
+      return Right(await profileRemoteDataSource.get(uid: uid));
+    } on ServerException catch (e) {
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } on OnBoardingException catch (e) {
+      return const Left(
+        OnBoardingFailure(
+          message: 'Please finish setting up your profile to continue.',
+        ),
+      );
     }
   }
 
@@ -81,8 +79,6 @@ class ProfileRepoImpl implements ProfileRepo {
       return Right(
         await profileRemoteDataSource.saveMetrics(metrics: metrics, uid: uid),
       );
-
-      // TODO: implement local caching
     } on ServerException catch (e) {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
@@ -120,8 +116,6 @@ class ProfileRepoImpl implements ProfileRepo {
           trainingDays: trainingDays,
         ),
       );
-
-      // TODO: implement local caching
     } on ServerException catch (e) {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),

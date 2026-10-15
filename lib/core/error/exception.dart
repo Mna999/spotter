@@ -8,6 +8,11 @@ class CacheException implements Exception {
   CacheException({required this.code});
 }
 
+class OnBoardingException implements Exception {
+  String code;
+  OnBoardingException({required this.code});
+}
+
 class AuthException implements Exception {
   String code;
   AuthException({required this.code});

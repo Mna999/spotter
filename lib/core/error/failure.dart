@@ -16,6 +16,10 @@ class CacheFailure extends Failure {
   const CacheFailure({super.message = 'Cache Failed'});
 }
 
+class OnBoardingFailure extends Failure {
+  const OnBoardingFailure({super.message = 'OnBoarding Failed'});
+}
+
 class AuthFailure extends Failure {
   const AuthFailure({super.message = 'Invalid Credentials'});
 }

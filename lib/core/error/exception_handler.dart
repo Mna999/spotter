@@ -31,10 +31,14 @@ class ExceptionHandler {
     return switch (code) {
       'no-current-user' =>
         "You're not signed in. Please sign in and try again.",
+
       'google-sign-in-canceled' => 'Google sign-in was cancelled.',
       'google-missing-id-token' => 'Google sign-in failed. Please try again.',
       'google-interrupted' =>
         'Google sign-in was interrupted. Please try again.',
+      'google-unknownError' =>
+        'Google sign-in is unavailable. Make sure a Google account is added '
+            'on this device and try again.',
       'google-clientConfigurationError' ||
       'google-providerConfigurationError' =>
         "Google sign-in isn't set up correctly on this device.",

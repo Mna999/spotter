@@ -87,8 +87,9 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   Future<UserProfileModel> get({required String uid}) async {
     try {
       final res = await firebaseFirestore.collection('users').doc(uid).get();
-      if (res.data() == null)
-        throw ServerException(code: 'onboarding-not-completed');
+      final data = res.data();
+      if (data == null || data['age'] == null)
+        throw OnBoardingException(code: 'onboarding-not-completed');
       return UserProfileModel.fromJson(res.data()!);
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
