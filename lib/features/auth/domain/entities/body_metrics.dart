@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:spotter/features/auth/domain/entities/user_profile.dart';
 
 class BodyMetrics extends Equatable {
   double bmi;
@@ -12,8 +13,41 @@ class BodyMetrics extends Equatable {
     required this.tdee,
   });
 
+  factory BodyMetrics.calculate({
+    required bool isMale,
+    required int age,
+    required double height,
+    required double weight,
+    required ActivityLevel activityLevel,
+    required Goal goal,
+  }) {
+    final heightM = height / 100;
+    final ree =
+        (10 * weight) + (6.25 * height) - (5 * age) + (isMale ? 5 : -161);
+    final tdee = ree * activityLevel.factor;
+    return BodyMetrics(
+      bmi: weight / (heightM * heightM),
+      ree: ree,
+      tdee: tdee,
+      macroTargets: MacroTargets.calculate(
+        targetCalories: tdee * goal.calorieMultiplier,
+        weightKg: weight,
+      ),
+    );
+  }
+
+  factory BodyMetrics.fromProfile(UserProfile profile) {
+    return BodyMetrics.calculate(
+      isMale: profile.isMale,
+      age: profile.age,
+      height: profile.height,
+      weight: profile.weight,
+      activityLevel: profile.activityLevel,
+      goal: profile.goal,
+    );
+  }
+
   @override
-  // TODO: implement props
   List<Object?> get props => [bmi, ree, tdee, macroTargets];
 }
 
@@ -29,9 +63,7 @@ class MacroTargets extends Equatable {
     required this.fatG,
     required this.carbsG,
   });
-  @override
-  // TODO: implement props
-  List<Object?> get props => [calories, proteinG, fatG, carbsG];
+
   // Atwater general factors (kcal/g): https://www.fao.org/4/AA040E/AA040E08.htm
   static const double _kcalPerGProtein = 4;
   static const double _kcalPerGCarb = 4;
@@ -77,4 +109,7 @@ class MacroTargets extends Equatable {
     fatG: (json['fatG'] as num).toInt(),
     carbsG: (json['carbsG'] as num).toInt(),
   );
+
+  @override
+  List<Object?> get props => [calories, proteinG, fatG, carbsG];
 }

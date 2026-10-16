@@ -9,25 +9,14 @@ class ComputeBodyMetricsUseCase implements UseCase<BodyMetrics, MetricsParams> {
   ComputeBodyMetricsUseCase({required this.profileRepo});
   @override
   Future<Either<Failure, BodyMetrics>> call(MetricsParams params) {
-    final heightM = params.height / 100;
-    final bmi = params.weight / (heightM * heightM);
-    final ree =
-        (10 * params.weight) +
-        (6.25 * params.height) -
-        (5 * params.age) +
-        (params.isMale ? 5 : -161);
-    final tdee = ree * params.activityLevel.factor;
-    final targetCalories = tdee * params.goal.calorieMultiplier;
-
-    final metrics = BodyMetrics(
-      bmi: bmi,
-      ree: ree,
-      tdee: tdee,
-      macroTargets: MacroTargets.calculate(
-        targetCalories: targetCalories,
-        weightKg: params.weight,
-      ),
+    final metrics = BodyMetrics.calculate(
+      isMale: params.isMale,
+      age: params.age,
+      height: params.height,
+      weight: params.weight,
+      activityLevel: params.activityLevel,
+      goal: params.goal,
     );
-    return profileRepo.saveMetrics(metrics: metrics, uid: params.uid);
+    return profileRepo.saveMetrics(uid: params.uid, metrics: metrics);
   }
 }

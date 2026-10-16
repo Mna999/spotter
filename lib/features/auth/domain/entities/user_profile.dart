@@ -26,6 +26,25 @@ class UserProfile extends Equatable {
     required this.goal,
   });
 
+  UserProfile copyWith({
+    required int weeklyTargetMin,
+    required int trainingDays,
+  }) {
+    return UserProfile(
+      age: age,
+      experienceLevel: experienceLevel,
+      height: height,
+      isMale: isMale,
+      trainingDays: trainingDays,
+      uid: uid,
+      weeklyTargetMin: weeklyTargetMin,
+      weight: weight,
+      activityLevel: activityLevel,
+      equipmentAccess: equipmentAccess,
+      goal: goal,
+    );
+  }
+
   @override
   // TODO: implement props
   List<Object?> get props => [
@@ -39,7 +58,7 @@ class UserProfile extends Equatable {
     weight,
     activityLevel,
     equipmentAccess,
-    goal
+    goal,
   ];
 }
 
