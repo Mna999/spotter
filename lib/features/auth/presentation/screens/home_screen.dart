@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotter/core/route/routing.dart';
+import 'package:spotter/core/snack_bar_builder.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:spotter/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:spotter/features/auth/presentation/widgets/spotter_title.dart';
@@ -30,7 +31,13 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.logout),
           ),
         ),
-        body: BlocBuilder<AuthBloc, AuthState>(
+        body: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthError)
+              SnackBarBuilder.showSnackBar(context, state.message, true, cs);
+            if (state is UnAuthenticated)
+              Routing.routeReplacement(const SignInScreen(), context);
+          },
           builder: (context, state) {
             if (state is Authenticated) {
               return Center(
