@@ -8,9 +8,7 @@ import 'package:spotter/core/route/routing.dart';
 import 'package:spotter/core/snack_bar_builder.dart';
 import 'package:spotter/core/usecases/usecase.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
-import 'package:spotter/features/auth/presentation/bloc/onBoarding_bloc/on_boarding_bloc.dart';
 import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
-import 'package:spotter/features/auth/presentation/screens/home_screen.dart';
 import 'package:spotter/features/auth/presentation/screens/onBoarding_screen.dart';
 import 'package:spotter/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:spotter/features/auth/presentation/screens/sign_up_screen.dart';
@@ -43,8 +41,8 @@ class _SignInScreenState extends State<SignInScreen> {
     final AuthBloc authBloc = context.read<AuthBloc>();
     final text = Theme.of(context).textTheme;
     final cs = Theme.of(context).colorScheme;
-    return BlocBuilder<OnBoardingBloc, OnBoardingState>(
-      builder: (context, onBoardingState) {
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, profileState) {
         return BlocConsumer<AuthBloc, AuthState>(
           listener: (context, authState) {
             if (authState is AuthError) {
@@ -61,10 +59,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   profileParams: ProfileParams(authState.userAccount.uid),
                 ),
               );
-              if (onBoardingState is OnBoardingNotCompleted) {
+              if (profileState is OnBoardingNotCompleted) {
                 Routing.routeReplacement(const OnboardingScreen(), context);
-              } else {
-                Routing.routeReplacement(const HomeScreen(), context);
               }
             }
           },
