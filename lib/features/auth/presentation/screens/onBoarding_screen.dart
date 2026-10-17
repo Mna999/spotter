@@ -190,9 +190,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ),
                             ),
                           const Spacer(),
+                          const SizedBox(width: 10),
                           if (currIndex < 5)
-                            SizedBox(
-                              width: constraints.maxWidth * 0.7,
+                            Expanded(
+                              flex: 20,
                               child: FilledButton.icon(
                                 onPressed: canGoNext
                                     ? () {
@@ -211,8 +212,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
 
                           if (currIndex == 5)
-                            SizedBox(
-                              width: constraints.maxWidth * 0.7,
+                            Expanded(
+                              flex: 20,
                               child: FilledButton.icon(
                                 onPressed: canGoNext
                                     ? () {
