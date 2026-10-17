@@ -18,20 +18,25 @@ class OnBoardingBloc extends Bloc<OnBoardingEvent, OnBoardingState> {
   }) : super(const OnBoardingEditing(step: 0)) {
     on<OnBoardingSubmitted>((event, emit) async {
       final res = await completeOnBoardingUseCase(event.onboardingParams);
-      res.fold((failure) => emit(OnBoardingError(message: failure.message)), (
-        profile,
-      ) async {
-        emit(OnBoardingSubmitting());
-        final res = await computeBodyMetricsUseCase(
-          MetricsParams.fromProfile(profile),
-        );
-        res.fold(
-          (failure) => emit(OnBoardingError(message: failure.message)),
-          (metrics) => emit(
-            OnBoardingCompleted(bodyMetrics: metrics, userProfile: profile),
-          ),
-        );
-      });
+      final profile = res.fold<UserProfile?>((failure) {
+        emit(OnBoardingError(message: failure.message));
+        return null;
+      }, (profile) => profile);
+
+      if (profile == null) return;
+
+      emit(OnBoardingSubmitting());
+
+      final metricsRes = await computeBodyMetricsUseCase(
+        MetricsParams.fromProfile(profile),
+      );
+
+      metricsRes.fold(
+        (failure) => emit(OnBoardingError(message: failure.message)),
+        (metrics) => emit(
+          OnBoardingCompleted(bodyMetrics: metrics, userProfile: profile),
+        ),
+      );
     });
   }
 }

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="mobile_tab" name="shell-type"/>
+<title>Smart Gym - Dashboard</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Space Grotesk, IBM Plex Sans, Cairo -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #131313;
+      color: #e5e2e1;
+      font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+    .font-space {
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .font-cairo {
+      font-family: 'Cairo', 'IBM Plex Sans', sans-serif;
+    }
+    .safe-top {
+      padding-top: max(env(safe-area-inset-top, 0px), 12px);
+    }
+    .safe-bottom {
+      padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+    }
+  </style>
+</head>
+<body class="bg-[#131313] text-[#e5e2e1] min-h-screen flex flex-col antialiased selection:bg-white selection:text-black" style="background-color: rgb(11, 23, 21); color: rgb(255, 255, 255);">
+<!-- TOP APP BAR -->
+<header class="fixed top-0 inset-x-0 z-50 bg-[#131313]/95 backdrop-blur-md border-b border-[#282727] safe-top" style="background-color: rgba(11, 23, 21, 0.95); border-color: rgb(26, 56, 48);">
+<div class="h-14 px-4 flex items-center justify-between">
+<!-- Brand Logo & Name -->
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-sm"><img alt="Spotter Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1UAf9YrSyQ6Fz4PxqJ4u12QejL6I3JRFDV0DKrNGX8crvUzAC1_G_kcItWl9CRBpBspk4t4iRZns4J82slQdM5q8cRGNUpWDszI1564NIGLFZi2yJVHGs2xCNy_i01QzgGgSKJIf7rDfOJi2huLglZ1rpyaJwLDLc7jgaqyK4v6kKhAmkpdhwiTb3_gGJRyLjiaGGLxUhGvXTIt6xBayHMZ1YfM37--P9BG_HCatdSlDKoh4zrQ27eqy-Sg"/></div>
+<div class="flex flex-col"><span class="font-space text-base font-bold text-white tracking-tight leading-none">Spotter</span><span class="font-space text-[10px] font-bold tracking-widest text-[#8e9192] uppercase mt-0.5">Be spot on.</span></div>
+</div>
+<!-- System Badges & Profile -->
+<div class="flex items-center gap-2">
+<!-- BLE Indicator -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 bg-[#201f1f] border border-[#353534] rounded-full" style="background-color: rgb(20, 40, 36); border-color: rgb(26, 56, 48);">
+<svg class="w-3.5 h-3.5 text-[#8e9192]" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24">
+<path d="M7 7l10 10-5 5V2l5 5L7 17" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="w-1.5 h-1.5 rounded-full bg-[#22C55E]" style="background-color: rgb(89, 235, 171);"></span>
+<span class="font-space text-[11px] font-bold text-white">84%</span>
+</div>
+<!-- Language Pill -->
+<div class="px-2.5 py-1 bg-[#201f1f] border border-[#353534] rounded-full font-space text-[11px] font-semibold text-[#c4c7c8] cursor-default pointer-events-none select-none" style="background-color: rgb(20, 40, 36); border-color: rgb(26, 56, 48); color: rgb(200, 194, 175);">EN | ع</div>
+<!-- Profile Avatar -->
+<div class="w-8 h-8 rounded-full bg-white text-[#131313] flex items-center justify-center font-bold text-xs shadow-sm cursor-default pointer-events-none" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);"><svg class="w-4 h-4 text-[#131313]" fill="currentColor" viewbox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"></path></svg></div>
+</div>
+</div>
+</header>
+<!-- MAIN SCROLLABLE CONTENT -->
+<main class="flex-1 w-full max-w-md mx-auto px-4 pt-20 pb-28 space-y-4"><div class="flex flex-col w-full font-cairo" dir="rtl">
+<!-- TOP BRAND STATUS STRIP (RTL) -->
+<div class="w-full flex items-center justify-between py-2 px-1 mb-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center p-1.5 shadow-sm">
+<img alt="شعار سبوتر" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UAf9YrSyQ6Fz4PxqJ4u12QejL6I3JRFDV0DKrNGX8crvUzAC1_G_kcItWl9CRBpBspk4t4iRZns4J82slQdM5q8cRGNUpWDszI1564NIGLFZi2yJVHGs2xCNy_i01QzgGgSKJIf7rDfOJi2huLglZ1rpyaJwLDLc7jgaqyK4v6kKhAmkpdhwiTb3_gGJRyLjiaGGLxUhGvXTIt6xBayHMZ1YfM37--P9BG_HCatdSlDKoh4zrQ27eqy-Sg"/>
+</div>
+<div class="flex flex-col">
+<span class="font-cairo font-bold text-headline-sm text-on-surface leading-none">سبوتر</span>
+<span class="font-cairo font-semibold text-label-sm text-primary-container mt-1">كُن دقيقاً.</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<!-- Status Badge -->
+<div class="flex items-center gap-1.5 px-3 py-1 bg-surface-container rounded-full shadow-sm">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-cairo font-bold text-label-sm text-primary-fixed">متصل</span>
+</div>
+<!-- Arabic Dialect Badge -->
+<div class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center font-cairo font-bold text-label-md text-on-surface">
+        ع
+      </div>
+</div>
+</div>
+<!-- GREETING & DATE BANNER -->
+<div class="flex flex-col mb-4 px-1">
+<span class="font-cairo text-label-md text-on-surface-variant font-medium">الثلاثاء، ٢٤ أكتوبر</span>
+<h1 class="font-cairo text-headline-md font-bold text-on-surface mt-0.5">صباح الخير يا كريم 👋</h1>
+</div>
+<!-- 3. PRIMARY WORKOUT ACTION CARD (Neon Mint Accents) -->
+<div class="relative w-full rounded-2xl bg-surface-container overflow-hidden p-5 shadow-lg mb-4">
+<!-- Ambient Luminous Gradient Scrim -->
+<div class="absolute inset-0 bg-gradient-to-bl from-primary-container/20 via-transparent to-surface-container pointer-events-none"></div>
+<div class="relative z-10 flex flex-col">
+<div class="flex items-center justify-between mb-3">
+<span class="px-2.5 py-1 bg-surface-container-highest text-primary-fixed font-cairo text-label-sm font-bold rounded-md">
+          تمرين اليوم المجدول
+        </span>
+<span class="material-symbols-outlined text-primary-container text-body-lg" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+</div>
+<h2 class="font-cairo text-headline-sm font-bold text-on-surface mb-1">
+        يوم الأرجل والقوة (Leg Day A)
+      </h2>
+<p class="font-cairo text-body-sm text-on-surface-variant mb-5">
+        تركيز عالي: سكوات ثقيل، طعنات ديناميكية، ورفعات أوتار المأبض مع تحليل حي للمستشعرات.
+      </p>
+<!-- Primary Action CTA -->
+<button class="w-full py-3.5 px-6 rounded-full bg-primary-container text-on-primary font-cairo font-bold text-label-lg flex items-center justify-center gap-2 shadow-md" type="button">
+<span class="">ابدأ التمرين الآن</span>
+<span class="material-symbols-outlined text-headline-sm" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+<!-- 4. ACTIVE EXPENDITURE / CALORIC GOAL (CYBER EMERALD) -->
+<div class="w-full rounded-2xl bg-surface-container-low p-5 shadow-md mb-4">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<h3 class="font-cairo text-headline-sm font-bold text-on-surface">الهدف الأيضي</h3>
+</div>
+<span class="font-cairo text-label-sm text-on-surface-variant font-semibold">تحديث لحظي</span>
+</div>
+<!-- Circular Dial Visual + Big Metric Display -->
+<div class="flex items-center justify-between gap-4 py-2">
+<!-- High-Impact Value Display -->
+<div class="flex flex-col">
+<span class="font-cairo text-body-sm text-on-surface-variant mb-1">السعرات المحروقة</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-cairo text-headline-lg font-bold text-primary-container">١,٨٤٠</span>
+<span class="font-cairo text-body-md text-on-surface-variant">/ ٢,٤٠٠</span>
+</div>
+<span class="font-cairo text-label-sm text-secondary-fixed mt-1">سعرة حرارية (٧٦٪ من الهدف)</span>
+</div>
+<!-- SVG Circular Progress Indicator -->
+<div class="relative w-20 h-20 shrink-0 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90 transform" viewbox="0 0 36 36">
+<circle class="stroke-surface-container-highest" cx="18" cy="18" fill="none" r="14" stroke-width="3.5"></circle>
+<circle class="stroke-primary-container" cx="18" cy="18" fill="none" r="14" stroke-dasharray="88" stroke-dashoffset="21" stroke-linecap="round" stroke-width="3.5"></circle>
+</svg>
+<span class="absolute material-symbols-outlined text-primary-container text-body-lg" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+</div>
+<!-- Macro Breakdown Badges -->
+<div class="grid grid-cols-3 gap-2.5 mt-4 pt-4 bg-surface-container-lowest/60 rounded-xl p-3">
+<div class="flex flex-col items-center text-center">
+<span class="font-cairo text-label-sm text-on-surface-variant">البروتين</span>
+<span class="font-cairo text-body-md font-bold text-on-surface mt-0.5">١٤٢ جم</span>
+<span class="w-6 h-1 rounded-full bg-primary-fixed mt-1.5"></span>
+</div>
+<div class="flex flex-col items-center text-center">
+<span class="font-cairo text-label-sm text-on-surface-variant">الكربوهيدرات</span>
+<span class="font-cairo text-body-md font-bold text-on-surface mt-0.5">١٩٥ جم</span>
+<span class="w-6 h-1 rounded-full bg-secondary-fixed mt-1.5"></span>
+</div>
+<div class="flex flex-col items-center text-center">
+<span class="font-cairo text-label-sm text-on-surface-variant">الدهون</span>
+<span class="font-cairo text-body-md font-bold text-on-surface mt-0.5">٥٢ جم</span>
+<span class="w-6 h-1 rounded-full bg-surface-tint mt-1.5"></span>
+</div>
+</div>
+</div>
+<!-- 5. WEEKLY TARGET PROGRESS CARD -->
+<div class="w-full rounded-2xl bg-surface-container p-5 shadow-sm mb-4">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">event_available</span>
+<h3 class="font-cairo text-body-lg font-bold text-on-surface">الهدف الأسبوعي</h3>
+</div>
+<span class="font-cairo text-label-md font-bold text-primary-fixed bg-surface-container-high px-2.5 py-0.5 rounded-full">
+        ٣ من ٤ أيام قوة
+      </span>
+</div>
+<!-- Daily Badges (Arabic Weekdays: ن، ث، ر، خ، ج، س، ح) -->
+<div class="grid grid-cols-7 gap-1.5 mt-2">
+<!-- الاثنين (ن) - Completed -->
+<div class="flex flex-col items-center gap-1.5">
+<span class="font-cairo text-label-sm text-on-surface-variant">ن</span>
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-cairo font-bold text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-body-sm font-bold">check</span>
+</div>
+</div>
+<!-- الثلاثاء (ث) - Today / Active -->
+<div class="flex flex-col items-center gap-1.5">
+<span class="font-cairo text-label-sm font-bold text-primary-container">ث</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-primary-container flex items-center justify-center font-cairo font-bold text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-body-sm">fitness_center</span>
+</div>
+</div>
+<!-- الأربعاء (ر) - Rest Planned -->
+<div class="flex flex-col items-center gap-1.5">
+<span class="font-cairo text-label-sm text-on-surface-variant">ر</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest text-on-surface-variant flex items-center justify-center font-cairo font-semibold text-label-sm">
+          —
+        </div>
+</div>
+<!-- الخميس (خ) - Scheduled -->
+<div class="flex flex-col items-center gap-1.5">
+<span class="font-cairo text-label-sm text-on-surface-variant">خ</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest text-on-surface-variant flex items-center justify-center font-cairo font-bold text-label-sm">
+          ٤
+        </div>
+</div>
+<!-- الجمعة (ج) - Completed -->
+<div class="flex flex-col items-center gap-1.5">
+<span class="font-cairo text-label-sm text-on-surface-variant">ج</span>
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-cairo font-bold text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-body-sm font-bold">check</span>
+</div>
+</div>
+<!-- السبت (س) - Completed -->
+<div class="flex flex-col items-center gap-1.5">
+<span class="font-cairo text-label-sm text-on-surface-variant">س</span>
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-cairo font-bold text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-body-sm font-bold">check</span>
+</div>
+</div>
+<!-- الأحد (ح) - Rest Completed -->
+<div class="flex flex-col items-center gap-1.5">
+<span class="font-cairo text-label-sm text-on-surface-variant">ح</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest text-on-surface-variant flex items-center justify-center font-cairo font-semibold text-label-sm">
+          —
+        </div>
+</div>
+</div>
+</div>
+<!-- 6. CAIRO EGYPTIAN NUTRITION CARD -->
+<div class="w-full rounded-2xl bg-surface-container p-5 shadow-sm mb-4">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-fixed" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>
+<h3 class="font-cairo text-body-lg font-bold text-on-surface">خطة التغذية اليومية</h3>
+</div>
+<span class="font-cairo text-label-sm text-primary-container font-semibold">وجبات مقترحة</span>
+</div>
+<div class="space-y-2.5">
+<!-- Egyptian Meal 1: High-Protein Koshari -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary-fixed">
+<span class="material-symbols-outlined text-body-lg">ramen_dining</span>
+</div>
+<div class="flex flex-col">
+<span class="font-cairo font-bold text-body-md text-on-surface">كشري عالي البروتين</span>
+<span class="font-cairo text-label-sm text-on-surface-variant">عدس مضاعف، حمص، وتوفو محمص</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-cairo font-bold text-label-md text-primary-fixed">٣٥ ج.م</span>
+<span class="font-cairo text-label-sm text-on-surface-variant">٥٨٠ سعرة</span>
+</div>
+</div>
+<!-- Egyptian Meal 2: Grilled Chicken & Molokhia -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-secondary-fixed">
+<span class="material-symbols-outlined text-body-lg">soup_kitchen</span>
+</div>
+<div class="flex flex-col">
+<span class="font-cairo font-bold text-body-md text-on-surface">دجاج مشوي وملوخية</span>
+<span class="font-cairo text-label-sm text-on-surface-variant">صدر دجاج، ملوخية طازجة، وأرز بني</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-cairo font-bold text-label-md text-primary-fixed">٧٥ ج.م</span>
+<span class="font-cairo text-label-sm text-on-surface-variant">٦٤٠ سعرة</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 7. ARABIC BOTTOM NAVIGATION BAR REPLICATION (STATIC COMPONENT EMBED) -->
+</div></main>
+<!-- 6. FIXED BOTTOM NAVIGATION BAR -->
+<nav class="fixed bottom-0 inset-x-0 z-50 bg-[#1c1b1b]/95 backdrop-blur-md border-t border-[#2a2a2a] safe-bottom" data-active-classes="text-white" style="background-color: rgba(11, 23, 21, 0.96); border-color: rgb(26, 56, 48);">
+<div class="h-16 max-w-md mx-auto flex items-center justify-around px-2"><div class="flex flex-col items-center justify-center gap-1 w-14 text-white cursor-default pointer-events-none select-none" style="color: rgb(89, 235, 171);"><svg class="w-5 h-5 fill-current" viewbox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg><span class="font-space text-[10px] font-bold tracking-tight">الرئيسية</span></div><div class="flex flex-col items-center justify-center gap-1 w-14 text-[#8e9192] cursor-default pointer-events-none select-none"><svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewbox="0 0 24 24"><path d="M6 9l3-3 9 9-3 3-9-9zM3 12l3-3M18 15l3-3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="font-space text-[10px] font-medium tracking-tight">التمارين</span></div><div class="flex flex-col items-center justify-center gap-1 w-14 text-[#8e9192] cursor-default pointer-events-none select-none"><svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewbox="0 0 24 24"><path d="M12 6v12m-6-6h12" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="font-space text-[10px] font-medium tracking-tight">التغذية</span></div><div class="flex flex-col items-center justify-center gap-1 w-14 text-[#8e9192] cursor-default pointer-events-none select-none"><svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewbox="0 0 24 24"><rect height="12" rx="2" width="16" x="4" y="6"></rect><line x1="9" x2="9.01" y1="10" y2="10"></line><line x1="15" x2="15.01" y1="10" y2="10"></line><line x1="9" x2="15" y1="14" y2="14"></line></svg><span class="font-space text-[10px] font-medium tracking-tight">المدرب</span></div><div class="flex flex-col items-center justify-center gap-1 w-14 text-[#8e9192] cursor-default pointer-events-none select-none"><svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewbox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="font-space text-[10px] font-medium tracking-tight">حسابي</span></div></div>
+</nav>
+</body></html>

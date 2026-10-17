@@ -1,0 +1,206 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#131313;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-surface": "#e5e2e1", "primary-fixed": "#e2e2e2", "on-tertiary-fixed-variant": "#474649", "inverse-primary": "#5d5f5f", "on-background": "#e5e2e1", "secondary-fixed": "#e4e2e1", "tertiary-container": "#e4e2e4", "surface-container-low": "#1c1b1b", "on-secondary-fixed": "#1b1c1c", "error": "#ffb4ab", "surface-variant": "#353534", "surface": "#131313", "tertiary": "#ffffff", "surface-container": "#201f1f", "surface-bright": "#3a3939", "on-tertiary-container": "#656466", "surface-tint": "#c6c6c7", "tertiary-fixed-dim": "#c8c6c8", "on-primary": "#2f3131", "outline-variant": "#444748", "inverse-on-surface": "#313030", "on-secondary-container": "#b7b5b4", "on-error-container": "#ffdad6", "secondary": "#c8c6c5", "error-container": "#93000a", "on-secondary": "#303030", "on-secondary-fixed-variant": "#474746", "inverse-surface": "#e5e2e1", "on-surface-variant": "#c4c7c8", "on-tertiary-fixed": "#1b1b1d", "surface-container-highest": "#353534", "background": "#131313", "primary-fixed-dim": "#c6c6c7", "secondary-container": "#474746", "surface-container-lowest": "#0e0e0e", "on-error": "#690005", "on-tertiary": "#303032", "surface-container-high": "#2a2a2a", "on-primary-fixed-variant": "#454747", "on-primary-container": "#636565", "primary-container": "#e2e2e2", "surface-dim": "#131313", "primary": "#ffffff", "tertiary-fixed": "#e4e2e4", "on-primary-fixed": "#1a1c1c", "secondary-fixed-dim": "#c8c6c5", "outline": "#8e9192" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "margin": "1rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-lg": "1.5rem", "space-md": "1rem", "space-xl": "2rem" }, fontFamily: { "label-lg": ["Space Grotesk"], "headline-md": ["Space Grotesk"], "headline-lg": ["Space Grotesk"], "body-md": ["IBM Plex Sans"], "headline-sm": ["Space Grotesk"], "label-sm": ["Space Grotesk"], "display-metric": ["Space Grotesk"], "body-sm": ["IBM Plex Sans"], "label-md": ["Space Grotesk"], "body-lg": ["IBM Plex Sans"] }, fontSize: { "label-lg": ["14px", { lineHeight: "18px", letterSpacing: "0.04em", fontWeight: "600" }], "headline-md": ["24px", { lineHeight: "30px", letterSpacing: "-0.01em", fontWeight: "600" }], "headline-lg": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "body-md": ["14px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }], "headline-sm": ["18px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "600" }], "label-sm": ["10px", { lineHeight: "14px", letterSpacing: "0.08em", fontWeight: "700" }], "display-metric": ["56px", { lineHeight: "60px", letterSpacing: "-0.04em", fontWeight: "700" }], "body-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "400" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }], "body-lg": ["16px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "500" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen" style="background-color: rgb(11, 23, 21); color: rgb(255, 255, 255);"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl pt-safe" style="background-color: rgba(11, 23, 21, 0.85); border-bottom: 1px solid rgb(26, 56, 48);"><div class="h-16 px-gutter flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-11 h-11 flex items-center justify-center text-on-surface pointer-events-none"><span class="material-symbols-outlined text-[22px]">arrow_back</span></div><img alt="Spotter" class="h-9 w-9 object-contain rounded-lg" src="https://lh3.googleusercontent.com/aida/AEtjO1UAf9YrSyQ6Fz4PxqJ4u12QejL6I3JRFDV0DKrNGX8crvUzAC1_G_kcItWl9CRBpBspk4t4iRZns4J82slQdM5q8cRGNUpWDszI1564NIGLFZi2yJVHGs2xCNy_i01QzgGgSKJIf7rDfOJi2huLglZ1rpyaJwLDLc7jgaqyK4v6kKhAmkpdhwiTb3_gGJRyLjiaGGLxUhGvXTIt6xBayHMZ1YfM37--P9BG_HCatdSlDKoh4zrQ27eqy-Sg"><div class="flex flex-col"><h1 class="font-headline-sm text-headline-sm uppercase text-on-surface truncate leading-none">Spotter</h1><span class="font-label-sm text-label-sm text-primary leading-none mt-1">Be spot on.</span></div></div><div class="flex items-center"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full px-margin pt-16 pb-safe bg-surface min-h-screen" style="background-color: rgb(11, 23, 21);"><div class="flex flex-col w-full pb-8 space-y-6">
+<!-- Visual Accent Header Card -->
+<div class="relative w-full rounded-xl overflow-hidden bg-surface-container-high p-space-md shadow-md" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);">
+<div class="absolute -right-8 -top-8 w-32 h-32 bg-surface-variant/40 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex items-start gap-space-sm relative z-10">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-primary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">no_food</span>
+</div>
+<div class="flex flex-col space-y-1">
+<span class="font-headline-sm text-headline-sm text-on-surface uppercase tracking-tight">Dietary Exclusions</span>
+
+</div>
+</div>
+<div class="mt-space-md pt-space-xs flex flex-col space-y-1">
+<p class="font-body-md text-body-md text-on-surface-variant">
+        Smart Gym filters recipes and cafeteria suggestions based on your food intolerances.
+      </p>
+
+</div>
+</div>
+<!-- Real-time Filter Metric Mini-Card -->
+<div class="w-full bg-surface-container-low rounded-xl p-space-md flex items-center justify-between shadow-sm" style="background-color: rgb(18, 30, 28); border: 1px solid rgb(26, 56, 48);">
+<div class="flex items-center gap-space-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase text-secondary">Active Guardrail</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Real-time menu stripping active</span>
+</div>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-display-metric text-[28px] leading-none text-primary" id="active-count">5</span>
+<span class="font-label-sm text-label-sm uppercase text-outline">Items</span>
+</div>
+</div>
+<!-- Active Exclusions Section -->
+<div class="flex flex-col space-y-3">
+<div class="flex items-baseline justify-between px-1">
+<h2 class="font-label-lg text-label-lg uppercase tracking-wider text-on-surface">
+        Active Exclusions
+      </h2>
+</div>
+<!-- Exclusion Chips Container -->
+<div class="flex flex-wrap gap-2 min-h-[44px]" id="chips-container" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48); padding: 0.75rem; border-radius: 0.75rem;"><div class="inline-flex items-center gap-2 rounded-lg py-2 px-3 pointer-events-none" style="background-color: rgba(89, 235, 171, 0.12); border: 1px solid rgb(89, 235, 171);"><span class="font-body-md text-body-md font-bold" style="color: rgb(89, 235, 171);">Lactose</span><span class="w-6 h-6 rounded flex items-center justify-center ml-1" style="color: rgb(89, 235, 171);"><span class="material-symbols-outlined text-[16px]">close</span></span></div><div class="inline-flex items-center gap-2 rounded-lg py-2 px-3 pointer-events-none" style="background-color: rgba(89, 235, 171, 0.12); border: 1px solid rgb(89, 235, 171);"><span class="font-body-md text-body-md font-bold" style="color: rgb(89, 235, 171);">Peanuts</span><span class="w-6 h-6 rounded flex items-center justify-center ml-1" style="color: rgb(89, 235, 171);"><span class="material-symbols-outlined text-[16px]">close</span></span></div><div class="inline-flex items-center gap-2 rounded-lg py-2 px-3 pointer-events-none" style="background-color: rgba(89, 235, 171, 0.12); border: 1px solid rgb(89, 235, 171);"><span class="font-body-md text-body-md font-bold" style="color: rgb(89, 235, 171);">Shellfish</span><span class="w-6 h-6 rounded flex items-center justify-center ml-1" style="color: rgb(89, 235, 171);"><span class="material-symbols-outlined text-[16px]">close</span></span></div><div class="inline-flex items-center gap-2 rounded-lg py-2 px-3 pointer-events-none" style="background-color: rgba(89, 235, 171, 0.12); border: 1px solid rgb(89, 235, 171);"><span class="font-body-md text-body-md font-bold" style="color: rgb(89, 235, 171);">Artificial Sweeteners</span><span class="w-6 h-6 rounded flex items-center justify-center ml-1" style="color: rgb(89, 235, 171);"><span class="material-symbols-outlined text-[16px]">close</span></span></div><div class="inline-flex items-center gap-2 rounded-lg py-2 px-3 pointer-events-none" style="background-color: rgba(89, 235, 171, 0.12); border: 1px solid rgb(89, 235, 171);"><span class="font-body-md text-body-md font-bold" style="color: rgb(89, 235, 171);">Raw Onion</span><span class="w-6 h-6 rounded flex items-center justify-center ml-1" style="color: rgb(89, 235, 171);"><span class="material-symbols-outlined text-[16px]">close</span></span></div></div>
+<!-- Empty State -->
+<div class="hidden flex-col items-center justify-center py-8 px-4 rounded-xl bg-surface-container-lowest text-center" id="empty-state">
+<span class="material-symbols-outlined text-outline text-[32px] mb-2">restaurant</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">No active exclusions</span>
+<span class="font-body-sm text-body-sm text-secondary mt-1">You will receive full recommendations across all cafeteria menus.</span>
+</div>
+</div>
+<!-- Add Custom Exclusion Card -->
+<div class="w-full bg-surface-container-low rounded-xl p-space-md flex flex-col space-y-3 shadow-sm" style="background-color: rgb(22, 47, 41); border: 1px dashed rgb(86, 169, 134); color: rgb(89, 235, 171);">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary" style="color: rgb(89, 235, 171);">add_circle</span>
+<span class="font-label-lg text-label-lg uppercase tracking-wider text-on-surface" style="color: rgb(89, 235, 171); font-weight: 700;">Add Exclusion</span>
+</div>
+
+</div>
+<form class="flex gap-2" id="add-exclusion-form"><div class="relative flex-1"><input class="w-full h-12 bg-surface-container-highest text-on-surface placeholder:text-outline px-4 rounded-lg font-body-md text-body-md outline-none pointer-events-none" id="custom-input" placeholder="e.g. Gluten, Soy, Eggs..." readonly="readonly" disabled="disabled" type="text"></div><div class="h-12 px-4 rounded-lg bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wider flex items-center justify-center gap-1.5 shrink-0 pointer-events-none" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21); font-weight: 700; border: 1px solid rgb(89, 235, 171); pointer-events: none; cursor: default;"><span class="material-symbols-outlined text-[18px]">add</span><span class="">Add</span></div></form>
+</div>
+<!-- Quick Suggestions Bento/Grid -->
+<div class="flex flex-col space-y-2">
+<div class="flex items-center justify-between px-1">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Quick Suggestions</span>
+
+</div>
+<div class="grid grid-cols-2 gap-2"><div class="w-full h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between text-on-surface pointer-events-none"><div class="flex items-center gap-2 truncate"><span class="material-symbols-outlined text-[16px] text-secondary">add</span><span class="font-body-md text-body-md text-primary">Gluten</span></div></div><div class="w-full h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between text-on-surface pointer-events-none"><div class="flex items-center gap-2 truncate"><span class="material-symbols-outlined text-[16px] text-secondary">add</span><span class="font-body-md text-body-md text-primary">Dairy</span></div></div><div class="w-full h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between text-on-surface pointer-events-none"><div class="flex items-center gap-2 truncate"><span class="material-symbols-outlined text-[16px] text-secondary">add</span><span class="font-body-md text-body-md text-primary">Added Sugar</span></div></div><div class="w-full h-12 bg-surface-container-low rounded-lg px-3 flex items-center justify-between text-on-surface pointer-events-none" style="background-color: rgb(22, 47, 41); border: 1px solid rgb(26, 56, 48); color: rgb(255, 255, 255);"><div class="flex items-center gap-2 truncate"><span class="material-symbols-outlined text-[16px] text-secondary">add</span><span class="font-body-md text-body-md text-primary">Red Meat</span></div></div></div>
+</div>
+<!-- Cafeteria & Training Sync Advisory -->
+<div class="w-full bg-surface-container-lowest rounded-xl p-space-md flex items-center gap-space-sm" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-secondary">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase text-on-surface">Gym Bar Sync</span>
+<span class="font-body-sm text-body-sm text-secondary">Baristas &amp; kitchen tablet will automatically highlight safe shake formulas.</span>
+</div>
+</div>
+<!-- Bottom Action Button Fixed Touch Target -->
+<div class="pt-space-sm">
+<div class="w-full h-14 bg-primary text-on-primary rounded-xl font-label-lg text-label-lg uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg pointer-events-none" id="save-btn" style="background-color: rgb(89, 235, 171); color: rgb(0, 56, 35); font-weight: 700; pointer-events: none; cursor: default;"><span class="material-symbols-outlined text-[20px]">save</span><span class="">Save Preferences</span></div>
+<div class="text-center mt-2 text-primary font-body-sm text-body-sm animate-pulse hidden" id="save-toast">
+      ✓ Preferences updated successfully / تم حفظ التفضيلات
+    </div>
+</div>
+</div>
+<script>
+  function updateCount() {
+    const container = document.getElementById('chips-container');
+    const emptyState = document.getElementById('empty-state');
+    const countDisplay = document.getElementById('active-count');
+    const count = container.children.length;
+    
+    countDisplay.textContent = count;
+    if (count === 0) {
+      emptyState.classList.remove('hidden');
+      emptyState.classList.add('flex');
+    } else {
+      emptyState.classList.add('hidden');
+      emptyState.classList.remove('flex');
+    }
+  }
+
+  function removeChip(button) {
+    const chip = button.closest('.group');
+    if (chip) {
+      chip.remove();
+      updateCount();
+    }
+  }
+
+  function createChip(enText, arText) {
+    const chip = document.createElement('div');
+    chip.className = "group inline-flex items-center gap-2 bg-surface-container-high hover:bg-surface-bright rounded-lg py-2 px-3 text-on-surface transition-colors duration-150";
+    
+    const labelEn = document.createElement('span');
+    labelEn.className = "font-body-md text-body-md text-primary";
+    labelEn.textContent = enText;
+    
+    const labelAr = document.createElement('span');
+    labelAr.className = "font-body-sm text-body-sm text-secondary";
+    labelAr.textContent = arText ? `/ ${arText}` : '';
+    
+    const btn = document.createElement('button');
+    btn.type = "button";
+    btn.className = "w-6 h-6 rounded flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-variant transition-colors ml-1";
+    btn.setAttribute('aria-label', `Remove ${enText}`);
+    btn.onclick = function() { removeChip(this); };
+    btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">close</span>';
+    
+    chip.appendChild(labelEn);
+    if (arText) chip.appendChild(labelAr);
+    chip.appendChild(btn);
+    
+    return chip;
+  }
+
+  function handleManualAdd(e) {
+    e.preventDefault();
+    const input = document.getElementById('custom-input');
+    const val = input.value.trim();
+    if (!val) return;
+
+    const container = document.getElementById('chips-container');
+    container.appendChild(createChip(val, ''));
+    input.value = '';
+    updateCount();
+  }
+
+  function addSuggestion(enText, arText, buttonElement) {
+    const container = document.getElementById('chips-container');
+    
+    // Check if already added
+    const existing = Array.from(container.children).some(child => {
+      return child.textContent.includes(enText);
+    });
+
+    if (!existing) {
+      container.appendChild(createChip(enText, arText));
+      updateCount();
+      
+      // Temporarily mark suggestion button as added
+      const icon = buttonElement.querySelector('.material-symbols-outlined');
+      if (icon) {
+        icon.textContent = 'check';
+        setTimeout(() => {
+          icon.textContent = 'add';
+        }, 1200);
+      }
+    }
+  }
+
+  function handleSave() {
+    const btn = document.getElementById('save-btn');
+    const toast = document.getElementById('save-toast');
+    
+    btn.classList.add('opacity-75');
+    toast.classList.remove('hidden');
+    
+    setTimeout(() => {
+      btn.classList.remove('opacity-75');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2500);
+    }, 400);
+  }
+</script></main>
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

@@ -9,8 +9,8 @@ class CompleteOnBoardingUseCase
   ProfileRepo profileRepo;
   CompleteOnBoardingUseCase({required this.profileRepo});
   @override
-  Future<Either<Failure, UserProfile>> call(OnboardingParams params) {
-    return profileRepo.create(
+  Future<Either<Failure, UserProfile>> call(OnboardingParams params) async {
+    return await profileRepo.create(
       uid: params.uid,
       isMale: params.isMale,
       weeklyTargetMin: params.weeklyTargetMin,

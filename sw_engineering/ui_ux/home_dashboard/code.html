@@ -1,0 +1,347 @@
+<!DOCTYPE html><html class="dark" lang="en" style="opacity: 0; background-color: rgb(9, 22, 20) !important; height: auto !important; min-height: 100% !important; overflow: visible !important;" data-stitch-orig-opacity="1" data-stitch-anim-opacity="true"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+<meta content="mobile_tab" name="shell-type">
+<title>Smart Gym - Dashboard</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Space Grotesk, IBM Plex Sans, Cairo -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #131313;
+      color: #e5e2e1;
+      font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+    .font-space {
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .font-cairo {
+      font-family: 'Cairo', 'IBM Plex Sans', sans-serif;
+    }
+    .safe-top {
+      padding-top: max(env(safe-area-inset-top, 0px), 12px);
+    }
+    .safe-bottom {
+      padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+    }
+  </style>
+</head>
+<body class="bg-[#131313] text-[#e5e2e1] min-h-screen flex flex-col antialiased selection:bg-white selection:text-black" style="color: rgb(216, 229, 226); font-family: &quot;Space Grotesk&quot;, system-ui, -apple-system, sans-serif; opacity: 1; background-color: rgb(9, 22, 20) !important; min-height: 100% !important; height: auto !important; overflow: visible !important;">
+<!-- TOP APP BAR -->
+<header class="fixed top-0 inset-x-0 z-50 border-b border-[#282727] safe-top" style="background-color: rgb(9, 22, 20); border-color: rgb(26, 56, 48); pointer-events: none;">
+<div class="h-14 px-4 flex items-center justify-between">
+<!-- Brand Logo & Name -->
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-sm"><img src="https://lh3.googleusercontent.com/aida/AEtjO1UAf9YrSyQ6Fz4PxqJ4u12QejL6I3JRFDV0DKrNGX8crvUzAC1_G_kcItWl9CRBpBspk4t4iRZns4J82slQdM5q8cRGNUpWDszI1564NIGLFZi2yJVHGs2xCNy_i01QzgGgSKJIf7rDfOJi2huLglZ1rpyaJwLDLc7jgaqyK4v6kKhAmkpdhwiTb3_gGJRyLjiaGGLxUhGvXTIt6xBayHMZ1YfM37--P9BG_HCatdSlDKoh4zrQ27eqy-Sg" alt="Spotter Logo" class="w-full h-full object-cover"></div>
+<div class="flex flex-col"><span class="font-space text-base font-bold text-white tracking-tight leading-none">Spotter</span><span class="font-space text-[10px] font-bold tracking-widest text-[#8e9192] uppercase mt-0.5">Be spot on.</span></div>
+</div>
+<!-- System Badges & Profile -->
+<div class="flex items-center gap-2">
+<!-- BLE Indicator -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 bg-[#201f1f] border border-[#353534] rounded-full" style="background-color: rgb(20, 40, 36); border-color: rgb(26, 56, 48);">
+<svg class="w-3.5 h-3.5 text-[#8e9192]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M7 7l10 10-5 5V2l5 5L7 17" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="w-1.5 h-1.5 rounded-full bg-[#22C55E]" style="background-color: rgb(89, 235, 171);"></span>
+<span class="font-space text-[11px] font-bold text-white">84%</span>
+</div>
+<!-- Language Pill -->
+<div class="px-2.5 py-1 bg-[#201f1f] border border-[#353534] rounded-full font-space text-[11px] font-semibold text-[#c4c7c8] cursor-default pointer-events-none select-none" style="background-color: rgb(20, 40, 36); border-color: rgb(26, 56, 48); color: rgb(200, 194, 175);">EN</div>
+<!-- Profile Avatar -->
+<div class="w-8 h-8 rounded-full bg-white text-[#131313] flex items-center justify-center font-bold text-xs shadow-sm cursor-default pointer-events-none" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);"><svg class="w-4 h-4 text-[#131313]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"></path></svg></div>
+</div>
+</div>
+</header>
+<!-- MAIN SCROLLABLE CONTENT -->
+<main class="flex-1 w-full max-w-md mx-auto px-4 pt-20 pb-28 space-y-4">
+<!-- 1. GREETING BANNER -->
+<div class="pt-2 flex flex-col space-y-0.5">
+<div class="flex items-baseline justify-between">
+<h1 class="font-space text-2xl font-bold text-white tracking-tight">Good morning, Karim</h1>
+
+</div>
+<p class="text-xs font-medium text-[#8e9192] font-space tracking-wide">Tuesday, 24 Oct</p>
+</div>
+<!-- 2. SCHEDULED ROUTINE HERO CARD -->
+<div class="bg-[#1c1b1b] border border-[#2a2a2a] p-3.5 rounded-2xl shadow-lg space-y-3" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-white" style="background-color: rgb(89, 235, 171);"></span>
+<span class="font-space text-[10px] font-bold text-[#8e9192] uppercase tracking-wider">Scheduled Routine</span>
+</div>
+<span class="font-space text-[11px] font-bold text-white bg-[#2a2a2a] px-2.5 py-0.5 rounded-full border border-[#353534]" style="background-color: rgb(25, 56, 48); border-color: rgb(82, 90, 86); color: rgb(255, 255, 255);">
+          Leg Day A
+        </span>
+</div>
+<!-- High-contrast Start CTA -->
+<div class="w-full h-14 bg-white text-[#131313] rounded-xl flex items-center justify-between px-5 font-space font-bold shadow-md cursor-default pointer-events-none select-none" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full bg-[#131313] text-white flex items-center justify-center"><svg class="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg></div><div class="flex items-baseline gap-2 text-left"><span class="text-base tracking-tight font-extrabold uppercase">Start Workout</span></div></div><svg class="w-5 h-5 text-[#131313]" fill="currentColor" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"></path></svg></div>
+</div>
+<!-- 3. METABOLIC DEFICIT & CALORIE PROGRESS -->
+<div class="bg-[#1c1b1b] border border-[#2a2a2a] rounded-2xl p-4 space-y-4 shadow-sm" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex items-center justify-between">
+<div>
+<span class="font-space text-[10px] font-bold text-[#8e9192] uppercase tracking-wider block">Active Expenditure</span>
+<h2 class="font-space text-base font-bold text-white tracking-tight">Metabolic Deficit Goal</h2>
+</div>
+<span class="font-space text-[11px] font-bold text-white bg-[#201f1f] border border-[#353534] px-2.5 py-1 rounded-full" style="background-color: rgb(20, 40, 36); border-color: rgb(26, 56, 48); color: rgb(89, 235, 171);">
+          560 kcal left
+        </span>
+</div>
+<!-- Calorie Circular Ring & Stats Row -->
+<div class="flex items-center justify-between gap-4 py-1">
+<!-- SVG Gauge -->
+<div class="relative w-32 h-32 flex items-center justify-center shrink-0">
+<svg class="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
+<!-- Background circle -->
+<circle cx="60" cy="60" fill="none" r="48" stroke="#18362f" stroke-width="10"></circle>
+<!-- Progress circle: 1840/2400 = 76.6% -> circumference ~301.6 -> stroke-dashoffset: 70 -->
+<circle cx="60" cy="60" fill="none" r="48" stroke="#59ebab" stroke-dasharray="301.6" stroke-dashoffset="70" stroke-linecap="round" stroke-width="10"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="font-space text-2xl font-bold text-white tracking-tight leading-none">1,840</span>
+<span class="font-space text-[10px] font-bold text-[#8e9192] mt-1">/ 2,400 kcal</span>
+</div>
+</div>
+<!-- Metric breakdown list -->
+<div class="flex flex-col justify-center flex-1 space-y-2 border-l border-[#2a2a2a] pl-4" style="border-color: rgb(26, 56, 48);">
+<div class="flex items-center justify-between">
+<span class="text-xs text-[#8e9192]">Burned Baseline</span>
+<span class="font-space text-xs font-bold text-white">1,420 kcal</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-[#8e9192]">Workout Burn</span>
+<span class="font-space text-xs font-bold text-white">420 kcal</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="text-xs text-[#8e9192]">Daily Pace</span>
+<span class="font-space text-[10px] font-bold text-black bg-white px-2 py-0.5 rounded" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);">
+              +8% Optimal
+            </span>
+</div>
+</div>
+</div>
+<!-- Macro Progress Strip -->
+<div class="grid grid-cols-3 gap-2 pt-1 border-t border-[#2a2a2a]/60" style="border-color: rgb(26, 56, 48);">
+<!-- Protein -->
+<div class="bg-[#201f1f] border border-[#2a2a2a] p-2.5 rounded-xl flex flex-col justify-between" style="background-color: rgb(20, 40, 36); border-color: rgb(26, 56, 48);">
+<div class="flex items-center justify-between mb-1">
+<span class="font-space text-[10px] font-bold text-[#8e9192] uppercase">Protein</span>
+<span class="font-space text-[10px] font-bold text-white">80%</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-space text-base font-bold text-white leading-tight">142g</span>
+<span class="text-[10px] text-[#8e9192]">/ 180g</span>
+</div>
+<div class="w-full bg-[#2a2a2a] h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-white h-full rounded-full" style="width: 80%; background-color: rgb(89, 235, 171);"></div>
+</div>
+</div>
+<!-- Carbs -->
+<div class="bg-[#201f1f] border border-[#2a2a2a] p-2.5 rounded-xl flex flex-col justify-between" style="background-color: rgb(20, 40, 36); border-color: rgb(26, 56, 48);">
+<div class="flex items-center justify-between mb-1">
+<span class="font-space text-[10px] font-bold text-[#8e9192] uppercase">Carbs</span>
+<span class="font-space text-[10px] font-bold text-white">72%</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-space text-base font-bold text-white leading-tight">195g</span>
+<span class="text-[10px] text-[#8e9192]">/ 270g</span>
+</div>
+<div class="w-full bg-[#2a2a2a] h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-white h-full rounded-full" style="width: 72%; background-color: rgb(89, 235, 171);"></div>
+</div>
+</div>
+<!-- Fats -->
+<div class="bg-[#201f1f] border border-[#2a2a2a] p-2.5 rounded-xl flex flex-col justify-between" style="background-color: rgb(20, 40, 36); border-color: rgb(26, 56, 48);">
+<div class="flex items-center justify-between mb-1">
+<span class="font-space text-[10px] font-bold text-[#8e9192] uppercase">Fats</span>
+<span class="font-space text-[10px] font-bold text-white">78%</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-space text-base font-bold text-white leading-tight">52g</span>
+<span class="text-[10px] text-[#8e9192]">/ 67g</span>
+</div>
+<div class="w-full bg-[#2a2a2a] h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-white h-full rounded-full" style="width: 78%; background-color: rgb(89, 235, 171);"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- 4. WEEKLY ACTIVITY PROGRESS TRACKER -->
+<div class="bg-[#1c1b1b] border border-[#2a2a2a] rounded-2xl p-4 space-y-3 shadow-sm" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-space text-[10px] font-bold text-[#8e9192] uppercase tracking-wider">Weekly Target</span>
+
+</div>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-space text-xl font-bold text-white tracking-tight">210</span>
+<span class="text-xs text-[#8e9192]">/ 300 min</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 bg-[#201f1f] border border-[#353534] px-2.5 py-1 rounded-full">
+<svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M3 13h2v-2H3v2zm4 4h2V7H7v10zm4 4h2V3h-2v18zm4-4h2V7h-2v10zm4-4h2v-2h-2v2z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="font-space text-[10px] font-bold text-white">3 of 4 Strength Days</span>
+</div>
+</div>
+<!-- 7-Day Matrix -->
+<div class="grid grid-cols-7 gap-1.5 pt-1">
+<!-- Mon -->
+<div class="bg-[#201f1f] border border-[#2a2a2a] rounded-xl py-2 px-1 flex flex-col items-center gap-1.5 text-center">
+<span class="font-space text-[10px] font-bold text-[#8e9192]">M</span>
+<div class="w-6 h-6 rounded-full bg-white text-[#131313] flex items-center justify-center" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);">
+<svg class="w-3.5 h-3.5 stroke-current" fill="none" stroke-width="3" viewBox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="font-space text-[11px] font-bold text-white">65m</span>
+</div>
+<!-- Tue (Today) -->
+<div class="bg-[#2a2a2a] border border-[#444748] rounded-xl py-2 px-1 flex flex-col items-center gap-1.5 text-center ring-1 ring-white/20" style="background-color: rgb(25, 61, 51); border-color: rgb(89, 235, 171);">
+<span class="font-space text-[10px] font-bold text-white">T</span>
+<div class="w-6 h-6 rounded-full bg-white text-[#131313] flex items-center justify-center" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);">
+<svg class="w-3.5 h-3.5 stroke-current" fill="none" stroke-width="3" viewBox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="font-space text-[11px] font-bold text-white">75m</span>
+</div>
+<!-- Wed -->
+<div class="bg-[#201f1f] border border-[#2a2a2a] rounded-xl py-2 px-1 flex flex-col items-center gap-1.5 text-center">
+<span class="font-space text-[10px] font-bold text-[#8e9192]">W</span>
+<div class="w-6 h-6 rounded-full bg-white text-[#131313] flex items-center justify-center" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);">
+<svg class="w-3.5 h-3.5 stroke-current" fill="none" stroke-width="3" viewBox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="font-space text-[11px] font-bold text-white">70m</span>
+</div>
+<!-- Thu -->
+<div class="bg-[#181818] border border-[#252525] rounded-xl py-2 px-1 flex flex-col items-center gap-1.5 text-center opacity-70">
+<span class="font-space text-[10px] font-bold text-[#8e9192]">T</span>
+<div class="w-6 h-6 rounded-full bg-[#2a2a2a] text-[#8e9192] flex items-center justify-center text-xs font-bold">
+            -
+          </div>
+<span class="font-space text-[11px] font-medium text-[#8e9192]">0m</span>
+</div>
+<!-- Fri -->
+<div class="bg-[#181818] border border-[#252525] rounded-xl py-2 px-1 flex flex-col items-center gap-1.5 text-center opacity-70">
+<span class="font-space text-[10px] font-bold text-[#8e9192]">F</span>
+<div class="w-6 h-6 rounded-full bg-[#2a2a2a] text-[#8e9192] flex items-center justify-center">
+<svg class="w-3 h-3 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+</div>
+<span class="font-space text-[10px] font-medium text-[#8e9192]">Plan</span>
+</div>
+<!-- Sat -->
+<div class="bg-[#181818] border border-[#252525] rounded-xl py-2 px-1 flex flex-col items-center gap-1.5 text-center opacity-70">
+<span class="font-space text-[10px] font-bold text-[#8e9192]">S</span>
+<div class="w-6 h-6 rounded-full bg-[#2a2a2a] text-[#8e9192] flex items-center justify-center">
+<svg class="w-3 h-3 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+</div>
+<span class="font-space text-[10px] font-medium text-[#8e9192]">Plan</span>
+</div>
+<!-- Sun -->
+<div class="bg-[#181818] border border-[#252525] rounded-xl py-2 px-1 flex flex-col items-center gap-1.5 text-center opacity-70">
+<span class="font-space text-[10px] font-bold text-[#8e9192]">S</span>
+<div class="w-6 h-6 rounded-full bg-[#2a2a2a] text-[#8e9192] flex items-center justify-center">
+<svg class="w-3 h-3 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24">
+<path d="M3 10h18M3 14h18M5 6v14m14-14v14" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="font-space text-[10px] font-medium text-[#8e9192]">Rest</span>
+</div>
+</div>
+</div>
+<!-- 5. CAIRO SMART NUTRITION -->
+<div class="bg-[#1c1b1b] border border-[#2a2a2a] rounded-2xl p-4 space-y-3 shadow-sm" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex items-center justify-between">
+<div>
+<span class="font-space text-[10px] font-bold text-[#8e9192] uppercase tracking-wider block">Cairo Bfit Nutrition</span>
+<h2 class="font-space text-base font-bold text-white tracking-tight">Today’s Nutrition • 155 of 180 EGP</h2>
+</div>
+<div class="w-8 h-8 rounded-lg bg-[#201f1f] border border-[#353534] flex items-center justify-center text-white">
+<svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24">
+<path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</div>
+<!-- Meal Items Stack -->
+<div class="space-y-2 pt-1">
+<!-- Lunch Item -->
+<div class="bg-[#201f1f] border border-[#2a2a2a] p-3 rounded-xl flex items-center justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-lg bg-[#2a2a2a] border border-[#353534] flex items-center justify-center text-white shrink-0">
+<svg class="w-5 h-5 stroke-current" fill="none" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M4 10h16M4 14h16M6 18h12M8 6h8" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<div class="flex flex-col truncate">
+<span class="font-space text-xs font-bold text-white truncate">Lunch: Koshary Protein Bowl</span>
+<span class="text-[11px] text-[#8e9192] truncate">680 kcal • Lentils &amp; Brown Rice</span>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0">
+<span class="font-space text-xs font-bold text-white">35 EGP</span>
+<span class="font-space text-[10px] font-bold text-[#22C55E]" style="color: rgb(89, 235, 171);">High Carb</span>
+</div>
+</div>
+<!-- Dinner Item -->
+<div class="bg-[#201f1f] border border-[#2a2a2a] p-3 rounded-xl flex items-center justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-lg bg-[#2a2a2a] border border-[#353534] flex items-center justify-center text-white shrink-0">
+<svg class="w-5 h-5 stroke-current" fill="none" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M12 3v18M3 12h18" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<div class="flex flex-col truncate">
+<span class="font-space text-xs font-bold text-white truncate">Dinner: Grilled Chicken &amp; Molokhia</span>
+<span class="text-[11px] text-[#8e9192] truncate">520 kcal • 48g Protein portion</span>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0">
+<span class="font-space text-xs font-bold text-white">75 EGP</span>
+<span class="font-space text-[10px] font-bold text-[#22C55E]" style="color: #59ebab;">Lean Pro</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- 6. FIXED BOTTOM NAVIGATION BAR -->
+<nav class="fixed bottom-0 inset-x-0 z-50 border-t border-[#2a2a2a] safe-bottom" data-active-classes="text-white" style="background-color: rgb(9, 22, 20); border-color: rgb(26, 56, 48); pointer-events: none;" tabindex="-1">
+<div class="h-16 max-w-md mx-auto flex items-center justify-around px-2"><div class="flex flex-col items-center justify-center gap-1 w-14 text-white cursor-default pointer-events-none select-none" style="color: rgb(89, 235, 171);"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg><span class="font-space text-[10px] font-bold tracking-tight">Home</span></div><div class="flex flex-col items-center justify-center gap-1 w-14 text-[#8e9192] cursor-default pointer-events-none select-none"><svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l3-3 9 9-3 3-9-9zM3 12l3-3M18 15l3-3" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="font-space text-[10px] font-medium tracking-tight">Workout</span></div><div class="flex flex-col items-center justify-center gap-1 w-14 text-[#8e9192] cursor-default pointer-events-none select-none"><svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v12m-6-6h12" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="font-space text-[10px] font-medium tracking-tight">Nutrition</span></div><div class="flex flex-col items-center justify-center gap-1 w-14 text-[#8e9192] cursor-default pointer-events-none select-none"><svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><rect height="12" rx="2" width="16" x="4" y="6"></rect><line x1="9" x2="9.01" y1="10" y2="10"></line><line x1="15" x2="15.01" y1="10" y2="10"></line><line x1="9" x2="15" y1="14" y2="14"></line></svg><span class="font-space text-[10px] font-medium tracking-tight">Coach</span></div><div class="flex flex-col items-center justify-center gap-1 w-14 text-[#8e9192] cursor-default pointer-events-none select-none"><svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="font-space text-[10px] font-medium tracking-tight">Profile</span></div></div>
+</nav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

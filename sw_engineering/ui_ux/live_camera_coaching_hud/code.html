@@ -1,0 +1,258 @@
+<!DOCTYPE html><html class="dark" lang="en"><head></head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary selection:text-on-primary" style="background-color: rgb(11, 23, 21); color: rgb(255, 255, 255);"><svg class="inline-defs-container" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"></svg>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+<meta content="mobile_stack" name="shell-type">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Space+Grotesk:wght@600;700&amp;family=Cairo:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "surface-bright": "#3a3939",
+          "on-secondary-fixed-variant": "#474746",
+          "primary": "#ffffff",
+          "inverse-primary": "#5d5f5f",
+          "surface-variant": "#353534",
+          "on-secondary-fixed": "#1b1c1c",
+          "secondary-container": "#474746",
+          "on-background": "#e5e2e1",
+          "surface-container-high": "#2a2a2a",
+          "on-primary-fixed": "#1a1c1c",
+          "tertiary-fixed": "#e4e2e4",
+          "outline-variant": "#444748",
+          "on-tertiary-fixed-variant": "#474649",
+          "surface-tint": "#c6c6c7",
+          "surface-container-low": "#1c1b1b",
+          "on-surface": "#e5e2e1",
+          "surface-dim": "#131313",
+          "secondary-fixed-dim": "#c8c6c5",
+          "on-primary-fixed-variant": "#454747",
+          "secondary": "#c8c6c5",
+          "on-tertiary-fixed": "#1b1b1d",
+          "primary-container": "#e2e2e2",
+          "primary-fixed-dim": "#c6c6c7",
+          "surface-container": "#201f1f",
+          "on-secondary-container": "#b7b5b4",
+          "surface-container-lowest": "#0e0e0e",
+          "on-tertiary": "#303032",
+          "on-tertiary-container": "#656466",
+          "primary-fixed": "#e2e2e2",
+          "surface-container-highest": "#353534",
+          "tertiary-container": "#e4e2e4",
+          "tertiary": "#ffffff",
+          "on-primary": "#2f3131",
+          "on-error-container": "#ffdad6",
+          "surface": "#131313",
+          "on-secondary": "#303030",
+          "inverse-on-surface": "#313030",
+          "outline": "#8e9192",
+          "on-surface-variant": "#c4c7c8",
+          "tertiary-fixed-dim": "#c8c6c8",
+          "on-primary-container": "#636565",
+          "secondary-fixed": "#e4e2e1",
+          "on-error": "#690005",
+          "error": "#ffb4ab",
+          "background": "#131313",
+          "error-container": "#93000a",
+          "inverse-surface": "#e5e2e1"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "space-xl": "2rem",
+          "space-sm": "0.5rem",
+          "space-xs": "0.25rem",
+          "margin": "1rem",
+          "space-lg": "1.5rem",
+          "space-md": "1rem",
+          "gutter": "1rem"
+        },
+        "fontFamily": {
+          "label-lg": ["Space Grotesk"],
+          "display-metric": ["Space Grotesk"],
+          "label-md": ["Space Grotesk"],
+          "headline-lg": ["Space Grotesk"],
+          "headline-sm": ["Space Grotesk"],
+          "body-md": ["IBM Plex Sans"],
+          "label-sm": ["Space Grotesk"],
+          "body-lg": ["IBM Plex Sans"],
+          "headline-md": ["Space Grotesk"],
+          "body-sm": ["IBM Plex Sans"]
+        },
+        "fontSize": {
+          "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+          "display-metric": ["56px", { "lineHeight": "60px", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+          "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+          "headline-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+          "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+          "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+          "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "700" }],
+          "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" }],
+          "headline-md": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+          "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }]
+        }
+      },
+    },
+  }
+</script>
+<style>
+@layer base {
+  html, body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #131313;
+    color: #e5e2e1;
+    overscroll-behavior: none;
+  }
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
+::-webkit-scrollbar {
+  display: none;
+}
+</style>
+
+
+<!-- STATIC HEADER -->
+<header class="fixed top-0 w-full z-50 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.6)] bg-surface" style="background-color: rgb(11, 23, 21);">
+<div class="h-16 px-margin flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-11 h-11 flex items-center justify-center text-on-surface rounded-full cursor-default select-none pointer-events-none">
+<span class="material-symbols-outlined text-[22px]">arrow_back_ios_new</span>
+</div>
+<div class="h-8 w-8 rounded-lg overflow-hidden shrink-0 flex items-center justify-center"><img src="https://lh3.googleusercontent.com/aida/AEtjO1UAf9YrSyQ6Fz4PxqJ4u12QejL6I3JRFDV0DKrNGX8crvUzAC1_G_kcItWl9CRBpBspk4t4iRZns4J82slQdM5q8cRGNUpWDszI1564NIGLFZi2yJVHGs2xCNy_i01QzgGgSKJIf7rDfOJi2huLglZ1rpyaJwLDLc7jgaqyK4v6kKhAmkpdhwiTb3_gGJRyLjiaGGLxUhGvXTIt6xBayHMZ1YfM37--P9BG_HCatdSlDKoh4zrQ27eqy-Sg" alt="Spotter Logo" class="w-full h-full object-contain"></div>
+<div class="flex flex-col"><h1 class="font-headline-sm text-[16px] text-primary tracking-tight leading-tight">Spotter</h1><span class="font-label-sm text-[10px] text-on-surface-variant tracking-wider leading-none">Be spot on.</span></div>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="min-h-[44px] px-space-sm py-space-xs rounded-full bg-surface-container flex items-center gap-1.5 cursor-default select-none">
+<span class="material-symbols-outlined text-[16px] text-on-surface">bluetooth_connected</span>
+<span class="w-1.5 h-1.5 rounded-full" style="background-color: rgb(89, 235, 171);"></span>
+<span class="font-label-sm text-label-sm text-on-surface">84%</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 pointer-events-none cursor-default">
+<span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+</div>
+</div>
+</div>
+</header>
+<main class="flex flex-col relative w-full pt-16 pb-safe bg-surface min-h-screen" style="background-color: rgb(11, 23, 21);">
+<div class="flex flex-col w-full relative select-none">
+<!-- CAMERA VIEWPORT & STATIC SKELETON CANVAS -->
+<div class="relative w-full h-[460px] bg-surface-container-lowest overflow-hidden flex items-center justify-center">
+<!-- Camera Feed Mockup Background SVG -->
+<div class="absolute inset-0 overflow-hidden pointer-events-none">
+<svg class="w-full h-full" preserveAspectRatio="xMidYMid slice" viewBox="0 0 400 460" xmlns="http://www.w3.org/2000/svg">
+<defs><radialGradient cx="50%" cy="45%" id="spotlight" r="55%"><stop offset="0%" stop-color="#162a26" stop-opacity="0.6"></stop><stop offset="65%" stop-color="#0e1d1a" stop-opacity="0.8"></stop><stop offset="100%" stop-color="#05100e" stop-opacity="1"></stop></radialGradient><pattern height="32" id="grid-pattern" patternUnits="userSpaceOnUse" width="32"><path d="M 32 0 L 0 0 0 32" fill="none" stroke="#3c4a41" stroke-opacity="0.25" stroke-width="1"></path></pattern></defs>
+<rect fill="url(#spotlight)" height="100%" width="100%"></rect>
+<rect fill="url(#grid-pattern)" height="100%" width="100%"></rect>
+<ellipse cx="200" cy="210" fill="#22C55E" fill-opacity="0.04" rx="110" ry="160"></ellipse>
+<ellipse cx="200" cy="420" fill="#000000" fill-opacity="0.45" rx="140" ry="35"></ellipse>
+</svg>
+</div>
+<!-- Vignette Overlays -->
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-surface/90 pointer-events-none"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-surface/80 via-transparent to-surface/80 pointer-events-none"></div>
+<!-- 17-Point Biomechanical Static Pose Skeleton Wireframe Layer -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" fill="none" viewBox="0 0 380 460"><line opacity="0.2" stroke="#525a56" stroke-dasharray="4 4" stroke-width="1" x1="75" x2="305" y1="130" y2="130"></line><line stroke="#59ebab" stroke-linecap="round" stroke-width="3" x1="190" x2="190" y1="125" y2="155"></line><line stroke="#59ebab" stroke-dasharray="1 1" stroke-width="3.5" x1="190" x2="190" y1="155" y2="235"></line><line opacity="0.7" stroke="#525a56" stroke-width="2.5" x1="145" x2="235" y1="155" y2="155"></line><line opacity="0.5" stroke="#525a56" stroke-width="2" x1="145" x2="120" y1="155" y2="190"></line><line opacity="0.5" stroke="#525a56" stroke-width="2" x1="120" x2="135" y1="190" y2="135"></line><line opacity="0.5" stroke="#525a56" stroke-width="2" x1="235" x2="260" y1="155" y2="190"></line><line opacity="0.5" stroke="#525a56" stroke-width="2" x1="260" x2="245" y1="190" y2="135"></line><line stroke="#59ebab" stroke-width="3" x1="155" x2="225" y1="235" y2="235"></line><line opacity="0.4" stroke="#525a56" stroke-width="1.5" x1="145" x2="155" y1="155" y2="235"></line><line opacity="0.4" stroke="#525a56" stroke-width="1.5" x1="235" x2="225" y1="155" y2="235"></line><line stroke="#59ebab" stroke-linecap="round" stroke-width="3.5" x1="155" x2="128" y1="235" y2="305"></line><line stroke="#59ebab" stroke-linecap="round" stroke-width="3.5" x1="128" x2="136" y1="305" y2="385"></line><line stroke="#59ebab" stroke-linecap="round" stroke-width="3.5" x1="225" x2="252" y1="235" y2="305"></line><line stroke="#525a56" stroke-linecap="round" stroke-width="3.5" x1="252" x2="244" y1="305" y2="385"></line><circle cx="190" cy="110" fill="#0b1715" fill-opacity="0.9" r="10" stroke="#59ebab" stroke-width="2"></circle><circle cx="190" cy="110" fill="#59ebab" r="3"></circle><circle cx="145" cy="155" fill="#525a56" r="5"></circle><circle cx="235" cy="155" fill="#525a56" r="5"></circle><circle cx="120" cy="190" fill="#525a56" r="4"></circle><circle cx="260" cy="190" fill="#525a56" r="4"></circle><circle cx="135" cy="135" fill="#525a56" r="4"></circle><circle cx="245" cy="135" fill="#525a56" r="4"></circle><circle cx="190" cy="175" fill="#59ebab" r="3.5"></circle><circle cx="190" cy="205" fill="#59ebab" r="3.5"></circle><circle cx="155" cy="235" fill="#0b1715" r="6" stroke="#59ebab" stroke-width="2"></circle><circle cx="225" cy="235" fill="#0b1715" r="6" stroke="#59ebab" stroke-width="2"></circle><circle cx="128" cy="305" fill="#59ebab" fill-opacity="0.2" r="7" stroke="#59ebab" stroke-width="2"></circle><circle cx="128" cy="305" fill="#59ebab" r="3"></circle><circle cx="252" cy="305" fill="#59ebab" fill-opacity="0.2" r="7" stroke="#59ebab" stroke-width="2"></circle><circle cx="252" cy="305" fill="#59ebab" r="3"></circle><circle cx="136" cy="385" fill="#59ebab" r="5"></circle><circle cx="126" cy="405" fill="#525a56" r="4"></circle><circle cx="244" cy="385" fill="#525a56" fill-opacity="0.3" r="6" stroke="#525a56" stroke-width="2"></circle><circle cx="244" cy="385" fill="#525a56" r="3"></circle><circle cx="254" cy="405" fill="#525a56" r="4"></circle></svg>
+<!-- IN-VIEWPORT HUD BAR (Static) -->
+<div class="absolute top-3 inset-x-margin flex items-center justify-between pointer-events-none">
+<!-- Workout Context Info -->
+<div class="flex items-center gap-space-sm px-3 py-2 rounded-xl bg-surface-container">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">pause</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary leading-tight break-words">BARBELL SQUAT</span>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Set 3 of 4 • 80 KG</span>
+<div class="text-primary flex items-center">
+<span class="material-symbols-outlined text-[14px]">volume_up</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Real-time Wristband BLE Biometrics: Fixed 172 BPM Zone 4 Cardio -->
+<div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-container">
+<span class="relative flex h-2 w-2">
+<span class="inline-flex rounded-full h-2 w-2" style="background-color: rgb(89, 235, 171);"></span>
+</span>
+<div class="flex flex-col items-end">
+<div class="flex items-baseline gap-1">
+<span class="font-label-lg text-label-lg text-primary font-bold">172</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">BPM</span>
+</div>
+<span class="font-label-sm text-[9px] uppercase tracking-widest" style="color: rgb(89, 235, 171);">ZONE 4 CARDIO</span>
+</div>
+</div>
+</div>
+</div>
+<!-- CENTER PRIMARY TELEMETRY CONSOLE -->
+<div class="px-margin -mt-4 relative z-10 grid gap-space-sm w-full grid-cols-2">
+<!-- Rep Counter Module: Fixed Reps Done: 7/10 -->
+<div class="col-span-1 bg-surface-container-low rounded-xl p-3 flex flex-col justify-between shadow-md">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Reps Done</span>
+<div class="flex items-baseline gap-1 my-0.5">
+<span class="font-display-metric text-display-metric text-primary leading-none">7</span>
+<span class="font-label-md text-label-md text-on-surface-variant">/ 10</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="h-full w-[70%]" style="background-color: rgb(89, 235, 171);"></div>
+</div>
+</div>
+<!-- Circular Live Form Score Gauge: Fixed Form Score: 92 Flawless -->
+<div class="col-span-1 bg-surface-container-low rounded-xl p-2.5 flex flex-col items-center justify-between shadow-md">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase text-center">Form Score</span>
+<div class="relative w-14 h-14 flex items-center justify-center my-0.5">
+<svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
+<circle cx="18" cy="18" fill="none" r="15" stroke="#201f1f" stroke-width="3"></circle>
+<circle cx="18" cy="18" fill="none" r="15" stroke="#59ebab" stroke-dasharray="94.2" stroke-dashoffset="7.5" stroke-linecap="round" stroke-width="3"></circle>
+</svg>
+<span class="absolute font-headline-sm text-headline-sm text-primary font-bold">92</span>
+</div>
+<span class="font-label-sm text-[10px] uppercase tracking-wider" style="color: rgb(89, 235, 171);">Flawless</span>
+</div>
+</div>
+<!-- CRITICAL BIOMECHANICS COACHING BANNER -->
+<div class="px-margin mt-space-sm w-full">
+<div class="bg-surface-container rounded-xl p-space-md shadow-md flex items-start gap-space-sm">
+<div class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]" style="color: rgb(89, 235, 171);">check_circle</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<!-- English Primary Cue -->
+<span class="font-headline-sm text-headline-sm text-primary leading-tight">Push your knees outward &amp; keep chest elevated</span>
+<!-- Egyptian Arabic Direct Translation -->
+
+</div>
+</div>
+</div>
+<!-- STATIC ACTION MODULE -->
+<div class="px-margin mt-space-md mb-space-sm flex flex-col gap-space-sm">
+<!-- Primary Action Touch Bar: Fixed Static Element -->
+<div class="w-full h-14 rounded-xl font-label-lg text-label-lg uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg cursor-default select-none pointer-events-none" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);"><span class="material-symbols-outlined text-[20px]">flag</span><span class="">LOG SET (REP 7)</span></div>
+</div>
+</div>
+</main>
+
+
+
+
+
+
+
+
+</body></html>

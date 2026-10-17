@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <!-- Deep premium dark squircle background -->
+    <radialGradient id="bgGrad" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#0e1f1c"/>
+      <stop offset="100%" stop-color="#050e0c"/>
+    </radialGradient>
+
+    <!-- Kinetic S & Heartbeat Gradient (Mint Green) -->
+    <linearGradient id="mintPulseGrad" x1="160" y1="120" x2="360" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#84f6c6"/>
+      <stop offset="40%" stop-color="#59ebab"/>
+      <stop offset="100%" stop-color="#32b884"/>
+    </linearGradient>
+
+    <!-- Viewfinder Accent Gradient (Neon Mint & Cyber Emerald) -->
+    <linearGradient id="viewfinderMintGrad" x1="50" y1="50" x2="462" y2="462" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#84f6c6"/>
+      <stop offset="50%" stop-color="#59ebab"/>
+      <stop offset="100%" stop-color="#2dd4bf"/>
+    </linearGradient>
+
+    <!-- Soft glow for kinetic pulse -->
+    <filter id="subtleGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- App Icon Squircle Container -->
+  <rect width="512" height="512" rx="116" fill="url(#bgGrad)"/>
+  <rect x="2" y="2" width="508" height="508" rx="114" stroke="#162e28" stroke-width="2"/>
+  <rect x="16" y="16" width="480" height="480" rx="100" stroke="#0f221e" stroke-width="1.5"/>
+
+  <!-- Expanded Optical Camera Viewfinder Reticle / Brackets in Neon Mint Green -->
+  <!-- Enlarged area: moved outwards closer to edges (58px to 454px) providing maximum breathing room -->
+  <g stroke="url(#viewfinderMintGrad)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Top-Left Corner Bracket (Expanded) -->
+    <path d="M 148 58 H 78 C 67 58 58 67 58 78 V 148" />
+    
+    <!-- Top-Right Corner Bracket (Expanded) -->
+    <path d="M 364 58 H 434 C 445 58 454 67 454 78 V 148" />
+
+    <!-- Bottom-Left Corner Bracket (Expanded) -->
+    <path d="M 58 364 V 434 C 58 445 67 454 78 454 H 148" />
+
+    <!-- Bottom-Right Corner Bracket (Expanded) -->
+    <path d="M 454 364 V 434 C 454 445 445 454 434 454 H 364" />
+  </g>
+
+  <!-- Kinetic S with Heartbeat / ECG Waveform (Clean, NO dot/spot) -->
+  <g>
+    <!-- Background ambient glow around pulse -->
+    <path d="M 334 172 C 334 135 294 120 248 120 C 196 120 172 152 172 192 C 172 232 202 246 230 256 L 254 200 L 274 312 L 292 256 C 314 266 338 288 338 328 C 338 372 300 392 252 392 C 198 392 168 362 168 332"
+          stroke="#59ebab"
+          stroke-width="36"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          opacity="0.22"
+          filter="url(#subtleGlow)"
+          fill="none"/>
+
+    <!-- Crisp, fluid kinetic S path with ECG heartbeat spike -->
+    <path d="M 334 172 C 334 135 294 120 248 120 C 196 120 172 152 172 192 C 172 232 202 246 230 256 L 254 200 L 274 312 L 292 256 C 314 266 338 288 338 328 C 338 372 300 392 252 392 C 198 392 168 362 168 332"
+          stroke="url(#mintPulseGrad)"
+          stroke-width="26"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          fill="none"/>
+  </g>
+</svg>

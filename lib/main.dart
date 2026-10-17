@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotter/core/theme/app_theme.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
+import 'package:spotter/features/auth/presentation/bloc/onBoarding_bloc/on_boarding_bloc.dart';
 import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
 import 'package:spotter/features/auth/presentation/screens/home_screen.dart';
 import 'package:spotter/features/auth/presentation/screens/onBoarding_screen.dart';
@@ -13,6 +14,7 @@ import 'package:spotter/injection_container.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   await init();
 
   runApp(const MyApp());
@@ -29,6 +31,7 @@ class MyApp extends StatelessWidget {
           create: (_) => sl<AuthBloc>()..add(SessionRestoreRequested()),
         ),
         BlocProvider<ProfileBloc>(create: (_) => sl<ProfileBloc>()),
+        BlocProvider<OnBoardingBloc>(create: (_) => sl<OnBoardingBloc>()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

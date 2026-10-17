@@ -28,9 +28,9 @@ class UserProfileModel extends UserProfile {
       experienceLevel: ExperienceLevel.values.byName(json['experience']),
       trainingDays: (json['trainingDays'] as num).toInt(),
       weeklyTargetMin: (json['weeklyTargetMin'] as num).toInt(),
-      activityLevel: json['activityLevel'],
-      equipmentAccess: json['equipmentAccess'],
-      goal: json['goal'],
+      activityLevel: ActivityLevel.values.byName(json['activityLevel']),
+      equipmentAccess: EquipmentAccess.values.byName(json['equipmentAccess']),
+      goal: Goal.values.byName(json['goal']),
     );
   }
 
@@ -43,9 +43,9 @@ class UserProfileModel extends UserProfile {
     'trainingDays': trainingDays,
     'weeklyTargetMin': weeklyTargetMin,
     'schemaVersion': SCHEMA_VERSION,
-    'activityLevel': activityLevel,
-    'equipmentAccess': equipmentAccess,
-    'goal': goal,
+    'activityLevel': activityLevel.name,
+    'equipmentAccess': equipmentAccess.name,
+    'goal': goal.name,
     'updatedAt': FieldValue.serverTimestamp(),
   };
 }

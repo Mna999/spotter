@@ -1,0 +1,456 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+<meta content="mobile_tab" name="shell-type">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-bright": "#3a3939",
+            "on-secondary-fixed-variant": "#474746",
+            "primary": "#ffffff",
+            "inverse-primary": "#5d5f5f",
+            "surface-variant": "#353534",
+            "on-secondary-fixed": "#1b1c1c",
+            "secondary-container": "#474746",
+            "on-background": "#e5e2e1",
+            "surface-container-high": "#2a2a2a",
+            "on-primary-fixed": "#1a1c1c",
+            "tertiary-fixed": "#e4e2e4",
+            "outline-variant": "#444748",
+            "on-tertiary-fixed-variant": "#474649",
+            "surface-tint": "#c6c6c7",
+            "surface-container-low": "#1c1b1b",
+            "on-surface": "#e5e2e1",
+            "surface-dim": "#131313",
+            "secondary-fixed-dim": "#c8c6c5",
+            "on-primary-fixed-variant": "#454747",
+            "secondary": "#c8c6c5",
+            "on-tertiary-fixed": "#1b1b1d",
+            "primary-container": "#e2e2e2",
+            "primary-fixed-dim": "#c6c6c7",
+            "surface-container": "#201f1f",
+            "on-secondary-container": "#b7b5b4",
+            "surface-container-lowest": "#0e0e0e",
+            "on-tertiary": "#303032",
+            "on-tertiary-container": "#656466",
+            "primary-fixed": "#e2e2e2",
+            "surface-container-highest": "#353534",
+            "tertiary-container": "#e4e2e4",
+            "tertiary": "#ffffff",
+            "on-primary": "#2f3131",
+            "on-error-container": "#ffdad6",
+            "surface": "#131313",
+            "on-secondary": "#303030",
+            "inverse-on-surface": "#313030",
+            "outline": "#8e9192",
+            "on-surface-variant": "#c4c7c8",
+            "tertiary-fixed-dim": "#c8c6c8",
+            "on-primary-container": "#636565",
+            "secondary-fixed": "#e4e2e1",
+            "on-error": "#690005",
+            "error": "#ffb4ab",
+            "background": "#131313",
+            "error-container": "#93000a",
+            "inverse-surface": "#e5e2e1"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "space-xl": "2rem",
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem",
+            "margin": "1rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "gutter": "1rem"
+          },
+          fontFamily: {
+            "label-lg": ["Space Grotesk"],
+            "display-metric": ["Space Grotesk"],
+            "label-md": ["Space Grotesk"],
+            "headline-lg": ["Space Grotesk"],
+            "headline-sm": ["Space Grotesk"],
+            "body-md": ["IBM Plex Sans"],
+            "label-sm": ["Space Grotesk"],
+            "body-lg": ["IBM Plex Sans"],
+            "headline-md": ["Space Grotesk"],
+            "body-sm": ["IBM Plex Sans"]
+          },
+          fontSize: {
+            "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "display-metric": ["56px", { "lineHeight": "60px", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "700" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "headline-md": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    @layer base {
+      html, body {
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+        background-color: #131313;
+      }
+      body {
+        overscroll-behavior-y: none;
+      }
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+      main > :first-child {
+        margin-top: 0 !important;
+      }
+      main > :last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-surface font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen" style="background-color: rgb(11, 23, 21); color: rgb(255, 255, 255);">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 pt-safe bg-surface border-b border-surface-container-high shadow-[0_1px_8px_rgba(0,0,0,0.4)]" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="h-20 px-margin flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<img src="https://lh3.googleusercontent.com/aida/AEtjO1UAf9YrSyQ6Fz4PxqJ4u12QejL6I3JRFDV0DKrNGX8crvUzAC1_G_kcItWl9CRBpBspk4t4iRZns4J82slQdM5q8cRGNUpWDszI1564NIGLFZi2yJVHGs2xCNy_i01QzgGgSKJIf7rDfOJi2huLglZ1rpyaJwLDLc7jgaqyK4v6kKhAmkpdhwiTb3_gGJRyLjiaGGLxUhGvXTIt6xBayHMZ1YfM37--P9BG_HCatdSlDKoh4zrQ27eqy-Sg" alt="Spotter Logo" class="h-8 w-8 rounded-lg object-contain shrink-0">
+<div class="flex flex-col">
+<div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Spotter</span><span class="font-body-sm text-body-sm text-secondary tracking-normal font-normal">Be spot on.</span></div>
+<h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight leading-none">Routine Session</h1>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="hidden sm:flex items-center gap-space-xs bg-surface-container-high px-space-sm py-1 rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold tabular-nums">84% • 152 BPM</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0" style="background-color: #59ebab; color: #0b1715;">
+<span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Body Content -->
+<main class="flex-1 flex flex-col relative w-full px-margin pt-24 pb-28 bg-surface" style="background-color: rgb(11, 23, 21);">
+<div class="flex flex-col w-full pb-16 space-y-space-md">
+<!-- Top Session Snapshot & Telemetry Strip -->
+<section class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm shadow-sm border border-surface-container" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="w-2 h-2 rounded-full bg-primary" style="background-color: rgb(89, 235, 171);"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">LIVE WORKOUT</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold truncate leading-tight">
+              Leg Day A — Hypertrophy &amp; Strength
+            </h2>
+
+</div>
+<div class="flex flex-col items-end shrink-0">
+<div class="flex items-center gap-1 bg-surface-container-high px-space-sm py-1 rounded-full border border-surface-container-highest">
+<span class="material-symbols-outlined text-primary text-[14px]">timer</span>
+<span class="font-label-sm text-label-sm text-on-surface font-bold tabular-nums tracking-normal">52 min</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">EST. TIME</span>
+</div>
+</div>
+<!-- Telemetry Bar -->
+<div class="grid grid-cols-3 gap-space-xs pt-space-xs">
+<div class="bg-surface-container px-space-sm py-2 rounded-lg flex flex-col justify-center">
+<span class="font-label-sm text-label-sm text-secondary uppercase">Exercises</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">5</span>
+<span class="font-body-sm text-body-sm text-secondary">total</span>
+</div>
+</div>
+<div class="bg-surface-container px-space-sm py-2 rounded-lg flex flex-col justify-center">
+<span class="font-label-sm text-label-sm text-secondary uppercase">Volume</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface tabular-nums">8,420</span>
+<span class="font-label-sm text-label-sm text-secondary">KG</span>
+</div>
+</div>
+<div class="bg-surface-container px-space-sm py-2 rounded-lg flex flex-col justify-center">
+<span class="font-label-sm text-label-sm text-secondary uppercase">Rest Clock</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-headline-sm text-headline-sm font-bold text-primary tabular-nums" style="color: rgb(89, 235, 171);">01:11</span>
+<span class="font-label-sm text-label-sm text-secondary">rem</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Static Warm-up Banner -->
+<div class="bg-surface-container-low border border-surface-container rounded-xl p-space-md flex items-center justify-between gap-space-sm" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">self_improvement</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm font-bold text-on-surface uppercase">WARM-UP SEQUENCE</span>
+<span class="font-body-sm text-body-sm text-secondary">Dynamic mobility &amp; hip activation</span>
+</div>
+</div>
+<div class="h-9 px-space-md bg-surface-container-high text-on-surface rounded-lg font-label-sm text-label-sm font-bold flex items-center justify-center cursor-default select-none border border-surface-container-highest pointer-events-none">
+          Start Warm-up Routine
+        </div>
+</div>
+<!-- Main Training Sequence -->
+<div class="flex flex-col space-y-space-md">
+<div class="flex items-center justify-between px-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">EXERCISE PROGRAMME</span>
+<span class="font-label-sm text-label-sm text-secondary">Target: 5 Exercises</span>
+</div>
+<!-- Exercise 1: Barbell Back Squat (Active Exercise) -->
+<article class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-md shadow-sm border border-surface-container pointer-events-none cursor-default select-none" style="background-color: rgb(17, 36, 32); border-color: rgb(82, 90, 86);">
+<!-- Exercise Header -->
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center font-headline-sm text-headline-sm font-bold shrink-0" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);">
+                1
+              </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm text-primary font-bold uppercase tracking-wider" style="color: rgb(89, 235, 171);">CURRENT EXERCISE</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">Barbell Back Squat</h3>
+
+</div>
+</div>
+<!-- Rest Timer Status Pill -->
+<div class="flex items-center gap-1 bg-surface-container-high px-space-sm py-1 rounded-full border border-surface-container-highest">
+<span class="material-symbols-outlined text-primary text-[14px]">hourglass_top</span>
+<span class="font-label-sm text-label-sm text-primary font-bold tabular-nums" style="color: rgb(89, 235, 171);">01:11</span>
+</div>
+</div>
+<!-- Set Ledger Table -->
+<div class="flex flex-col space-y-space-xs">
+<div class="grid grid-cols-12 px-space-sm py-1 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+<div class="col-span-2">SET</div>
+<div class="col-span-4">LOAD</div>
+<div class="col-span-3">REPS</div>
+<div class="col-span-3 text-right">STATUS / FORM</div>
+</div>
+<!-- Set 1 (Completed: 60kg x 10) -->
+<div class="grid grid-cols-12 items-center bg-surface-container px-space-sm py-space-sm rounded-lg min-h-[52px]">
+<div class="col-span-2 font-label-md text-label-md font-bold text-secondary">01</div>
+<div class="col-span-4 font-headline-sm text-headline-sm font-bold text-on-surface tabular-nums">
+                60 <span class="font-label-sm text-label-sm text-secondary font-normal">KG</span>
+</div>
+<div class="col-span-3 font-headline-sm text-headline-sm font-bold text-on-surface tabular-nums">
+                10 <span class="font-label-sm text-label-sm text-secondary font-normal">REPS</span>
+</div>
+<div class="col-span-3 flex items-center justify-end gap-1.5">
+<span class="font-label-sm text-label-sm bg-surface-container-high px-2 py-0.5 rounded text-on-surface font-mono">98%</span>
+<div class="w-7 h-7 rounded-full bg-surface-container-highest text-primary flex items-center justify-center" style="color: rgb(89, 235, 171); background-color: rgb(11, 23, 21);">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+</div>
+<!-- Set 2 (Completed: 80kg x 10) -->
+<div class="grid grid-cols-12 items-center bg-surface-container px-space-sm py-space-sm rounded-lg min-h-[52px]">
+<div class="col-span-2 font-label-md text-label-md font-bold text-secondary">02</div>
+<div class="col-span-4 font-headline-sm text-headline-sm font-bold text-on-surface tabular-nums">
+                80 <span class="font-label-sm text-label-sm text-secondary font-normal">KG</span>
+</div>
+<div class="col-span-3 font-headline-sm text-headline-sm font-bold text-on-surface tabular-nums">
+                10 <span class="font-label-sm text-label-sm text-secondary font-normal">REPS</span>
+</div>
+<div class="col-span-3 flex items-center justify-end gap-1.5">
+<span class="font-label-sm text-label-sm bg-surface-container-high px-2 py-0.5 rounded text-on-surface font-mono">96%</span>
+<div class="w-7 h-7 rounded-full bg-surface-container-highest text-primary flex items-center justify-center" style="color: rgb(89, 235, 171); background-color: rgb(11, 23, 21);">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+</div>
+<!-- Set 3 (CURRENT: 85kg x 8) -->
+<div class="grid grid-cols-12 items-center bg-surface-container-high px-space-sm py-space-sm rounded-lg min-h-[52px] border border-outline-variant">
+<div class="col-span-2 font-label-md text-label-md font-bold text-primary">03</div>
+<div class="col-span-4 font-headline-sm text-headline-sm font-bold text-on-surface tabular-nums">
+                85 <span class="font-label-sm text-label-sm text-secondary font-normal">KG</span>
+</div>
+<div class="col-span-3 font-headline-sm text-headline-sm font-bold text-on-surface tabular-nums">
+                8 <span class="font-label-sm text-label-sm text-secondary font-normal">REPS</span>
+</div>
+<div class="col-span-3 flex items-center justify-end">
+<div class="h-9 px-space-sm bg-primary text-on-primary font-label-sm text-label-sm font-bold rounded-lg flex items-center gap-1 select-none cursor-default pointer-events-none" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<span class="">Log Set 3</span>
+</div>
+</div>
+</div>
+<!-- Set 4 (Pending: 85kg x 8) -->
+<div class="grid grid-cols-12 items-center bg-surface-container-low px-space-sm py-space-sm rounded-lg min-h-[52px] opacity-70">
+<div class="col-span-2 font-label-md text-label-md font-medium text-secondary">04</div>
+<div class="col-span-4 font-headline-sm text-headline-sm font-semibold text-secondary tabular-nums">
+                85 <span class="font-label-sm text-label-sm text-outline-variant font-normal">KG</span>
+</div>
+<div class="col-span-3 font-headline-sm text-headline-sm font-semibold text-secondary tabular-nums">
+                8 <span class="font-label-sm text-label-sm text-outline-variant font-normal">REPS</span>
+</div>
+<div class="col-span-3 flex items-center justify-end">
+<div class="w-7 h-7 rounded-full bg-surface-container text-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Add Set & Action Toolbar -->
+<div class="flex items-center justify-between pt-space-xs border-t border-surface-container">
+<div class="h-10 px-space-md rounded-lg bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1.5 cursor-default select-none border border-surface-container-high pointer-events-none">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span class="">Add Set</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary">Rest interval: 120s (Remaining: 01:11)</span>
+</div>
+</article>
+<!-- Exercise 2: Up Next -->
+<article class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm border border-surface-container pointer-events-none cursor-default select-none" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high text-secondary flex items-center justify-center font-headline-sm text-headline-sm font-bold shrink-0">
+                2
+              </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">UP NEXT</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">Romanian Deadlift (RDL)</h3>
+
+</div>
+</div>
+<div class="bg-surface-container px-space-sm py-1 rounded text-right">
+<span class="font-label-sm text-label-sm text-secondary block">TARGET</span>
+<span class="font-label-md text-label-md text-on-surface font-bold tabular-nums">3 × 10 @ 65 KG</span>
+</div>
+</div>
+</article>
+<!-- Exercise 3: Scheduled -->
+<article class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm opacity-90 border border-surface-container pointer-events-none cursor-default select-none" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high text-secondary flex items-center justify-center font-headline-sm text-headline-sm font-bold shrink-0">
+                3
+              </div>
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">Bulgarian Split Squats</h3>
+
+</div>
+</div>
+<div class="bg-surface-container px-space-sm py-1 rounded text-right">
+<span class="font-label-sm text-label-sm text-secondary block">TARGET</span>
+<span class="font-label-md text-label-md text-on-surface font-bold tabular-nums">3 × 12 @ 16 KG</span>
+</div>
+</div>
+</article>
+<!-- Exercise 4: Core Finisher -->
+<article class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm opacity-80 border border-surface-container pointer-events-none cursor-default select-none" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high text-secondary flex items-center justify-center font-headline-sm text-headline-sm font-bold shrink-0">
+                4
+              </div>
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">Hanging Leg Raises</h3>
+
+</div>
+</div>
+<div class="bg-surface-container px-space-sm py-1 rounded text-right">
+<span class="font-label-sm text-label-sm text-secondary block">TARGET</span>
+<span class="font-label-md text-label-md text-on-surface font-bold tabular-nums">3 × 15 REPS</span>
+</div>
+</div>
+</article>
+<!-- Exercise 5: Calves / Finisher -->
+<article class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm opacity-70 border border-surface-container pointer-events-none cursor-default select-none" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high text-secondary flex items-center justify-center font-headline-sm text-headline-sm font-bold shrink-0">
+                5
+              </div>
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">Standing Calf Raises</h3>
+
+</div>
+</div>
+<div class="bg-surface-container px-space-sm py-1 rounded text-right">
+<span class="font-label-sm text-label-sm text-secondary block">TARGET</span>
+<span class="font-label-md text-label-md text-on-surface font-bold tabular-nums">4 × 20 @ 70 KG</span>
+</div>
+</div>
+</article>
+</div>
+<!-- Persistent Floating Workout Control Bar -->
+<div class="sticky bottom-4 z-40 w-full pt-space-xs">
+<div class="bg-surface-container-high rounded-xl p-space-xs flex items-center gap-space-xs shadow-2xl border border-surface-container-highest" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex-1 h-14 bg-primary text-on-primary rounded-lg font-label-lg text-label-lg font-bold flex items-center justify-center gap-space-xs select-none cursor-default pointer-events-none" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);">
+<span class="material-symbols-outlined text-[24px]">photo_camera_front</span>
+<span class="">Resume Set 3 with Live AI</span>
+</div>
+<div class="h-14 px-space-md rounded-lg bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1 shrink-0 select-none cursor-default border border-surface-container-high pointer-events-none" title="Finish Workout Early">
+<span class="material-symbols-outlined text-[20px]">stop_circle</span>
+<span class="hidden sm:inline">Finish</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface border-t border-surface-container-high shadow-[0_-1px_12px_rgba(0,0,0,0.4)] pointer-events-none select-none" style="background-color: rgb(17, 36, 32); border-color: rgb(26, 56, 48);">
+<div class="flex items-center justify-around h-16 px-space-xs">
+<a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant cursor-default pointer-events-none" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="font-label-sm text-label-sm mt-0.5">Home</span>
+</a>
+<a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-primary font-label-md cursor-default pointer-events-none" href="#" style="color: rgb(89, 235, 171);">
+<span class="material-symbols-outlined text-[22px]">fitness_center</span>
+<span class="font-label-sm text-label-sm mt-0.5">Workout</span>
+</a>
+<a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant cursor-default pointer-events-none" href="#">
+<span class="material-symbols-outlined text-[22px]">restaurant</span>
+<span class="font-label-sm text-label-sm mt-0.5">Nutrition</span>
+</a>
+<a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant cursor-default pointer-events-none" href="#">
+<span class="material-symbols-outlined text-[22px]">sports</span>
+<span class="font-label-sm text-label-sm mt-0.5">Coach</span>
+</a>
+<a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant cursor-default pointer-events-none" href="#">
+<span class="material-symbols-outlined text-[22px]">tune</span>
+<span class="font-label-sm text-label-sm mt-0.5">Profile</span>
+</a>
+</div>
+</nav>
+
+
+
+
+
+
+
+
+
+
+</body></html>

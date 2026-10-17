@@ -1,0 +1,176 @@
+<!DOCTYPE html><html class="dark" lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>
+body, [lang="ar"], .font-arabic { font-family: 'Cairo', 'IBM Plex Sans', sans-serif; }
+@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#131313;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}
+:root {
+  --primary: #ffffff;
+  --on-primary: #2f3131;
+  --primary-container: #e2e2e2;
+  --surface: #131313;
+  --surface-container-lowest: #0e0e0e;
+  --surface-container-low: #1c1b1b;
+  --surface-container: #201f1f;
+  --surface-container-high: #2a2a2a;
+  --surface-container-highest: #353534;
+  --on-surface: #e5e2e1;
+  --on-surface-variant: #c4c7c8;
+}
+.bg-surface { background-color: #131313; }
+.bg-surface-container-lowest { background-color: #0e0e0e; }
+.bg-surface-container-low { background-color: #1c1b1b; }
+.bg-surface-container { background-color: #201f1f; }
+.bg-surface-container-high { background-color: #2a2a2a; }
+.bg-surface-container-highest { background-color: #353534; }
+.bg-primary { background-color: #ffffff; }
+.text-primary { color: #ffffff; }
+.text-on-primary { color: #2f3131; }
+.text-on-surface { color: #e5e2e1; }
+.text-on-surface-variant { color: #c4c7c8; }
+.font-display-metric { font-family: 'Space Grotesk', sans-serif; font-size: 56px; line-height: 60px; letter-spacing: -0.04em; font-weight: 700; }
+.font-headline-lg { font-family: 'Space Grotesk', sans-serif; font-size: 32px; line-height: 38px; letter-spacing: -0.02em; font-weight: 700; }
+.font-headline-sm { font-family: 'Space Grotesk', sans-serif; font-size: 18px; line-height: 24px; letter-spacing: 0em; font-weight: 600; }
+.font-label-lg { font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 18px; letter-spacing: 0.04em; font-weight: 600; }
+.font-label-md { font-family: 'Space Grotesk', sans-serif; font-size: 12px; line-height: 16px; letter-spacing: 0.05em; font-weight: 600; }
+.font-label-sm { font-family: 'Space Grotesk', sans-serif; font-size: 10px; line-height: 14px; letter-spacing: 0.08em; font-weight: 700; }
+.font-body-md { font-family: 'IBM Plex Sans', 'Cairo', sans-serif; font-size: 14px; line-height: 20px; font-weight: 400; }
+.font-body-sm { font-family: 'IBM Plex Sans', 'Cairo', sans-serif; font-size: 12px; line-height: 16px; letter-spacing: 0.01em; font-weight: 400; }
+.px-margin { padding-left: 1rem; padding-right: 1rem; }
+.pt-space-md { padding-top: 1rem; }
+.pb-space-lg { padding-bottom: 1.5rem; }
+.pt-space-lg { padding-top: 1.5rem; }
+.gap-space-sm { gap: 0.5rem; }
+.gap-space-md { gap: 1rem; }
+.gap-space-xs { gap: 0.25rem; }
+.p-space-md { padding: 1rem; }
+</style><link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"></head><body class="bg-surface text-on-surface font-body-md flex flex-col min-h-screen" style="background-color: rgb(11, 23, 21); color: rgb(255, 255, 255);"><header class="fixed top-0 w-full z-50 pt-safe bg-surface" style="background-color: rgb(11, 23, 21);"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><div class="w-11 h-11 flex items-center justify-center rounded-lg bg-surface-container text-on-surface flex-shrink-0"><span class="material-symbols-outlined rtl:rotate-180 text-[20px]">arrow_back</span></div><div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"><img src="https://lh3.googleusercontent.com/aida/AEtjO1UAf9YrSyQ6Fz4PxqJ4u12QejL6I3JRFDV0DKrNGX8crvUzAC1_G_kcItWl9CRBpBspk4t4iRZns4J82slQdM5q8cRGNUpWDszI1564NIGLFZi2yJVHGs2xCNy_i01QzgGgSKJIf7rDfOJi2huLglZ1rpyaJwLDLc7jgaqyK4v6kKhAmkpdhwiTb3_gGJRyLjiaGGLxUhGvXTIt6xBayHMZ1YfM37--P9BG_HCatdSlDKoh4zrQ27eqy-Sg" alt="Spotter Logo" class="w-full h-full object-cover"></div><div class="flex flex-col min-w-0"><span class="font-label-sm text-primary uppercase tracking-wider truncate font-semibold">Spotter</span><h1 class="font-headline-sm text-on-surface truncate">Be spot on.</h1></div></div><div class="flex items-center gap-space-xs flex-shrink-0"><div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-low text-on-surface"><span class="relative flex h-2 w-2"><span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span></span><span class="material-symbols-outlined text-[16px] text-primary">bluetooth_searching</span><span class="font-label-sm text-on-surface uppercase">BLE LIVE</span></div><div class="h-11 px-2.5 flex items-center justify-center rounded-lg bg-surface-container text-on-surface"><span class="font-label-md text-primary uppercase">EN</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 bg-surface flex-grow" style="background-color: rgb(11, 23, 21);"><div class="flex flex-col w-full pb-safe">
+<!-- Scanning Radar Status Banner -->
+<section class="px-margin pt-space-md">
+<div class="w-full bg-surface-container-low rounded-xl p-space-md flex items-center justify-between shadow-sm" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="relative flex items-center justify-center w-10 h-10 rounded-lg bg-surface-container-high flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-[22px]">sensors</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="inline-block w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label-sm text-primary uppercase tracking-wider truncate">BLE RADAR ACTIVE</span>
+</div>
+<p class="font-body-sm text-on-surface-variant truncate">Searching for nearby telemetry devices...</p>
+</div>
+</div>
+<div class="h-11 px-3 flex items-center gap-1.5 rounded-lg bg-surface-container text-on-surface flex-shrink-0" style="pointer-events: none; cursor: default;">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+<span class="font-label-sm font-semibold uppercase">Scan</span>
+</div>
+</div>
+</section>
+<!-- Active Connected Device Card (Telemetry Core) -->
+<section class="px-margin pt-space-md">
+<div class="w-full bg-surface-container rounded-xl p-space-md flex flex-col gap-space-md shadow-md" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);">
+<!-- Device Header -->
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center flex-shrink-0 text-primary">
+<span class="material-symbols-outlined text-[26px]">monitor_heart</span>
+</div>
+<div class="flex flex-col min-w-0"><div class="flex items-center gap-2"><h2 class="font-headline-sm text-on-surface truncate">Smart Gym Band</h2><span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-label-sm" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21); font-weight: 700;"><span class="w-1.5 h-1.5 rounded-full bg-primary" style="background-color: rgb(11, 23, 21);"></span> LIVE</span></div><p class="font-body-sm text-on-surface-variant truncate">Smart Gym Band • Connected Now</p></div>
+</div>
+<div class="px-2.5 py-1 rounded-lg bg-surface-container-highest text-on-surface font-label-sm flex items-center gap-1 flex-shrink-0">
+<span class="material-symbols-outlined text-[14px] text-primary">signal_cellular_alt</span>
+<span class="">-42 dBm</span>
+</div>
+</div>
+<!-- Live Metric Grid -->
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Live BPM -->
+<div class="bg-surface-container-low rounded-lg p-3 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-on-surface-variant uppercase">PULSE RATE</span>
+<span class="material-symbols-outlined text-[14px] text-primary">favorite</span>
+</div>
+<div class="flex items-baseline gap-1 my-1">
+<span class="font-display-metric text-primary leading-none tracking-tight">74</span>
+<span class="font-label-md text-on-surface-variant">Disconnect</span>
+</div>
+<span class="font-body-sm text-primary">Normal Resting Rate</span>
+</div>
+<!-- Battery & Firmware -->
+<div class="bg-surface-container-low rounded-lg p-3 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-on-surface-variant uppercase">POWER STATE</span>
+<span class="material-symbols-outlined text-[16px] text-primary">battery_charging_full</span>
+</div>
+<div class="flex items-baseline gap-1 my-1">
+<span class="font-headline-lg text-on-surface leading-none">92%</span>
+</div>
+<div class="flex items-center justify-between font-body-sm text-on-surface-variant pt-1">
+<span class="">Firmware</span>
+<span class="font-label-sm text-on-surface">v3.1.4</span>
+</div>
+</div>
+</div>
+<!-- Quick Action Controls -->
+<div class="grid gap-space-sm pt-1 w-full">
+<div class="h-11 px-3 rounded-lg bg-surface-container-high flex items-center justify-center gap-1.5 text-on-surface" style="pointer-events: none; cursor: default;">
+<span class="material-symbols-outlined text-[18px]">link_off</span>
+<span class="font-label-md">Disconnect</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Hardware Diagnostics & Stream Health -->
+<section class="px-margin pt-space-md"><div class="flex flex-col gap-2"><div class="w-full bg-surface-container-high rounded-xl p-3 flex items-center justify-between gap-3 shadow-sm" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);"><div class="flex items-center gap-2.5 min-w-0"><div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center flex-shrink-0 text-primary"><span class="material-symbols-outlined text-[20px]">sync</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-1.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-primary"></span><span class="font-label-sm text-primary uppercase tracking-wider truncate">Reconnecting...</span></div><p class="font-body-sm text-on-surface-variant truncate">Reconnecting to Smart Gym Band...</p></div></div><span class="px-2 py-1 rounded bg-surface-container-highest font-label-sm text-on-surface flex-shrink-0">Auto 3s</span></div><div class="w-full bg-surface-container rounded-xl p-3 flex items-center justify-between gap-3 shadow-sm" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);"><div class="flex items-center gap-2.5 min-w-0"><div class="w-9 h-9 rounded-lg bg-surface-container-highest flex items-center justify-center flex-shrink-0 text-on-surface-variant"><span class="material-symbols-outlined text-[20px]">bluetooth_disabled</span></div><div class="flex flex-col min-w-0"><span class="font-label-sm text-on-surface uppercase tracking-wider truncate">Bluetooth is Off</span><p class="font-body-sm text-on-surface-variant truncate">Turn on Bluetooth to pair telemetry sensors</p></div></div><div class="h-9 px-3 rounded-lg bg-primary text-on-primary flex items-center justify-center font-label-sm font-semibold uppercase tracking-wider flex-shrink-0" style="pointer-events: none; cursor: default; background-color: rgb(89, 235, 171); color: rgb(11, 23, 21);">Enable</div></div></div></section>
+<!-- Discovered Hardware List -->
+<section class="px-margin pt-space-md">
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-headline-sm text-on-surface">Available Devices</h3>
+<span class="font-label-sm text-on-surface-variant uppercase">3 Discovered</span>
+</div>
+<div class="flex flex-col gap-2">
+<!-- Device Item 1: Smart Gym Pulse Band -->
+<div class="w-full bg-surface-container rounded-xl p-3 flex items-center justify-between gap-3 shadow-sm" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);"><div class="flex items-center gap-3 min-w-0"><div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center flex-shrink-0 text-primary"><span class="material-symbols-outlined text-[20px]">watch</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-1.5"><span class="font-label-lg text-on-surface truncate">Smart Gym Pulse Band</span><span class="inline-block w-1.5 h-1.5 rounded-full bg-primary"></span></div><div class="flex items-center gap-2 text-on-surface-variant font-body-sm truncate"><span class="">Excellent Signal</span><span class="">•</span><span class="font-label-sm text-on-surface-variant">ID: AA:BB:CC:89</span></div></div></div><div class="h-10 px-3.5 rounded-lg bg-primary text-on-primary flex items-center justify-center flex-shrink-0 font-label-md uppercase tracking-wider" style="pointer-events: none; cursor: default; background-color: rgb(89, 235, 171); color: rgb(11, 23, 21); font-weight: 700;">Connect</div></div>
+</div>
+</section>
+<!-- Dismissible Smart Advisory Box -->
+<section class="px-margin pt-space-md">
+<div class="w-full bg-surface-container-low rounded-xl p-space-md flex items-start gap-space-sm shadow-sm relative" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center flex-shrink-0 text-primary mt-0.5">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</div>
+<div class="flex flex-col min-w-0 flex-grow pr-6">
+<span class="font-label-sm text-primary uppercase tracking-wider">OFFLINE RECOVERY PROTOCOL</span>
+<p class="font-body-sm text-on-surface-variant mt-1 leading-snug">
+Auto-reconnect is enabled. If your wristband disconnects during a heavy set, Smart Gym caches rep telemetry locally and resyncs seamlessly.
+</p>
+
+</div>
+<div class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-on-surface-variant" style="pointer-events: none; cursor: default;">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</div>
+</div>
+</section>
+<!-- Floating Sticky Bottom CTA -->
+<section class="px-margin pt-space-lg pb-space-lg mt-auto">
+<div class="w-full h-14 bg-primary text-on-primary rounded-xl flex items-center justify-between px-space-md shadow-md" style="pointer-events: none; cursor: default; background-color: rgb(89, 235, 171); color: rgb(11, 23, 21); font-weight: 700;">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">monitoring</span>
+<span class="font-headline-sm tracking-wide">Live Biometrics Stream</span>
+</div>
+<div class="flex items-center gap-1.5">
+
+<span class="material-symbols-outlined rtl:rotate-180 text-[20px]">arrow_forward</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+
+
+
+
+
+
+
+
+
+
+</body></html>

@@ -8,7 +8,7 @@ class ComputeBodyMetricsUseCase implements UseCase<BodyMetrics, MetricsParams> {
   ProfileRepo profileRepo;
   ComputeBodyMetricsUseCase({required this.profileRepo});
   @override
-  Future<Either<Failure, BodyMetrics>> call(MetricsParams params) {
+  Future<Either<Failure, BodyMetrics>> call(MetricsParams params) async {
     final metrics = BodyMetrics.calculate(
       isMale: params.isMale,
       age: params.age,
@@ -17,6 +17,6 @@ class ComputeBodyMetricsUseCase implements UseCase<BodyMetrics, MetricsParams> {
       activityLevel: params.activityLevel,
       goal: params.goal,
     );
-    return profileRepo.saveMetrics(uid: params.uid, metrics: metrics);
+    return await profileRepo.saveMetrics(uid: params.uid, metrics: metrics);
   }
 }

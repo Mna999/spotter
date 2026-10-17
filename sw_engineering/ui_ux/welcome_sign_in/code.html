@@ -1,0 +1,162 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&amp;display=swap" rel="stylesheet" class=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary-fixed": "#e2e2e2", "tertiary-fixed-dim": "#c8c6c8", "inverse-surface": "#e5e2e1", "surface-variant": "#353534", "surface-container-high": "#2a2a2a", "on-surface": "#e5e2e1", "error-container": "#93000a", "surface-bright": "#3a3939", "tertiary-container": "#e4e2e4", "inverse-primary": "#5d5f5f", "on-primary-fixed-variant": "#454747", "surface-container-low": "#1c1b1b", "on-error-container": "#ffdad6", "secondary-container": "#474746", "outline": "#8e9192", "on-primary-container": "#636565", "on-secondary-container": "#b7b5b4", "background": "#131313", "on-secondary-fixed": "#1b1c1c", "secondary": "#c8c6c5", "surface-tint": "#c6c6c7", "surface": "#131313", "surface-container": "#201f1f", "surface-dim": "#131313", "primary": "#ffffff", "on-tertiary": "#303032", "surface-container-highest": "#353534", "on-surface-variant": "#c4c7c8", "tertiary-fixed": "#e4e2e4", "primary-container": "#e2e2e2", "on-secondary-fixed-variant": "#474746", "on-tertiary-fixed-variant": "#474649", "outline-variant": "#444748", "on-background": "#e5e2e1", "on-primary-fixed": "#1a1c1c", "tertiary": "#ffffff", "secondary-fixed-dim": "#c8c6c5", "on-error": "#690005", "on-primary": "#2f3131", "surface-container-lowest": "#0e0e0e", "inverse-on-surface": "#313030", "error": "#ffb4ab", "on-tertiary-fixed": "#1b1b1d", "secondary-fixed": "#e4e2e1", "on-tertiary-container": "#656466", "on-secondary": "#303030", "primary-fixed-dim": "#c6c6c7" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-xs": "0.25rem", "space-md": "1rem", "space-sm": "0.5rem", "space-xl": "2rem", "gutter": "1rem", "space-lg": "1.5rem", "margin": "1rem" }, fontFamily: { "label-sm": ["Space Grotesk"], "headline-md": ["Space Grotesk"], "body-lg": ["IBM Plex Sans"], "display-metric": ["Space Grotesk"], "label-lg": ["Space Grotesk"], "headline-sm": ["Space Grotesk"], "body-sm": ["IBM Plex Sans"], "label-md": ["Space Grotesk"], "body-md": ["IBM Plex Sans"], "headline-lg": ["Space Grotesk"] }, fontSize: { "label-sm": ["10px", { lineHeight: "14px", letterSpacing: "0.08em", fontWeight: "700" }], "headline-md": ["24px", { lineHeight: "30px", letterSpacing: "-0.01em", fontWeight: "600" }], "body-lg": ["16px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "500" }], "display-metric": ["56px", { lineHeight: "60px", letterSpacing: "-0.04em", fontWeight: "700" }], "label-lg": ["14px", { lineHeight: "18px", letterSpacing: "0.04em", fontWeight: "600" }], "headline-sm": ["18px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "600" }], "body-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "400" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }], "body-md": ["14px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }], "headline-lg": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }] } } } }</script><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#131313;color:#e5e2e1;overscroll-behavior:none;}.pb-safe{padding-bottom:max(env(safe-area-inset-bottom,0px),16px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary selection:text-on-primary" style="background-color: rgb(11, 23, 21); color: rgb(255, 255, 255);"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.6)]" style="background-color: rgba(11, 23, 21, 0.95);"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm"><div aria-label="Go back" class="w-11 h-11 flex items-center justify-center text-on-surface rounded-full pointer-events-none cursor-default"><span class="material-symbols-outlined text-[22px]">arrow_back_ios_new</span></div><h1 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate max-w-[200px]">Sign In</h1></div><div class="flex items-center gap-space-sm"><div aria-label="Toggle bilingual language English and Egyptian Arabic" class="min-h-[44px] px-space-sm py-space-xs rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant flex items-center justify-center pointer-events-none cursor-default"><span class="tracking-wider">EN</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface min-h-screen" style="background-color: rgb(11, 23, 21);"><div class="flex flex-col w-full px-margin pb-space-xl">
+<!-- Top Utility Bar: Audio Guidance & Quick Accessibility -->
+<div class="flex items-center justify-between py-space-sm mb-space-xs">
+<div class="flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm tracking-widest uppercase" style="background-color: rgba(89, 235, 171, 0.15); border: 1px solid rgba(89, 235, 171, 0.4); color: rgb(89, 235, 171);">
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style="background-color: rgb(89, 235, 171);"></span>
+<span class="">AI BioTelemetry Active</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<div aria-label="Toggle voice guidance" class="w-11 h-11 rounded-xl bg-surface-container-low text-on-surface-variant flex items-center justify-center pointer-events-none cursor-default" id="voice-coach-btn"><span class="material-symbols-outlined text-[20px]" id="voice-icon">volume_up</span></div>
+<div aria-label="Toggle Egyptian Arabic or English interface" class="h-11 px-space-md rounded-xl bg-surface-container-low text-primary font-label-md text-label-md flex items-center gap-space-xs pointer-events-none cursor-default" id="lang-switch-toggle"><span class="text-primary font-semibold">EN</span></div>
+</div>
+</div>
+<!-- Hero Identity Block -->
+<div class="flex flex-col items-center text-center mt-space-sm mb-space-lg">
+<div class="relative mb-space-md">
+<div class="w-20 h-20 rounded-xl bg-surface-container-lowest p-2 shadow-xl flex items-center justify-center">
+<img alt="Spotter App Icon" class="w-full h-full object-contain rounded-lg" src="https://lh3.googleusercontent.com/aida/AEtjO1UAf9YrSyQ6Fz4PxqJ4u12QejL6I3JRFDV0DKrNGX8crvUzAC1_G_kcItWl9CRBpBspk4t4iRZns4J82slQdM5q8cRGNUpWDszI1564NIGLFZi2yJVHGs2xCNy_i01QzgGgSKJIf7rDfOJi2huLglZ1rpyaJwLDLc7jgaqyK4v6kKhAmkpdhwiTb3_gGJRyLjiaGGLxUhGvXTIt6xBayHMZ1YfM37--P9BG_HCatdSlDKoh4zrQ27eqy-Sg">
+</div>
+
+</div>
+<div class="flex flex-col items-center gap-0.5"><h2 class="font-headline-lg text-headline-lg text-primary tracking-tight">Spotter</h2><span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest font-semibold">Be spot on.</span></div>
+<!-- Telemetry Badges / Micro-Delight Highlights -->
+<div class="grid grid-cols-2 gap-space-xs w-full mt-space-md mb-space-sm">
+<div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-2 rounded-xl text-left" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);">
+<div class="w-7 h-7 rounded-lg bg-surface-container-high flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px] text-primary" style="color: rgb(89, 235, 171);">motion_photos_on</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Vision Engine</span>
+<span class="font-body-sm text-body-sm text-primary truncate font-medium">Kinetic Tracking</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-2 rounded-xl text-left" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);">
+<div class="w-7 h-7 rounded-lg bg-surface-container-high flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px] text-primary" style="color: rgb(89, 235, 171);">restaurant</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Local Macros</span>
+<span class="font-body-sm text-body-sm text-primary truncate font-medium">Egyptian Nutrition</span>
+</div>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-xs mt-1">
+      AI-powered biomechanics coaching &amp; Egyptian nutrition guidance, built for real progress.
+    </p>
+</div>
+<!-- Sign-In Form Container -->
+<form class="flex flex-col gap-space-md w-full" id="login-form" onsubmit="event.preventDefault();">
+<!-- Email Input Card -->
+<div class="flex flex-col gap-1.5 text-left">
+<div class="flex justify-between items-baseline px-0.5">
+<label class="font-label-md text-label-md text-on-surface uppercase tracking-wider" for="email">Email Address</label>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase" id="id-tag">Required</span>
+</div>
+<div class="relative flex items-center rounded-xl bg-surface-container-lowest" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);"><div class="w-12 h-12 flex items-center justify-center text-on-surface-variant pl-1"><span class="material-symbols-outlined text-[20px]">alternate_email</span></div><input autocomplete="email" class="w-full h-12 bg-transparent text-primary placeholder:text-outline text-body-md font-body-md pr-space-md outline-none pointer-events-none cursor-default" disabled="" id="email" placeholder="karim.fouad@example.com" readonly="" required="" tabindex="-1" type="email" value="karim.fouad@example.com"></div>
+</div>
+<!-- Password Input Card -->
+<div class="flex flex-col gap-1.5 text-left">
+<div class="flex justify-between items-baseline px-0.5">
+<label class="font-label-md text-label-md text-on-surface uppercase tracking-wider" for="password">Password</label>
+<span class="font-label-sm text-label-sm text-primary underline decoration-outline-variant underline-offset-4 pointer-events-none cursor-default">Forgot Password?</span>
+</div>
+<div class="relative flex items-center rounded-xl bg-surface-container-lowest" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);"><div class="w-12 h-12 flex items-center justify-center text-on-surface-variant pl-1"><span class="material-symbols-outlined text-[20px]">lock</span></div><input autocomplete="current-password" class="w-full h-12 bg-transparent text-primary placeholder:text-outline text-body-md font-body-md pr-12 outline-none font-mono tracking-widest pointer-events-none cursor-default" disabled="" id="password" placeholder="••••••••••••" readonly="" required="" tabindex="-1" type="password"><div aria-label="Toggle password visibility" class="absolute right-1 w-11 h-11 flex items-center justify-center text-on-surface-variant rounded-lg pointer-events-none cursor-default" id="toggle-password"><span class="material-symbols-outlined text-[20px]" id="eye-icon">visibility</span></div></div>
+</div>
+<!-- Remember Session Telemetry Strip -->
+
+<!-- Primary Action Bar (56px High-Impact Gym Target) -->
+<div class="w-full h-14 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg font-bold uppercase tracking-wider flex items-center justify-between px-space-lg shadow-lg mt-space-xs pointer-events-none cursor-default" id="submit-btn" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21); font-weight: 700;"><span class="flex items-center gap-space-xs"><span class="tracking-normal">Sign In</span></span><div class="w-8 h-8 rounded-lg bg-surface flex items-center justify-center text-primary shadow-sm" style="background-color: rgb(11, 23, 21); color: rgb(89, 235, 171);"><span class="material-symbols-outlined text-[20px]" id="action-arrow">arrow_forward</span></div></div>
+</form>
+<!-- Divider Section -->
+<div class="relative flex items-center justify-center my-space-lg">
+<div class="w-full h-[1px] bg-surface-container-highest"></div>
+<div class="absolute px-space-md bg-surface text-on-surface-variant font-label-sm text-label-sm uppercase tracking-widest flex items-center gap-space-xs"><span class="">Or continue with</span></div>
+</div>
+<!-- Social Fast-Pass Providers -->
+<div class="flex flex-col gap-space-sm w-full">
+<!-- Google Auth Button -->
+<div class="w-full h-12 rounded-xl bg-surface-container-low text-on-surface font-label-md text-label-md flex items-center justify-between px-space-md pointer-events-none cursor-default" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);"><div class="flex items-center gap-space-md"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#FFFFFF"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#C4C7C8"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#8E9192"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#E5E2E1"></path></svg><span class="tracking-wide font-medium">Continue with Google</span></div></div>
+<!-- Apple Auth Button -->
+
+</div>
+<!-- Switch Mode & Registration Link -->
+<div class="flex flex-col items-center justify-center mt-space-xl text-center gap-space-xs">
+<p class="font-body-md text-body-md text-on-surface-variant">Don't have an account?</p>
+<span class="inline-flex items-center gap-1.5 font-label-md text-label-md text-primary font-bold underline decoration-primary underline-offset-4 pointer-events-none cursor-default"><span class="">Create Account</span><span class="material-symbols-outlined text-[16px] inline-block">chevron_right</span></span>
+</div>
+<!-- Regulatory & End-To-End Security Microcopy -->
+<div class="mt-space-lg px-space-sm pt-space-md flex flex-col items-center gap-2 text-center">
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+<span class="">Encrypted Local Vault • Cairo Cloud Relay</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline leading-relaxed max-w-xs">
+      By continuing, you agree to our <span class="text-on-surface underline pointer-events-none cursor-default">Terms of Service</span> &amp; <span class="text-on-surface underline pointer-events-none cursor-default">Privacy Policy</span>. Biometric data is stored with zero-knowledge encryption.
+    </p>
+</div>
+</div>
+<script>
+  // Toggle password visibility with micro-haptic state switch
+  const togglePassBtn = document.getElementById('toggle-password');
+  const passwordInput = document.getElementById('password');
+  const eyeIcon = document.getElementById('eye-icon');
+
+  if (togglePassBtn && passwordInput && eyeIcon) {
+    togglePassBtn.addEventListener('click', () => {
+      const isPassword = passwordInput.getAttribute('type') === 'password';
+      passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+      eyeIcon.textContent = isPassword ? 'visibility_off' : 'visibility';
+    });
+  }
+
+  // Voice coaching toggle micro-interaction
+  const voiceBtn = document.getElementById('voice-coach-btn');
+  const voiceIcon = document.getElementById('voice-icon');
+  let voiceActive = true;
+
+  if (voiceBtn && voiceIcon) {
+    voiceBtn.addEventListener('click', () => {
+      voiceActive = !voiceActive;
+      voiceIcon.textContent = voiceActive ? 'volume_up' : 'volume_off';
+      voiceBtn.classList.toggle('text-primary', voiceActive);
+      voiceBtn.classList.toggle('text-outline', !voiceActive);
+    });
+  }
+
+  // Language switch toggle visual demo
+  const langToggle = document.getElementById('lang-switch-toggle');
+  let currentLang = 'EN';
+  if (langToggle) {
+    langToggle.addEventListener('click', () => {
+      currentLang = currentLang === 'EN' ? 'AR' : 'EN';
+      if (currentLang === 'AR') {
+        langToggle.innerHTML = '<span class="text-on-surface-variant font-normal">EN</span><span class="text-outline text-label-sm">/</span><span class="text-primary font-semibold">عربي</span>';
+      } else {
+        langToggle.innerHTML = '<span class="text-primary font-semibold">EN</span><span class="text-outline text-label-sm">/</span><span class="text-on-surface-variant font-normal">عربي</span>';
+      }
+    });
+  }
+</script></main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

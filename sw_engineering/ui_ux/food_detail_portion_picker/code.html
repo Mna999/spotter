@@ -1,0 +1,300 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#131313;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-surface": "#e5e2e1", "primary-fixed": "#e2e2e2", "on-tertiary-fixed-variant": "#474649", "inverse-primary": "#5d5f5f", "on-background": "#e5e2e1", "secondary-fixed": "#e4e2e1", "tertiary-container": "#e4e2e4", "surface-container-low": "#1c1b1b", "on-secondary-fixed": "#1b1c1c", "error": "#ffb4ab", "surface-variant": "#353534", "surface": "#131313", "tertiary": "#ffffff", "surface-container": "#201f1f", "surface-bright": "#3a3939", "on-tertiary-container": "#656466", "surface-tint": "#c6c6c7", "tertiary-fixed-dim": "#c8c6c8", "on-primary": "#2f3131", "outline-variant": "#444748", "inverse-on-surface": "#313030", "on-secondary-container": "#b7b5b4", "on-error-container": "#ffdad6", "secondary": "#c8c6c5", "error-container": "#93000a", "on-secondary": "#303030", "on-secondary-fixed-variant": "#474746", "inverse-surface": "#e5e2e1", "on-surface-variant": "#c4c7c8", "on-tertiary-fixed": "#1b1b1d", "surface-container-highest": "#353534", "background": "#131313", "primary-fixed-dim": "#c6c6c7", "secondary-container": "#474746", "surface-container-lowest": "#0e0e0e", "on-error": "#690005", "on-tertiary": "#303032", "surface-container-high": "#2a2a2a", "on-primary-fixed-variant": "#454747", "on-primary-container": "#636565", "primary-container": "#e2e2e2", "surface-dim": "#131313", "primary": "#ffffff", "tertiary-fixed": "#e4e2e4", "on-primary-fixed": "#1a1c1c", "secondary-fixed-dim": "#c8c6c5", "outline": "#8e9192" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "margin": "1rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-lg": "1.5rem", "space-md": "1rem", "space-xl": "2rem" }, fontFamily: { "label-lg": ["Space Grotesk"], "headline-md": ["Space Grotesk"], "headline-lg": ["Space Grotesk"], "body-md": ["IBM Plex Sans"], "headline-sm": ["Space Grotesk"], "label-sm": ["Space Grotesk"], "display-metric": ["Space Grotesk"], "body-sm": ["IBM Plex Sans"], "label-md": ["Space Grotesk"], "body-lg": ["IBM Plex Sans"] }, fontSize: { "label-lg": ["14px", { lineHeight: "18px", letterSpacing: "0.04em", fontWeight: "600" }], "headline-md": ["24px", { lineHeight: "30px", letterSpacing: "-0.01em", fontWeight: "600" }], "headline-lg": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "body-md": ["14px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }], "headline-sm": ["18px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "600" }], "label-sm": ["10px", { lineHeight: "14px", letterSpacing: "0.08em", fontWeight: "700" }], "display-metric": ["56px", { lineHeight: "60px", letterSpacing: "-0.04em", fontWeight: "700" }], "body-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "400" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }], "body-lg": ["16px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "500" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen" style="background-color: rgb(11, 23, 21); color: rgb(255, 255, 255);"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl pt-safe" style="background-color: rgba(11, 23, 21, 0.85); border-bottom: 1px solid rgb(26, 56, 48);"><div class="h-16 px-gutter flex items-center justify-between"><div class="flex items-center gap-space-sm"><button class="w-11 h-11 flex items-center justify-center text-on-surface hover:text-primary" onclick="history.back()"><span class="material-symbols-outlined text-[22px]">arrow_back</span></button><img src="https://lh3.googleusercontent.com/aida/AEtjO1UAf9YrSyQ6Fz4PxqJ4u12QejL6I3JRFDV0DKrNGX8crvUzAC1_G_kcItWl9CRBpBspk4t4iRZns4J82slQdM5q8cRGNUpWDszI1564NIGLFZi2yJVHGs2xCNy_i01QzgGgSKJIf7rDfOJi2huLglZ1rpyaJwLDLc7jgaqyK4v6kKhAmkpdhwiTb3_gGJRyLjiaGGLxUhGvXTIt6xBayHMZ1YfM37--P9BG_HCatdSlDKoh4zrQ27eqy-Sg" alt="Spotter" class="h-9 w-9 object-contain rounded-lg"><div class="flex flex-col"><h1 class="font-headline-sm text-headline-sm uppercase text-on-surface truncate">Spotter</h1><span class="font-label-sm text-label-sm text-primary tracking-wide">Be spot on.</span></div></div><div class="flex items-center"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full px-margin pt-16 pb-safe bg-surface min-h-screen"><div class="flex flex-col w-full pb-space-xl">
+<!-- Internal Navigation Header Action Area -->
+<div class="flex items-center justify-between py-space-sm mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">restaurant</span>
+<span class="font-label-md text-label-md text-on-surface tracking-wide uppercase">Food Item Details / تفاصيل الوجبة</span>
+</div>
+<button aria-label="Toggle Bookmark" class="w-11 h-11 rounded-lg bg-surface-container flex items-center justify-center text-on-surface active:scale-95 transition-transform" id="favorite-btn">
+<span class="material-symbols-outlined text-[20px] transition-colors" id="fav-icon">bookmark</span>
+</button>
+</div>
+<!-- Hero Visual & Bio Card -->
+<div class="w-full bg-surface-container rounded-xl overflow-hidden shadow-md flex flex-col mb-space-md">
+<div class="relative w-full h-56 bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up gourmet high protein Egyptian Koshary in a minimalist dark matte ceramic bowl with seasoned brown lentils, whole chickpeas, crispy golden onions, and spiced tomato sauce on a dark industrial slate background, high contrast studio lighting, hyper detailed food photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADhZ8PXWpXu7I0UUii-d94nNRBsbtUEiJ8aZIoCGuxgIe4jj7YKiJ0bSJpo7SHFswMNWKTMWM80pw8wPldKl2HsgAaghpshAsK1-NxznOxd_zFHT3ZMi92Fq49o6TlxKv_yz3mbHzq9PsSYdLWcBrl8Y-lHRYU6UUwY_9vb8-a9giGn5u_SaGwBUdnMwhnjC8L2QdAk0EbzYU25U1zoLYiUXtW3LrR-A7E4qOK56eraivA1gaL6tXcBQ">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/30 to-transparent"></div>
+<!-- Real-time Status Badge -->
+<div class="absolute top-3 left-3 bg-surface-container-lowest/90 px-space-sm py-1 rounded flex items-center gap-space-xs shadow-sm">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface uppercase">Egyptian Lean Fit</span>
+</div>
+<!-- Live Portion Tag -->
+<div class="absolute bottom-3 right-3 bg-surface-container-high/90 px-space-sm py-1 rounded">
+<span class="font-label-sm text-label-sm text-primary uppercase" id="badge-weight">400g Total Mass</span>
+</div>
+</div>
+<!-- Title & Quick Price Meta -->
+<div class="p-space-md flex flex-col gap-space-xs">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex flex-col">
+<h2 class="font-headline-md text-headline-md text-primary tracking-tight">High-Protein Egyptian Koshary</h2>
+<p class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-normal mt-0.5" dir="rtl">كشري عالي البروتين والعدس</p>
+</div>
+</div>
+<div class="flex items-center gap-space-sm mt-space-xs">
+<span class="font-label-lg text-label-lg text-primary" id="hero-price">45 EGP</span>
+<span class="text-outline text-xs">•</span>
+<span class="font-label-lg text-label-lg text-secondary" id="hero-cals">480 kcal total</span>
+</div>
+</div>
+</div>
+<!-- Interactive Portion Selector -->
+<div class="bg-surface-container rounded-xl p-space-md flex flex-col gap-space-md mb-space-md shadow-sm" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary uppercase">Portion Size / حجم الحصة</span>
+<span class="font-label-md text-label-md text-primary font-bold" id="active-multiplier-label" style="color: rgb(89, 235, 171);">1 plate (400g)</span>
+</div>
+<!-- Portion Quick Chips -->
+<div class="grid grid-cols-2 gap-space-xs pointer-events-none">
+<button class="portion-btn py-space-sm px-space-xs rounded bg-surface-container-low text-on-surface text-center transition-all flex flex-col items-center justify-center min-h-[48px] active:scale-98" data-factor="0.5" onclick="setPortion(0.5, '0.5 plate (200g)', 'نصف طبق')" style="background-color: rgb(18, 30, 28); border: 1px solid rgba(89, 235, 171, 0.25);">
+<span class="font-label-md text-label-md">0.5 Plate</span>
+<span class="font-body-sm text-body-sm text-secondary" dir="rtl">نصف طبق</span>
+</button>
+<button class="portion-btn py-space-sm px-space-xs rounded bg-primary text-on-primary text-center transition-all flex flex-col items-center justify-center min-h-[48px] active:scale-98" data-factor="1.0" onclick="setPortion(1.0, '1 plate (400g)', 'طبق واحد')" style="background-color: rgb(89, 235, 171); color: rgb(11, 23, 21); font-weight: 700; border: 1px solid rgb(89, 235, 171); box-shadow: rgba(89, 235, 171, 0.4) 0px 0px 14px;">
+<span class="font-label-md text-label-md">1 Plate</span>
+<span class="font-body-sm text-body-sm" dir="rtl">طبق واحد</span>
+</button>
+<button class="portion-btn py-space-sm px-space-xs rounded bg-surface-container-low text-on-surface text-center transition-all flex flex-col items-center justify-center min-h-[48px] active:scale-98" data-factor="1.5" onclick="setPortion(1.5, '1.5 plates (600g)', 'طبق ونصف')" style="background-color: rgb(18, 30, 28); border: 1px solid rgba(89, 235, 171, 0.25);">
+<span class="font-label-md text-label-md">1.5 Plates</span>
+<span class="font-body-sm text-body-sm text-secondary" dir="rtl">طبق ونصف</span>
+</button>
+<button class="portion-btn py-space-sm px-space-xs rounded bg-surface-container-low text-on-surface text-center transition-all flex flex-col items-center justify-center min-h-[48px] active:scale-98" data-factor="2.0" onclick="setPortion(2.0, '2 plates (800g)', 'طبقان')" style="background-color: rgb(18, 30, 28); border: 1px solid rgba(89, 235, 171, 0.25);">
+<span class="font-label-md text-label-md">2 Plates</span>
+<span class="font-body-sm text-body-sm text-secondary" dir="rtl">طبقان</span>
+</button>
+</div>
+<!-- Precision Stepper Controller -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-space-xs rounded-lg mt-space-xs pointer-events-none" style="border: 1px solid rgba(89, 235, 171, 0.3); background-color: rgb(9, 22, 20);">
+<button aria-label="Decrease portion" class="w-12 h-12 rounded bg-surface-container flex items-center justify-center text-primary" onclick="adjustStep(-0.5)" style="color: rgb(89, 235, 171); border: 1px solid rgba(89, 235, 171, 0.4); background-color: rgb(18, 30, 28);">
+<span class="material-symbols-outlined text-[20px]">remove</span>
+</button>
+<div class="flex flex-col items-center">
+<span class="font-headline-sm text-headline-sm text-primary" id="stepper-text" style="color: rgb(89, 235, 171);">1.0</span>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">Plate Factor</span>
+</div>
+<button aria-label="Increase portion" class="w-12 h-12 rounded bg-surface-container flex items-center justify-center text-primary" onclick="adjustStep(0.5)" style="color: rgb(89, 235, 171); border: 1px solid rgba(89, 235, 171, 0.4); background-color: rgb(18, 30, 28);">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+<!-- Macro Summary Telemetry Cards -->
+<div class="grid grid-cols-3 gap-space-xs mb-space-md">
+<!-- Protein -->
+<div class="bg-surface-container p-space-md rounded-xl flex flex-col shadow-sm" style="background-color: rgb(18, 30, 28); border: 1px solid rgb(26, 56, 48);">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-sm text-label-sm text-secondary uppercase">Protein</span>
+<span class="material-symbols-outlined text-primary text-[16px]">fitness_center</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-md text-headline-md text-primary" id="macro-protein">32</span>
+<span class="font-body-sm text-body-sm text-secondary">g</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full mt-space-sm overflow-hidden">
+<div class="bg-primary h-full transition-all duration-300" id="bar-protein" style="width: 70%; background-color: rgb(89, 235, 171);"></div>
+</div>
+<span class="font-body-sm text-body-sm text-secondary mt-1" dir="rtl">بروتين</span>
+</div>
+<!-- Carbs -->
+<div class="bg-surface-container p-space-md rounded-xl flex flex-col shadow-sm" style="background-color: rgb(18, 30, 28); border: 1px solid rgb(26, 56, 48);">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-sm text-label-sm text-secondary uppercase">Carbs</span>
+<span class="material-symbols-outlined text-primary text-[16px]">grain</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-md text-headline-md text-primary" id="macro-carbs">68</span>
+<span class="font-body-sm text-body-sm text-secondary">g</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full mt-space-sm overflow-hidden">
+<div class="bg-primary h-full transition-all duration-300" id="bar-carbs" style="width: 60%; background-color: rgb(89, 235, 171);"></div>
+</div>
+<span class="font-body-sm text-body-sm text-secondary mt-1" dir="rtl">نشويات</span>
+</div>
+<!-- Fats -->
+<div class="bg-surface-container p-space-md rounded-xl flex flex-col shadow-sm" style="background-color: rgb(18, 30, 28); border: 1px solid rgb(26, 56, 48);">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-sm text-label-sm text-secondary uppercase">Fats</span>
+<span class="material-symbols-outlined text-primary text-[16px]">opacity</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-md text-headline-md text-primary" id="macro-fats">9</span>
+<span class="font-body-sm text-body-sm text-secondary">g</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full mt-space-sm overflow-hidden">
+<div class="bg-primary h-full transition-all duration-300" id="bar-fats" style="width: 25%; background-color: rgb(89, 235, 171);"></div>
+</div>
+<span class="font-body-sm text-body-sm text-secondary mt-1" dir="rtl">دهون صحية</span>
+</div>
+</div>
+<!-- Egyptian Budget Impact Card / Alert Chip -->
+<div class="w-full bg-surface-container rounded-xl p-space-md mb-space-lg flex flex-col gap-space-xs shadow-sm" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px]">account_balance_wallet</span>
+<span class="font-label-sm text-label-sm text-secondary uppercase">Egyptian Daily Food Budget</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-bold" id="budget-delta">+45 EGP</span>
+</div>
+<!-- Visual Progress Representation -->
+<div class="w-full bg-surface-container-lowest h-2 rounded-full mt-space-xs overflow-hidden flex" style="border: 1px solid rgba(89, 235, 171, 0.3); background-color: rgb(9, 22, 20);">
+<div class="bg-secondary h-full" style="width: 65%;"></div>
+<div class="bg-primary h-full transition-all duration-300" id="budget-bar-delta" style="width: 25%;"></div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-body-sm text-body-sm text-on-surface" id="budget-progress-text">New Total: 155 → 200 EGP</span>
+<div class="flex items-center gap-1 bg-surface-container-highest px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-primary text-[14px]">warning</span>
+<span class="font-label-sm text-label-sm text-primary" id="budget-threshold">180 EGP Alert Met</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5" dir="rtl">تحذير ميزانية الوجبات اليومية: تجاوز الحد المخصص بـ ٢٠ ج.م</p>
+</div>
+<!-- Action Stack -->
+<div class="flex flex-col gap-space-sm w-full">
+<!-- Primary CTA: Add to Log -->
+<button class="w-full h-14 bg-primary text-on-primary rounded-xl flex items-center justify-between px-space-lg shadow-md pointer-events-none" id="add-log-btn" onclick="triggerLogSuccess()" style="background-color: rgb(89, 235, 171); color: rgb(0, 56, 35); font-weight: 700; pointer-events: none; cursor: default;">
+<div class="flex flex-col text-left">
+<span class="font-label-lg text-label-lg font-bold">Add to Log</span>
+<span class="font-body-sm text-body-sm text-on-primary-container" dir="rtl">إضافة إلى السجل</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="font-label-md text-label-md font-semibold" id="btn-price-calc">45 EGP</span>
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+</div>
+</button>
+<!-- Dedicated Secondary: Repeat Yesterday's Meal -->
+<button class="w-full min-h-[52px] bg-surface-container text-on-surface rounded-xl flex items-center justify-between px-space-md py-space-xs shadow-sm pointer-events-none" onclick="applyYesterdayPattern()" style="background-color: rgb(17, 36, 32); border: 1px solid rgb(26, 56, 48);">
+<div class="flex items-center gap-space-sm text-left">
+<div class="w-8 h-8 rounded bg-surface-container-lowest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">history</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Repeat Yesterday</span>
+<span class="font-body-sm text-body-sm text-secondary">1 plate koshary + green salad (Karim)</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-body-sm text-body-sm text-secondary" dir="rtl">تكرار وجبة الأمس</span>
+<span class="font-label-sm text-label-sm text-primary">55 EGP Total</span>
+</div>
+</button>
+</div>
+<!-- Notification Toast for Interaction Feedback -->
+<div class="fixed bottom-6 left-4 right-4 bg-primary text-on-primary px-space-md py-space-sm rounded-xl shadow-xl flex items-center justify-between transition-all duration-300 z-50 opacity-0 pointer-events-none translate-y-4" id="toast">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<span class="font-label-md text-label-md font-semibold" id="toast-text">Meal Logged: 400g Koshary / تم التسجيل بنجاح</span>
+</div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">OK</span>
+</div>
+</div>
+<script>
+  let currentFactor = 1.0;
+  const basePrice = 45;
+  const baseCals = 480;
+  const baseProtein = 32;
+  const baseCarbs = 68;
+  const baseFats = 9;
+  const basePriorTotal = 155;
+  const budgetAlert = 180;
+
+  function updateTelemetry() {
+    const calculatedPrice = Math.round(basePrice * currentFactor);
+    const calculatedCals = Math.round(baseCals * currentFactor);
+    const calculatedProt = Math.round(baseProtein * currentFactor);
+    const calculatedCarbs = Math.round(baseCarbs * currentFactor);
+    const calculatedFats = Math.round(baseFats * currentFactor);
+    const newTotal = basePriorTotal + calculatedPrice;
+
+    // DOM Updates
+    document.getElementById('hero-price').innerText = calculatedPrice + ' EGP';
+    document.getElementById('hero-cals').innerText = calculatedCals + ' kcal total';
+    document.getElementById('badge-weight').innerText = Math.round(400 * currentFactor) + 'g Total Mass';
+    
+    document.getElementById('macro-protein').innerText = calculatedProt;
+    document.getElementById('macro-carbs').innerText = calculatedCarbs;
+    document.getElementById('macro-fats').innerText = calculatedFats;
+
+    document.getElementById('stepper-text').innerText = currentFactor.toFixed(1);
+    document.getElementById('btn-price-calc').innerText = calculatedPrice + ' EGP';
+
+    // Budget Update
+    document.getElementById('budget-delta').innerText = '+' + calculatedPrice + ' EGP';
+    document.getElementById('budget-progress-text').innerHTML = `New Total: ${basePriorTotal} &rarr; ${newTotal} EGP`;
+    
+    const deltaPercent = Math.min(35, Math.round((calculatedPrice / 250) * 100));
+    document.getElementById('budget-bar-delta').style.width = deltaPercent + '%';
+
+    // Highlight chip selection
+    document.querySelectorAll('.portion-btn').forEach(btn => {
+      const f = parseFloat(btn.getAttribute('data-factor'));
+      if (Math.abs(f - currentFactor) < 0.05) {
+        btn.classList.remove('bg-surface-container-low', 'text-on-surface');
+        btn.classList.add('bg-primary', 'text-on-primary');
+        const secondaryText = btn.querySelector('.text-secondary');
+        if (secondaryText) secondaryText.classList.remove('text-secondary');
+      } else {
+        btn.classList.add('bg-surface-container-low', 'text-on-surface');
+        btn.classList.remove('bg-primary', 'text-on-primary');
+        const subspan = btn.querySelectorAll('span')[1];
+        if (subspan) subspan.classList.add('text-secondary');
+      }
+    });
+  }
+
+  function setPortion(factor, enLabel, arLabel) {
+    currentFactor = factor;
+    document.getElementById('active-multiplier-label').innerText = enLabel;
+    updateTelemetry();
+  }
+
+  function adjustStep(delta) {
+    currentFactor = Math.max(0.5, Math.min(3.0, currentFactor + delta));
+    document.getElementById('active-multiplier-label').innerText = currentFactor.toFixed(1) + ' plates (' + Math.round(currentFactor * 400) + 'g)';
+    updateTelemetry();
+  }
+
+  // Favorite toggle
+  const favBtn = document.getElementById('favorite-btn');
+  const favIcon = document.getElementById('fav-icon');
+  let isFav = false;
+  favBtn.addEventListener('click', () => {
+    isFav = !isFav;
+    favIcon.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
+    showToast(isFav ? 'Added to Egyptian Favorites / تم الحفظ' : 'Removed from Favorites');
+  });
+
+  function triggerLogSuccess() {
+    showToast('Meal Logged: ' + (currentFactor * 400) + 'g Koshary / تم التسجيل بنجاح');
+  }
+
+  function applyYesterdayPattern() {
+    setPortion(1.0, '1 plate (400g) + Salad', 'طبق واحد + سلطة');
+    showToast('Applied Karim\'s Yesterday Lunch Combo (1 Plate + Salad)');
+  }
+
+  function showToast(text) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-text').innerText = text;
+    toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+    toast.classList.add('opacity-100', 'translate-y-0');
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+      toast.classList.remove('opacity-100', 'translate-y-0');
+    }, 2400);
+  }
+</script></main>
+
+
+
+
+
+
+
+</body></html>
