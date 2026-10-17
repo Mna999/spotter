@@ -50,6 +50,7 @@ dependencies:
   get_it: ^9.3.0
   flutter_bloc: ^9.1.1
   font_awesome_flutter: ^11.0.0
+  introduction_screen: ^5.0.1
 
 dev_dependencies:
   flutter_test:

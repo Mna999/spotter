@@ -25,6 +25,8 @@ final class ProfileLoaded extends ProfileState {
   List<Object?> get props => [userProfile, bodyMetrics];
 }
 
+final class OnBoardingNotCompleted extends ProfileState {}
+
 final class ProfileError extends ProfileState {
   final String message;
 

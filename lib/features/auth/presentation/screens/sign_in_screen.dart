@@ -8,7 +8,7 @@ import 'package:spotter/core/route/routing.dart';
 import 'package:spotter/core/snack_bar_builder.dart';
 import 'package:spotter/core/usecases/usecase.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
-import 'package:spotter/features/auth/presentation/screens/home_screen.dart';
+import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
 import 'package:spotter/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:spotter/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:spotter/features/auth/presentation/widgets/info_tile.dart';
@@ -42,12 +42,17 @@ class _SignInScreenState extends State<SignInScreen> {
     final cs = Theme.of(context).colorScheme;
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthError)
+        if (state is AuthError) {
           SnackBarBuilder.showSnackBar(context, state.message, true, cs);
-        if (state is Authenticated)
-          Routing.routeReplacement(const HomeScreen(), context);
+        }
+        if (state is Authenticated) {
+          context.read<ProfileBloc>().add(
+            ProfileLoadRequested(
+              profileParams: ProfileParams(state.userAccount.uid),
+            ),
+          );
+        }
       },
-
       builder: (context, state) {
         bool isLoading = state is AuthLoading ? true : false;
         return Scaffold(
@@ -85,7 +90,6 @@ class _SignInScreenState extends State<SignInScreen> {
                       const SizedBox(height: 30),
                       SizedBox(
                         width: constraints.maxWidth * 0.25,
-
                         child: Image.asset(
                           './lib/core/assets/images/logo.png',
                           scale: 0.1,
@@ -199,7 +203,6 @@ class _SignInScreenState extends State<SignInScreen> {
                               : null,
                           child: Text(
                             'Forgot Password?',
-
                             style: text.titleSmall!,
                           ),
                         ),
@@ -219,8 +222,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                         ),
                                       ),
                                     );
-                                  } else
+                                  } else {
                                     log('not valid');
+                                  }
                                 }
                               : null,
                           label: const Align(

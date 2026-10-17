@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotter/core/theme/app_theme.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
+import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
 import 'package:spotter/features/auth/presentation/screens/home_screen.dart';
+import 'package:spotter/features/auth/presentation/screens/onBoarding_screen.dart';
 import 'package:spotter/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:spotter/firebase_options.dart';
 import 'package:spotter/injection_container.dart';
@@ -26,6 +28,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<AuthBloc>(
           create: (_) => sl<AuthBloc>()..add(SessionRestoreRequested()),
         ),
+        BlocProvider<ProfileBloc>(create: (_) => sl<ProfileBloc>()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -38,9 +41,22 @@ class MyApp extends StatelessWidget {
           child: SafeArea(top: false, child: child!),
         ),
         home: BlocBuilder<AuthBloc, AuthState>(
-          builder: (context, state) => state is Authenticated
-              ? const HomeScreen()
-              : const SignInScreen(),
+          builder: (context, authState) {
+            if (authState is! Authenticated) return const SignInScreen();
+
+            return BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, profileState) => switch (profileState) {
+                OnBoardingNotCompleted() => const OnboardingScreen(),
+                ProfileLoaded() => const HomeScreen(),
+                ProfileError(:final message) => Scaffold(
+                  body: Center(child: Text(message)),
+                ),
+                _ => const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                ),
+              },
+            );
+          },
         ),
       ),
     );

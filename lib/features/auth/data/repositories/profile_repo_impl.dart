@@ -2,7 +2,6 @@ import 'package:dartz/dartz.dart';
 import 'package:spotter/core/error/exception.dart';
 import 'package:spotter/core/error/exception_handler.dart';
 import 'package:spotter/core/error/failure.dart';
-import 'package:spotter/core/network/network_info.dart';
 import 'package:spotter/features/auth/data/datasources/profile_remote_data_source.dart';
 import 'package:spotter/features/auth/domain/entities/body_metrics.dart';
 import 'package:spotter/features/auth/domain/entities/user_profile.dart';
@@ -10,12 +9,8 @@ import 'package:spotter/features/auth/domain/repositories/profile_repo.dart';
 
 class ProfileRepoImpl implements ProfileRepo {
   ProfileRemoteDataSource profileRemoteDataSource;
-  NetworkInfo networkInfo;
 
-  ProfileRepoImpl({
-    required this.profileRemoteDataSource,
-    required this.networkInfo,
-  });
+  ProfileRepoImpl({required this.profileRemoteDataSource});
   @override
   Future<Either<Failure, UserProfile>> create({
     required String uid,
@@ -57,15 +52,11 @@ class ProfileRepoImpl implements ProfileRepo {
   Future<Either<Failure, UserProfile?>> get({required String uid}) async {
     try {
       return Right(await profileRemoteDataSource.get(uid: uid));
+    } on OnBoardingException catch (e) {
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
-      );
-    } on OnBoardingException catch (e) {
-      return const Left(
-        OnBoardingFailure(
-          message: 'Please finish setting up your profile to continue.',
-        ),
       );
     }
   }

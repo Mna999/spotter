@@ -5,7 +5,7 @@ import 'package:spotter/core/route/routing.dart';
 import 'package:spotter/core/snack_bar_builder.dart';
 import 'package:spotter/core/usecases/usecase.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
-import 'package:spotter/features/auth/presentation/screens/home_screen.dart';
+import 'package:spotter/features/auth/presentation/screens/onBoarding_screen.dart';
 import 'package:spotter/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:spotter/features/auth/presentation/widgets/spotter_title.dart';
 import 'package:spotter/features/auth/presentation/widgets/text_form_title.dart';
@@ -63,7 +63,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               cs,
             );
 
-            Routing.routeReplacement(const HomeScreen(), context);
+            Routing.routeReplacement(const OnboardingScreen(), context);
           }
         },
         builder: (context, state) {
