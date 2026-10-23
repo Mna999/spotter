@@ -90,7 +90,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       final data = res.data();
       if (data == null || data['age'] == null)
         throw OnBoardingException(code: 'onboarding-not-completed');
-      return UserProfileModel.fromJson(res.data()!);
+      return UserProfileModel.fromJson(data);
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
@@ -150,6 +150,18 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
           .collection('users')
           .doc(uid)
           .update(userProfile.toJson());
+
+      await saveMetrics(
+        metrics: BodyMetrics.calculate(
+          isMale: isMale,
+          age: age,
+          height: height,
+          weight: weight,
+          activityLevel: activityLevel,
+          goal: goal,
+        ),
+        uid: uid,
+      );
       return userProfile;
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);

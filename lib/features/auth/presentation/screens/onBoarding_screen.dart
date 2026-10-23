@@ -7,7 +7,7 @@ import 'package:spotter/core/usecases/usecase.dart';
 import 'package:spotter/features/auth/domain/entities/user_profile.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:spotter/features/auth/presentation/bloc/onBoarding_bloc/on_boarding_bloc.dart';
-import 'package:spotter/features/auth/presentation/screens/home_screen.dart';
+
 import 'package:spotter/features/auth/presentation/widgets/about_you_step.dart';
 import 'package:spotter/features/auth/presentation/widgets/body_step.dart';
 import 'package:spotter/features/auth/presentation/widgets/goal_step.dart';
@@ -15,6 +15,7 @@ import 'package:spotter/features/auth/presentation/widgets/lifestyle_step.dart';
 import 'package:spotter/features/auth/presentation/widgets/step_container.dart';
 import 'package:spotter/features/auth/presentation/widgets/training_step.dart';
 import 'package:spotter/features/auth/presentation/widgets/welcome_step.dart';
+import 'package:spotter/home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

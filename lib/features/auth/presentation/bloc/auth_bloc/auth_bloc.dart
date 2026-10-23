@@ -34,7 +34,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.verifyAccountUseCase,
     required this.checkEmailVerifiedUseCase,
   }) : super(AuthInitial()) {
-    
     on<SessionRestoreRequested>((event, emit) async {
       emit(AuthLoading());
       final res = await restoreSessionUseCase(NoParams());

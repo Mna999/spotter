@@ -25,6 +25,7 @@ class BodyMetrics extends Equatable {
     final ree =
         (10 * weight) + (6.25 * height) - (5 * age) + (isMale ? 5 : -161);
     final tdee = ree * activityLevel.factor;
+    
     return BodyMetrics(
       bmi: weight / (heightM * heightM),
       ree: ree,
