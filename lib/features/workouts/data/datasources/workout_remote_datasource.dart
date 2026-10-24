@@ -121,7 +121,8 @@ class WorkoutRemoteDatasourceImpl implements WorkoutRemoteDataSource {
       final doc = firebaseFirestore
           .collection('users')
           .doc(workout.uid)
-          .collection('workouts').doc();
+          .collection('workouts')
+          .doc();
       workoutSessionModel.workoutId = doc.id;
       await doc.set(workoutSessionModel.toJson(isCreating: true));
       return workoutSessionModel;
@@ -141,7 +142,7 @@ class WorkoutRemoteDatasourceImpl implements WorkoutRemoteDataSource {
           .doc(workout.uid)
           .collection('workouts')
           .doc(workout.workoutId)
-          .set(workoutSessionModel.toJson());
+          .update(workoutSessionModel.toJson());
       return workoutSessionModel;
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
