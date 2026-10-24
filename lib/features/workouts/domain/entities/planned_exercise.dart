@@ -1,27 +1,33 @@
 import 'package:equatable/equatable.dart';
 
 class PlannedExercise extends Equatable {
-  final String plannedExerciseId;
+   String plannedExerciseId;
 
-  final String workoutId;
+   String workoutId;
 
-  final String uid;
+   String uid;
 
-  final String exerciseId;
+   String exerciseId;
 
-  final int order;
+   int order;
 
-  final int targetSets;
+   int targetSets;
 
-  final int targetReps;
+   int targetReps;
 
-  final double targetLoad;
+   double targetLoad;
 
-  final String targetTempo;
+   String targetTempo;
 
-  final int restSec;
+   int restSec;
 
-  const PlannedExercise({
+   int schemaVersion;
+
+   DateTime createdAt;
+
+   DateTime? updatedAt;
+
+   PlannedExercise({
     required this.plannedExerciseId,
     required this.workoutId,
     required this.uid,
@@ -32,6 +38,9 @@ class PlannedExercise extends Equatable {
     required this.targetLoad,
     required this.targetTempo,
     required this.restSec,
+    required this.schemaVersion,
+    required this.createdAt,
+    this.updatedAt,
   });
 
   PlannedExercise copyWith({
@@ -59,7 +68,9 @@ class PlannedExercise extends Equatable {
     targetLoad: targetLoad ?? this.targetLoad,
     targetTempo: targetTempo ?? this.targetTempo,
     restSec: restSec ?? this.restSec,
-
+    schemaVersion: schemaVersion ?? this.schemaVersion,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
   );
 
   @override
@@ -74,6 +85,9 @@ class PlannedExercise extends Equatable {
     targetLoad,
     targetTempo,
     restSec,
+    schemaVersion,
+    createdAt,
+    updatedAt,
   
   ];
 }

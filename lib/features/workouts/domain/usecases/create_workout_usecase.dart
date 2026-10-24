@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:spotter/core/constants.dart';
 import 'package:spotter/core/error/failure.dart';
 import 'package:spotter/core/usecases/usecase.dart';
 import 'package:spotter/features/workouts/domain/entities/session_status.dart';
@@ -17,7 +18,13 @@ class CreateWorkoutUseCase implements UseCase<WorkoutSession, CreateParams> {
         : SessionStatus.planned;
 
     return await workoutRepo.save(
-      workout: WorkoutSession(workoutId: '', uid: params.uid, status: status),
+      workout: WorkoutSession(
+        workoutId: '',
+        uid: params.uid,
+        status: status,
+        schemaVersion: SCHEMA_VERSION,
+        createdAt: DateTime.now(),
+      ),
     );
   }
 }

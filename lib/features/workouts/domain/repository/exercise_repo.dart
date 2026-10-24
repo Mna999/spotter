@@ -8,5 +8,4 @@ abstract class ExerciseRepo {
     required ExerciseFilterParams filter,
   });
   Future<Either<Failure, Exercise?>> get({required String id});
-  Future<Either<Failure, List<Exercise>>> search({required String query});
 }

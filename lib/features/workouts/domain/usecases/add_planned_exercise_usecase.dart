@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:spotter/core/constants.dart';
 import 'package:spotter/core/error/failure.dart';
 import 'package:spotter/core/usecases/usecase.dart';
 import 'package:spotter/features/workouts/domain/entities/planned_exercise.dart';
@@ -27,6 +28,8 @@ class AddPlannedExerciseUseCase
         targetLoad: params.targetLoad,
         targetTempo: params.targetTempo,
         restSec: params.restSec,
+        schemaVersion: SCHEMA_VERSION,
+        createdAt: DateTime.now(),
       ),
     );
   }

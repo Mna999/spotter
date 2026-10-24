@@ -12,6 +12,7 @@ class DeleteSetUseCase implements UseCase<Unit, SetIdParams> {
     return await setRepo.deleteSet(
       uid: params.uid,
       workoutId: params.workoutId,
+      plannedExerciseId: params.plannedExerciseId,
       setId: params.setId,
     );
   }

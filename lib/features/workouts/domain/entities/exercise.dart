@@ -22,6 +22,8 @@ class Exercise extends Equatable {
 
   final DateTime? updatedAt;
 
+ 
+
   const Exercise({
     required this.exerciseId,
     required this.nameAr,
@@ -33,6 +35,7 @@ class Exercise extends Equatable {
     required this.schemaVersion,
     required this.createdAt,
     this.updatedAt,
+ 
   });
 
   @override
@@ -40,5 +43,6 @@ class Exercise extends Equatable {
         exerciseId, nameAr, nameEn,
         requiredLandmarks, repThresholds, rules, cues,
         schemaVersion, createdAt, updatedAt,
+      
       ];
 }

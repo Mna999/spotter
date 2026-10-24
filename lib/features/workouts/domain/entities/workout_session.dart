@@ -1,30 +1,35 @@
 import 'package:equatable/equatable.dart';
+
 import 'session_status.dart';
 
 class WorkoutSession extends Equatable {
-  final String workoutId;
+  String workoutId;
 
-  final String uid;
+  String uid;
 
-  final DateTime? startedAt;
+  DateTime? startedAt;
 
-  final DateTime? scheduledFor;
+  DateTime? scheduledFor;
 
-  final DateTime? endedAt;
+  DateTime? endedAt;
 
-  final SessionStatus status;
+  SessionStatus status;
 
-  final int? avgHr;
+  int? avgHr;
 
-  final int? maxHr;
+  int? maxHr;
 
-  final double? meanFormScore;
+  double? meanFormScore;
 
- 
+  int currentIndex;
 
-  final int currentIndex;
+  int schemaVersion;
 
-  const WorkoutSession({
+  DateTime createdAt;
+
+  DateTime? updatedAt;
+
+  WorkoutSession({
     required this.workoutId,
     required this.uid,
     this.startedAt,
@@ -34,8 +39,11 @@ class WorkoutSession extends Equatable {
     this.avgHr,
     this.maxHr,
     this.meanFormScore,
-  
+
     this.currentIndex = 0,
+    required this.schemaVersion,
+    required this.createdAt,
+    this.updatedAt,
   });
 
   WorkoutSession copyWith({
@@ -52,27 +60,38 @@ class WorkoutSession extends Equatable {
     DateTime? createdAt,
     DateTime? updatedAt,
     int? currentIndex,
-  }) =>
-      WorkoutSession(
-        workoutId: workoutId ?? this.workoutId,
-        uid: uid ?? this.uid,
-        startedAt: startedAt ?? this.startedAt,
-        scheduledFor: scheduledFor ?? this.scheduledFor,
-        endedAt: endedAt ?? this.endedAt,
-        status: status ?? this.status,
-        avgHr: avgHr ?? this.avgHr,
-        maxHr: maxHr ?? this.maxHr,
-        meanFormScore: meanFormScore ?? this.meanFormScore,
- 
-        currentIndex: currentIndex ?? this.currentIndex,
-      );
+  }) => WorkoutSession(
+    workoutId: workoutId ?? this.workoutId,
+    uid: uid ?? this.uid,
+    startedAt: startedAt ?? this.startedAt,
+    scheduledFor: scheduledFor ?? this.scheduledFor,
+    endedAt: endedAt ?? this.endedAt,
+    status: status ?? this.status,
+    avgHr: avgHr ?? this.avgHr,
+    maxHr: maxHr ?? this.maxHr,
+    meanFormScore: meanFormScore ?? this.meanFormScore,
+
+    currentIndex: currentIndex ?? this.currentIndex,
+    schemaVersion: schemaVersion ?? this.schemaVersion,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
 
   @override
   List<Object?> get props => [
-        workoutId, uid, startedAt, scheduledFor, endedAt,
-        status,
-        avgHr, maxHr, meanFormScore,
-   
-        currentIndex,
-      ];
+    workoutId,
+    uid,
+    startedAt,
+    scheduledFor,
+    endedAt,
+    status,
+    avgHr,
+    maxHr,
+    meanFormScore,
+
+    currentIndex,
+    schemaVersion,
+    createdAt,
+    updatedAt,
+  ];
 }

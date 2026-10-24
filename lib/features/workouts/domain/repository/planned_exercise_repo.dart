@@ -21,15 +21,7 @@ abstract class PlannedExerciseRepo {
   });
 
   Future<Either<Failure, PlannedExercise>> update({
-    required String uid,
-    required String workoutId,
-    required String plannedExerciseId,
-    int? order,
-    int? targetSets,
-    int? targetReps,
-    double? targetLoad,
-    String? targetTempo,
-    int? restSec,
+    required PlannedExercise plannedExercise,
   });
   Future<Either<Failure, Unit>> delete({
     required String uid,
