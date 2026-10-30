@@ -7,9 +7,10 @@ import 'package:spotter/features/auth/presentation/bloc/onBoarding_bloc/on_board
 import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
 import 'package:spotter/features/auth/presentation/screens/onBoarding_screen.dart';
 import 'package:spotter/features/auth/presentation/screens/sign_in_screen.dart';
+import 'package:spotter/features/workouts/presentation/blocs/workout_session_bloc/workout_session_bloc.dart';
 import 'package:spotter/firebase_options.dart';
-import 'package:spotter/home_screen.dart';
 import 'package:spotter/injection_container.dart';
+import 'package:spotter/main_shell.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<ProfileBloc>(create: (_) => sl<ProfileBloc>()),
         BlocProvider<OnBoardingBloc>(create: (_) => sl<OnBoardingBloc>()),
+        BlocProvider<WorkoutSessionBloc>(
+          create: (_) => sl<WorkoutSessionBloc>(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -50,7 +54,7 @@ class MyApp extends StatelessWidget {
             return BlocBuilder<ProfileBloc, ProfileState>(
               builder: (context, profileState) => switch (profileState) {
                 OnBoardingNotCompleted() => const OnboardingScreen(),
-                ProfileLoaded() => const HomeScreen(),
+                ProfileLoaded() => const MainShell(),
                 ProfileError(:final message) => Scaffold(
                   body: Center(child: Text(message)),
                 ),

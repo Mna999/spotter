@@ -21,3 +21,11 @@ class ExerciseSelected extends ExerciseLibraryEvent {
   @override
   List<Object> get props => [exerciseId];
 }
+
+class ExerciseDetailsRequested extends ExerciseLibraryEvent {
+  final List<String> exerciseIds;
+
+  ExerciseDetailsRequested({required this.exerciseIds});
+  @override
+  List<Object> get props => [exerciseIds];
+}

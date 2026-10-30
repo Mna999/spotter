@@ -43,16 +43,23 @@ final _textTheme = TextTheme(
 
 @immutable
 class AppColors extends ThemeExtension<AppColors> {
-  const AppColors({required this.success, required this.warning});
+  const AppColors({
+    required this.success,
+    required this.warning,
+    required this.carbs,
+  });
 
   final Color success;
   final Color warning;
+  final Color carbs;
 
   @override
-  AppColors copyWith({Color? success, Color? warning}) => AppColors(
-    success: success ?? this.success,
-    warning: warning ?? this.warning,
-  );
+  AppColors copyWith({Color? success, Color? warning, Color? carbs}) =>
+      AppColors(
+        success: success ?? this.success,
+        warning: warning ?? this.warning,
+        carbs: carbs ?? this.carbs,
+      );
 
   @override
   AppColors lerp(AppColors? other, double t) {
@@ -60,6 +67,7 @@ class AppColors extends ThemeExtension<AppColors> {
     return AppColors(
       success: Color.lerp(success, other.success, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
+      carbs: Color.lerp(carbs, other.carbs, t)!,
     );
   }
 }
@@ -131,13 +139,52 @@ class AppTheme {
 
   static ThemeData get dark => _build(
     _darkScheme,
-    const AppColors(success: Color(0xFF22C55E), warning: Color(0xFFF59E0B)),
+    const AppColors(
+      success: Color(0xFF22C55E),
+      warning: Color(0xFFF59E0B),
+      carbs: Color(0xFFD2691E),
+    ),
   );
 
   static ThemeData get light => _build(
     _lightScheme,
-    const AppColors(success: Color(0xFF15803D), warning: Color(0xFFB45309)),
+    const AppColors(
+      success: Color(0xFF15803D),
+      warning: Color(0xFFB45309),
+      carbs: Color(0xFFA6500F),
+    ),
   );
+}
+
+/// A subtle fade + slide used for every page transition so navigation feels
+/// consistent across platforms.
+class _SmoothPageTransitionsBuilder extends PageTransitionsBuilder {
+  const _SmoothPageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final curved = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+    return FadeTransition(
+      opacity: curved,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.04),
+          end: Offset.zero,
+        ).animate(curved),
+        child: child,
+      ),
+    );
+  }
 }
 
 ThemeData _build(ColorScheme cs, AppColors extra) {
@@ -156,6 +203,16 @@ ThemeData _build(ColorScheme cs, AppColors extra) {
   return ThemeData(
     useMaterial3: true,
     colorScheme: cs,
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: _SmoothPageTransitionsBuilder(),
+        TargetPlatform.iOS: _SmoothPageTransitionsBuilder(),
+        TargetPlatform.macOS: _SmoothPageTransitionsBuilder(),
+        TargetPlatform.windows: _SmoothPageTransitionsBuilder(),
+        TargetPlatform.linux: _SmoothPageTransitionsBuilder(),
+        TargetPlatform.fuchsia: _SmoothPageTransitionsBuilder(),
+      },
+    ),
     fontFamily: _plexSans,
     fontFamilyFallback: _arabicFallback,
     textTheme: text,

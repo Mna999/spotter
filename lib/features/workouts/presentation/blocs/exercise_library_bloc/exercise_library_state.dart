@@ -27,6 +27,15 @@ final class ExerciseLoaded extends ExerciseLibraryState {
   List<Object?> get props => [exercise];
 }
 
+final class ExerciseDetailsLoaded extends ExerciseLibraryState {
+  final Map<String, Exercise> exercises;
+
+  const ExerciseDetailsLoaded({required this.exercises});
+
+  @override
+  List<Object?> get props => [exercises];
+}
+
 final class ExerciseLibraryError extends ExerciseLibraryState {
   String message;
 

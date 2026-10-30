@@ -14,7 +14,7 @@ import 'package:spotter/features/auth/presentation/screens/reset_password_screen
 import 'package:spotter/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:spotter/features/auth/presentation/widgets/info_tile.dart';
 import 'package:spotter/features/auth/presentation/widgets/text_form_title.dart';
-import 'package:spotter/home_screen.dart';
+import 'package:spotter/main_shell.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -45,7 +45,7 @@ class _SignInScreenState extends State<SignInScreen> {
     return BlocConsumer<ProfileBloc, ProfileState>(
       listener: (context, profileState) {
         if (profileState is ProfileLoaded) {
-          Routing.routeReplacement(const HomeScreen(), context);
+          Routing.routeReplacement(const MainShell(), context);
         } else if (profileState is OnBoardingNotCompleted) {
           Routing.routeReplacement(const OnboardingScreen(), context);
         }

@@ -3,7 +3,7 @@ import 'package:spotter/core/constants.dart';
 import 'package:spotter/features/workouts/domain/entities/planned_exercise.dart';
 
 class PlannedExerciseModel extends PlannedExercise {
-   PlannedExerciseModel({
+  PlannedExerciseModel({
     required super.plannedExerciseId,
     required super.workoutId,
     required super.uid,
@@ -33,7 +33,7 @@ class PlannedExerciseModel extends PlannedExercise {
       restSec: (json['restSec'] as num).toInt(),
       schemaVersion: (json['schemaVersion'] as num).toInt(),
       createdAt: (json['createdAt'] as Timestamp).toDate(),
-      updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(),
+      updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(), 
     );
   }
 

@@ -1,0 +1,91 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // admin custom claim, set from the Admin SDK / a Cloud Function
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    // Writes must keep the owner's uid on the document.
+    // On update, request.resource.data is the full post-write document,
+    // so this also prevents re-assigning a document to another user.
+    function ownedWrite(uid) {
+      return isOwner(uid) && request.resource.data.uid == uid;
+    }
+
+    // users/{uid}: document ID is the Auth UID.
+    // Subcollection rules go INSIDE this block: rules do not cascade,
+    // so every nested path needs its own match.
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid);
+
+      // users/{uid}/workouts/{workoutId}
+      match /workouts/{workoutId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if ownedWrite(uid);
+
+        // users/{uid}/workouts/{workoutId}/plannedExercises/{plannedExerciseId}
+        match /plannedExercises/{plannedExerciseId} {
+          allow read, delete: if isOwner(uid);
+          allow create, update: if ownedWrite(uid);
+
+          // .../plannedExercises/{plannedExerciseId}/sets/{setId}
+          match /sets/{setId} {
+            allow read, delete: if isOwner(uid);
+            allow create, update: if ownedWrite(uid);
+          }
+        }
+      }
+    }
+
+    // Legacy user-owned top-level collections: each document carries the owner's uid field
+    match /{collection}/{docId} {
+      allow read, delete: if collection in
+          ['workouts', 'sets', 'biometrics', 'meals', 'chat', 'alerts', 'devices']
+          && isOwner(resource.data.uid);
+
+      allow create: if collection in
+          ['workouts', 'sets', 'biometrics', 'meals', 'chat', 'alerts', 'devices']
+          && isOwner(request.resource.data.uid);
+
+      allow update: if collection in
+          ['workouts', 'sets', 'biometrics', 'meals', 'chat', 'alerts', 'devices']
+          && isOwner(resource.data.uid)
+          && request.resource.data.uid == resource.data.uid;
+    }
+
+    // Catalogues: any signed-in user reads, only admins write
+    match /foods/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+    match /exercises/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+    match /appConfig/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // Audit log: admins can read, nobody writes from a client.
+    // Entries are written by the Admin SDK / Cloud Functions, which bypass rules.
+    match /auditLog/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Anything not matched above is denied by default.
+  }
+}

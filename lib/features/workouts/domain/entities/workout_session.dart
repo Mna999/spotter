@@ -7,6 +7,8 @@ class WorkoutSession extends Equatable {
 
   String uid;
 
+  String name;
+
   DateTime? startedAt;
 
   DateTime? scheduledFor;
@@ -32,6 +34,7 @@ class WorkoutSession extends Equatable {
   WorkoutSession({
     required this.workoutId,
     required this.uid,
+    this.name = 'Workout',
     this.startedAt,
     this.scheduledFor,
     this.endedAt,
@@ -49,6 +52,7 @@ class WorkoutSession extends Equatable {
   WorkoutSession copyWith({
     String? workoutId,
     String? uid,
+    String? name,
     DateTime? startedAt,
     DateTime? scheduledFor,
     DateTime? endedAt,
@@ -63,6 +67,7 @@ class WorkoutSession extends Equatable {
   }) => WorkoutSession(
     workoutId: workoutId ?? this.workoutId,
     uid: uid ?? this.uid,
+    name: name ?? this.name,
     startedAt: startedAt ?? this.startedAt,
     scheduledFor: scheduledFor ?? this.scheduledFor,
     endedAt: endedAt ?? this.endedAt,
@@ -81,6 +86,7 @@ class WorkoutSession extends Equatable {
   List<Object?> get props => [
     workoutId,
     uid,
+    name,
     startedAt,
     scheduledFor,
     endedAt,

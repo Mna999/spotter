@@ -22,8 +22,7 @@ class ExerciseRemoteDatasourceImpl implements ExerciseRemoteDataSource {
           .get();
       final data = res.data();
       if (data == null) return null;
-      ExerciseModel exerciseModel = ExerciseModel.fromJson(data);
-      return exerciseModel;
+      return ExerciseModel.fromJson(data, documentId: exerciseId);
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
@@ -34,45 +33,68 @@ class ExerciseRemoteDatasourceImpl implements ExerciseRemoteDataSource {
     required ExerciseFilterParams filter,
   }) async {
     try {
-      final query = filter.query;
-      if (query == null) return [];
-      Query res = firebaseFirestore
-          .collection('exercises')
-          .where(
-            Filter.or(
-              Filter(
-                'nameLowerEn',
-                isGreaterThanOrEqualTo: query.toLowerCase(),
-                isLessThan: '${query.toLowerCase()}\u{F8FF}',
-              ),
-              Filter(
-                'nameLowerAr',
-                isGreaterThanOrEqualTo: query.toLowerCase(),
-                isLessThan: '${query.toLowerCase()}\u{F8FF}',
-              ),
-            ),
-          )
-          .limit(filter.limit);
+      final collection = firebaseFirestore.collection('exercises');
+      final query = filter.query?.trim().toLowerCase();
+      final limit = filter.limit;
 
-      if (filter.cursor != null) {
-        final cursorDoc = await firebaseFirestore
-            .collection('exercises')
-            .doc(filter.cursor)
-            .get();
-        if (cursorDoc.exists) {
-          res = res.startAfterDocument(cursorDoc);
+      if (query == null || query.isEmpty) {
+        // No search term: read the whole catalogue straight from Firestore so
+        // the picker can list every exercise before the user types anything.
+        final snapshot = limit > 0
+            ? await collection.limit(limit).get()
+            : await collection.get();
+        return _sorted(snapshot.docs.map(_toModel));
+      }
+
+      // Case-insensitive prefix search, executed by Firestore.
+      // Each name field needs its own range query: a Filter takes exactly one
+      // operator, and a single range query cannot span two different fields.
+      final upperBound = '$query\u{F8FF}';
+      final snapshots = await Future.wait([
+        _prefixQuery(collection, 'nameLowerEn', query, upperBound, limit),
+        _prefixQuery(collection, 'nameLowerAr', query, upperBound, limit),
+      ]);
+
+      final byId = <String, ExerciseModel>{};
+      for (final snapshot in snapshots) {
+        for (final doc in snapshot.docs) {
+          final model = _toModel(doc);
+          byId[model.exerciseId] = model;
         }
       }
 
-      QuerySnapshot<Object?> data = await res.get();
-
-      return data.docs
-          .map(
-            (doc) => ExerciseModel.fromJson(doc.data() as Map<String, dynamic>),
-          )
-          .toList();
+      final models = _sorted(byId.values);
+      return limit > 0 && models.length > limit
+          ? models.sublist(0, limit)
+          : models;
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> _prefixQuery(
+    CollectionReference<Map<String, dynamic>> collection,
+    String field,
+    String prefix,
+    String upperBound,
+    int limit,
+  ) {
+    Query<Map<String, dynamic>> query = collection
+        .where(field, isGreaterThanOrEqualTo: prefix)
+        .where(field, isLessThan: upperBound);
+    if (limit > 0) query = query.limit(limit);
+    return query.get();
+  }
+
+  ExerciseModel _toModel(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+    return ExerciseModel.fromJson(doc.data(), documentId: doc.id);
+  }
+
+  /// Merging the English and Arabic result sets produces an unsorted list, so
+  /// it is ordered by English name before it reaches the UI.
+  List<ExerciseModel> _sorted(Iterable<ExerciseModel> models) {
+    return models.toList()..sort(
+      (a, b) => a.nameEn.toLowerCase().compareTo(b.nameEn.toLowerCase()),
+    );
   }
 }

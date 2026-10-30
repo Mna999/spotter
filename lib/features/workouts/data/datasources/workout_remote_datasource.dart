@@ -13,10 +13,7 @@ abstract class WorkoutRemoteDataSource {
     required String workoutId,
   });
 
-  Future<List<WorkoutSessionModel>> recent({
-    required String uid,
-    int limit = 20,
-  });
+  Future<List<WorkoutSessionModel>> recent({required String uid, int? limit});
 
   Future<List<WorkoutSessionModel>> inRange({
     required String uid,
@@ -93,17 +90,20 @@ class WorkoutRemoteDatasourceImpl implements WorkoutRemoteDataSource {
   @override
   Future<List<WorkoutSessionModel>> recent({
     required String uid,
-    int limit = 20,
+    int? limit,
   }) async {
     try {
-      final res = await firebaseFirestore
+      Query<Map<String, dynamic>> res = firebaseFirestore
           .collection('users')
           .doc(uid)
           .collection('workouts')
-          .limit(limit)
-          .orderBy('createdAt')
-          .get();
-      final data = res.docs
+          .orderBy('createdAt');
+
+      if (limit != null) {
+        res = res.limit(limit);
+      }
+      final getter = await res.get();
+      final data = getter.docs
           .map((doc) => WorkoutSessionModel.fromJson(doc.data()))
           .toList();
       return data;

@@ -62,7 +62,7 @@ class WorkoutRepoImpl implements WorkoutRepo {
   @override
   Future<Either<Failure, List<WorkoutSession>>> recent({
     required String uid,
-    int limit = 20,
+    int? limit,
   }) async {
     try {
       return Right(

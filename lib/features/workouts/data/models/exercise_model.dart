@@ -17,21 +17,39 @@ class ExerciseModel extends Exercise {
     super.updatedAt,
   });
 
-  factory ExerciseModel.fromJson(Map<String, dynamic> json) {
+  factory ExerciseModel.fromJson(
+    Map<String, dynamic> json, {
+    String? documentId,
+  }) {
     return ExerciseModel(
-      exerciseId: json['exerciseId'] as String,
-      nameAr: json['nameAr'] as String,
-      nameEn: json['nameEn'] as String,
+      exerciseId: (json['exerciseId'] as String?)?.trim().isNotEmpty == true
+          ? json['exerciseId'] as String
+          : (documentId ?? ''),
+      nameAr: (json['nameAr'] as String?) ?? '',
+      nameEn: (json['nameEn'] as String?) ?? '',
       cues: (json['cues'] as Map<String, dynamic>?)?.map(
         (k, v) => MapEntry(k, CueText.fromJson(v)),
       ),
       repThresholds: json['repThresholds'] as Map<String, dynamic>?,
       requiredLandmarks: (json['requiredLandmarks'] as List?)?.cast<int>(),
       rules: (json['rules'] as List?)?.cast<Map<String, dynamic>>(),
-      schemaVersion: (json['schemaVersion'] as num).toInt(),
-      createdAt: (json['createdAt'] as Timestamp).toDate(),
-      updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(),
+      // The seeded catalogue documents only carry the fields above, so fall
+      // back to defaults instead of throwing on the missing ones.
+      schemaVersion: (json['schemaVersion'] as num?)?.toInt() ?? SCHEMA_VERSION,
+      createdAt:
+          _toDateTime(json['createdAt']) ??
+          DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt: _toDateTime(json['updatedAt']),
     );
+  }
+
+  static DateTime? _toDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    return null;
   }
 
   factory ExerciseModel.fromEntity(Exercise e) {
@@ -53,9 +71,9 @@ class ExerciseModel extends Exercise {
     return {
       'exerciseId': exerciseId,
       'nameAr': nameAr,
-      'nameArLower': nameAr.toLowerCase(),
+      'nameLowerAr': nameAr.toLowerCase(),
       'nameEn': nameEn,
-      'nameEnLower': nameEn.toLowerCase(),
+      'nameLowerEn': nameEn.toLowerCase(),
       'cues': cues?.map((k, v) => MapEntry(k, v.toJson())),
       'repThresholds': repThresholds,
       'requiredLandmarks': requiredLandmarks,

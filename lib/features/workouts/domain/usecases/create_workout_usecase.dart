@@ -21,7 +21,9 @@ class CreateWorkoutUseCase implements UseCase<WorkoutSession, CreateParams> {
       workout: WorkoutSession(
         workoutId: '',
         uid: params.uid,
+        name: params.name,
         status: status,
+        scheduledFor: scheduledFor,
         schemaVersion: SCHEMA_VERSION,
         createdAt: DateTime.now(),
       ),

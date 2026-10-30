@@ -15,7 +15,7 @@ import 'package:spotter/features/auth/presentation/widgets/lifestyle_step.dart';
 import 'package:spotter/features/auth/presentation/widgets/step_container.dart';
 import 'package:spotter/features/auth/presentation/widgets/training_step.dart';
 import 'package:spotter/features/auth/presentation/widgets/welcome_step.dart';
-import 'package:spotter/home_screen.dart';
+import 'package:spotter/main_shell.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -80,7 +80,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           if (state is OnBoardingError)
             SnackBarBuilder.showSnackBar(context, state.message, true, cs);
           if (state is OnBoardingCompleted)
-            Routing.routeReplacement(const HomeScreen(), context);
+            Routing.routeReplacement(const MainShell(), context);
         },
         builder: (context, state) {
           return BlocBuilder<AuthBloc, AuthState>(
