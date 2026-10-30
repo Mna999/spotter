@@ -25,6 +25,8 @@ class _WorkoutListScreenState extends State<WorkoutListScreen> {
   bool _openingDetail = false;
   String? _uid;
 
+  String? _deletingId;
+
   @override
   void initState() {
     super.initState();
@@ -91,6 +93,8 @@ class _WorkoutListScreenState extends State<WorkoutListScreen> {
           FilledButton(
             onPressed: () {
               Navigator.pop(dialogContext);
+              if (!mounted) return;
+              setState(() => _deletingId = workout.workoutId);
               final bloc = context.read<WorkoutSessionBloc>();
               bloc.add(WorkoutDeleted(uid: uid, workoutId: workout.workoutId));
               bloc.add(LoadWorkouts(uid: uid));
@@ -126,16 +130,43 @@ class _WorkoutListScreenState extends State<WorkoutListScreen> {
       body: BlocConsumer<WorkoutSessionBloc, WorkoutSessionState>(
         listener: (context, state) {
           if (state is WorkoutsLoaded) {
-            _lastWorkouts = state.workoutSessions;
+            final deletingId = _deletingId;
+            _lastWorkouts = deletingId == null
+                ? state.workoutSessions
+                : state.workoutSessions
+                      .where((session) => session.workoutId != deletingId)
+                      .toList();
+            if (_deletingId != null) setState(() => _deletingId = null);
           }
           if (state is WorkoutError) {
+            if (_deletingId != null) setState(() => _deletingId = null);
             SnackBarBuilder.showSnackBar(context, state.message, true, cs);
           }
-          if (state is WorkoutLoaded) {
+          if (state is WorkoutEmpty && _deletingId != null) {
+            // The delete finished: drop it from the cached list right away so
+            // the screen cannot fall back to "No workouts yet" while the list
+            // refresh is still on its way.
+            final deletingId = _deletingId;
+            final remaining = _lastWorkouts
+                .where((session) => session.workoutId != deletingId)
+                .toList();
+            if (remaining.isNotEmpty) {
+              // Still has workouts to show: stop the delete spinner and render
+              // the updated list. When nothing is left, keep spinning until the
+              // refresh confirms the list really is empty.
+              setState(() {
+                _lastWorkouts = remaining;
+                _deletingId = null;
+              });
+            }
+          } else if (state is WorkoutLoaded) {
             _openDetail(state.workoutSession);
           }
         },
         builder: (context, state) {
+          if (_deletingId != null) {
+            return const Center(child: CircularProgressIndicator());
+          }
           // Keep the cached list on screen while a refresh is in flight so the
           // calendar keeps the week the user navigated to (and the list does
           // not flash a full-screen spinner on every reload).
@@ -151,7 +182,7 @@ class _WorkoutListScreenState extends State<WorkoutListScreen> {
               onRetry: _load,
             );
           }
-          if (state is WorkoutEmpty) {
+          if (state is WorkoutEmpty && _lastWorkouts.isEmpty) {
             return _messageView(
               context,
               title: 'No workouts yet',
@@ -161,9 +192,7 @@ class _WorkoutListScreenState extends State<WorkoutListScreen> {
             );
           }
 
-          final workouts = state is WorkoutsLoaded
-              ? state.workoutSessions
-              : _lastWorkouts;
+          final workouts = _lastWorkouts;
 
           if (workouts.isEmpty) {
             return _messageView(

@@ -1,33 +1,33 @@
 import 'package:equatable/equatable.dart';
 
 class PlannedExercise extends Equatable {
-   String plannedExerciseId;
+  String plannedExerciseId;
 
-   String workoutId;
+  String workoutId;
 
-   String uid;
+  String uid;
 
-   String exerciseId;
+  String exerciseId;
 
-   int order;
+  int order;
 
-   int targetSets;
+  int targetSets;
 
-   int targetReps;
+  int targetReps;
 
-   double targetLoad;
+  double targetLoad;
 
-   String targetTempo;
+  String targetTempo;
 
-   int restSec;
+  int restSec;
 
-   int schemaVersion;
+  int schemaVersion;
 
-   DateTime createdAt;
+  DateTime createdAt;
 
-   DateTime? updatedAt;
+  DateTime? updatedAt;
 
-   PlannedExercise({
+  PlannedExercise({
     required this.plannedExerciseId,
     required this.workoutId,
     required this.uid,
@@ -88,6 +88,5 @@ class PlannedExercise extends Equatable {
     schemaVersion,
     createdAt,
     updatedAt,
-  
   ];
 }

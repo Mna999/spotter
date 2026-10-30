@@ -68,11 +68,15 @@ void main() {
   });
 
   testWidgets('marks a scheduled workout as a plan', (tester) async {
+    final now = DateTime.now();
+    // Keep the scheduled date inside the visible week (Monday to Sunday) so the
+    // test does not depend on which weekday it happens to run.
+    final daysUntilSunday = DateTime.daysPerWeek - now.weekday;
     final planned = _session(
       status: SessionStatus.planned,
-      createdAt: DateTime.now(),
+      createdAt: now,
       id: 'w2',
-    )..scheduledFor = DateTime.now().add(const Duration(days: 2));
+    )..scheduledFor = now.add(Duration(days: daysUntilSunday));
 
     await tester.pumpWidget(_host(WorkoutWeekCalendar(workouts: [planned])));
 
