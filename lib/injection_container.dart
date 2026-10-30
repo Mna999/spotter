@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:spotter/core/network/network_info.dart';
 import 'package:spotter/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:spotter/features/auth/data/datasources/profile_remote_data_source.dart';
 import 'package:spotter/features/auth/data/repositories/auth_repo_impl.dart';
@@ -201,16 +203,19 @@ Future<void> initWorkouts() async {
   sl.registerLazySingleton(() => UpdateWorkoutUseCase(workoutRepo: sl()));
 
   sl.registerLazySingleton<WorkoutRepo>(
-    () => WorkoutRepoImpl(workoutRemoteDataSource: sl()),
+    () => WorkoutRepoImpl(workoutRemoteDataSource: sl(), networkInfo: sl()),
   );
   sl.registerLazySingleton<PlannedExerciseRepo>(
-    () => PlannedExerciseRepoImpl(plannedExerciseRemoteDataSource: sl()),
+    () => PlannedExerciseRepoImpl(
+      plannedExerciseRemoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
   );
   sl.registerLazySingleton<SetRepo>(
-    () => SetRepoImpl(setRemoteDataSource: sl()),
+    () => SetRepoImpl(setRemoteDataSource: sl(), networkInfo: sl()),
   );
   sl.registerLazySingleton<ExerciseRepo>(
-    () => ExerciseRepoImpl(exerciseRemoteDataSource: sl()),
+    () => ExerciseRepoImpl(exerciseRemoteDataSource: sl(), networkInfo: sl()),
   );
 
   sl.registerLazySingleton<WorkoutRemoteDataSource>(
@@ -225,4 +230,10 @@ Future<void> initWorkouts() async {
   sl.registerLazySingleton<ExerciseRemoteDataSource>(
     () => ExerciseRemoteDatasourceImpl(firebaseFirestore: sl()),
   );
+
+  sl.registerLazySingleton<NetworkInfo>(
+    () => NetworkInfoImpl(internetConnection: sl()),
+  );
+
+  sl.registerLazySingleton(() => InternetConnection());
 }

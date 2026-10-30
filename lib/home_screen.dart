@@ -12,6 +12,7 @@ import 'package:spotter/features/workouts/presentation/blocs/workout_session_blo
 import 'package:spotter/features/workouts/presentation/screens/workout_detail_screen.dart';
 import 'package:spotter/features/workouts/presentation/widgets/section_title.dart';
 import 'package:spotter/features/workouts/presentation/widgets/workout_card.dart';
+import 'package:spotter/features/workouts/presentation/widgets/workout_week_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.onOpenWorkouts});
@@ -118,6 +119,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   workout: _nextWorkout(workouts),
                   onOpen: (workout) => _openDetail(workout),
                   onPlan: widget.onOpenWorkouts,
+                ),
+                const SizedBox(height: 16),
+                WorkoutWeekCalendar(
+                  workouts: workouts,
+                  onWorkoutTap: _openDetail,
                 ),
                 if (metrics != null && profile != null) ...[
                   const SizedBox(height: 16),

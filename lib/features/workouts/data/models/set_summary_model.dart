@@ -3,7 +3,7 @@ import 'package:spotter/core/constants.dart';
 import 'package:spotter/features/workouts/domain/entities/set_summary.dart';
 
 class SetSummaryModel extends SetSummary {
-   SetSummaryModel({
+  SetSummaryModel({
     required super.setId,
     required super.workoutId,
     required super.uid,
@@ -44,7 +44,8 @@ class SetSummaryModel extends SetSummary {
       rom: (json['rom'] as num?)?.toDouble(),
       tempo: json['tempo'] as String?,
       schemaVersion: (json['schemaVersion'] as num).toInt(),
-      createdAt: (json['createdAt'] as Timestamp).toDate(),
+
+      createdAt: (json['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(),
     );
   }

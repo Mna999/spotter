@@ -32,8 +32,8 @@ class PlannedExerciseModel extends PlannedExercise {
       targetTempo: json['targetTempo'] as String,
       restSec: (json['restSec'] as num).toInt(),
       schemaVersion: (json['schemaVersion'] as num).toInt(),
-      createdAt: (json['createdAt'] as Timestamp).toDate(),
-      updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(), 
+      createdAt: (json['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(),
     );
   }
 

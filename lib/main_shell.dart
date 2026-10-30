@@ -9,9 +9,10 @@ import 'package:spotter/home_screen.dart';
 
 /// Root navigation shell for the signed-in app.
 ///
-/// Keeps the three top-level destinations alive in an [IndexedStack] so the
-/// workout dashboard keeps its scroll position and loaded data while the user
-/// moves between tabs.
+/// The three top-level destinations live in a [PageView], so they can be
+/// reached by swiping left/right as well as by tapping the bottom bar. Each
+/// page opts into keep-alive so its scroll position and loaded data survive
+/// tab changes.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -19,34 +20,32 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell>
-    with SingleTickerProviderStateMixin {
+class _MainShellState extends State<MainShell> {
+  static const _pageAnimation = Duration(milliseconds: 300);
+
   int _index = 0;
-  late final AnimationController _tabTransition = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 240),
-    value: 1,
-  );
-  late final Animation<double> _tabOpacity = _tabTransition.drive(
-    CurveTween(curve: Curves.easeOutCubic),
-  );
-  late final Animation<Offset> _tabOffset = _tabTransition.drive(
-    Tween<Offset>(
-      begin: const Offset(0, 0.015),
-      end: Offset.zero,
-    ).chain(CurveTween(curve: Curves.easeOutCubic)),
-  );
+  final PageController _pageController = PageController();
 
   @override
   void dispose() {
-    _tabTransition.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
   void _select(int index) {
     if (index == _index) return;
     setState(() => _index = index);
-    _tabTransition.forward(from: 0);
+    if (!_pageController.hasClients) return;
+    _pageController.animateToPage(
+      index,
+      duration: _pageAnimation,
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _onPageChanged(int index) {
+    if (index == _index) return;
+    setState(() => _index = index);
   }
 
   @override
@@ -58,19 +57,14 @@ class _MainShellState extends State<MainShell>
         }
       },
       child: Scaffold(
-        body: FadeTransition(
-          opacity: _tabOpacity,
-          child: SlideTransition(
-            position: _tabOffset,
-            child: IndexedStack(
-              index: _index,
-              children: [
-                HomeScreen(onOpenWorkouts: () => _select(1)),
-                const WorkoutListScreen(),
-                const ProfileScreen(),
-              ],
-            ),
-          ),
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: _onPageChanged,
+          children: [
+            _KeepAlivePage(child: HomeScreen(onOpenWorkouts: () => _select(1))),
+            const _KeepAlivePage(child: WorkoutListScreen()),
+            const _KeepAlivePage(child: ProfileScreen()),
+          ],
         ),
         bottomNavigationBar: NavigationBar(
           selectedIndex: _index,
@@ -95,5 +89,26 @@ class _MainShellState extends State<MainShell>
         ),
       ),
     );
+  }
+}
+
+class _KeepAlivePage extends StatefulWidget {
+  const _KeepAlivePage({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_KeepAlivePage> createState() => _KeepAlivePageState();
+}
+
+class _KeepAlivePageState extends State<_KeepAlivePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
   }
 }

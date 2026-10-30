@@ -11,6 +11,7 @@ import 'package:spotter/features/workouts/presentation/screens/workout_detail_sc
 import 'package:spotter/features/workouts/presentation/screens/workout_form_sheet.dart';
 import 'package:spotter/features/workouts/presentation/widgets/section_title.dart';
 import 'package:spotter/features/workouts/presentation/widgets/workout_card.dart';
+import 'package:spotter/features/workouts/presentation/widgets/workout_week_calendar.dart';
 
 class WorkoutListScreen extends StatefulWidget {
   const WorkoutListScreen({super.key});
@@ -135,7 +136,10 @@ class _WorkoutListScreenState extends State<WorkoutListScreen> {
           }
         },
         builder: (context, state) {
-          if (state is WorkoutLoading) {
+          // Keep the cached list on screen while a refresh is in flight so the
+          // calendar keeps the week the user navigated to (and the list does
+          // not flash a full-screen spinner on every reload).
+          if (state is WorkoutLoading && _lastWorkouts.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is WorkoutError) {
@@ -190,6 +194,11 @@ class _WorkoutListScreenState extends State<WorkoutListScreen> {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                WorkoutWeekCalendar(
+                  workouts: workouts,
+                  onWorkoutTap: _openDetail,
+                ),
+                const SizedBox(height: 16),
                 if (active.isNotEmpty) ...[
                   const SectionTitle(title: 'CONTINUE TRAINING'),
                   const SizedBox(height: 8),

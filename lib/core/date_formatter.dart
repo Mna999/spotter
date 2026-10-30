@@ -29,6 +29,9 @@ class DateFormatter {
   static String date(DateTime value) =>
       '${value.day} ${_months[value.month - 1]} ${value.year}';
 
+  static String monthDay(DateTime value) =>
+      '${value.day} ${_months[value.month - 1]}';
+
   static String weekday(DateTime value) => _weekdays[value.weekday - 1];
 
   static String dateTime(DateTime value) => '${date(value)} · ${clock(value)}';

@@ -4,8 +4,14 @@ import 'package:spotter/features/workouts/data/models/exercise_model.dart';
 import 'package:spotter/features/workouts/domain/params/exercise_filter_params.dart';
 
 abstract class ExerciseRemoteDataSource {
-  Future<List<ExerciseModel>> list({required ExerciseFilterParams filter});
-  Future<ExerciseModel?> get({required String exerciseId});
+  Future<List<ExerciseModel>> list({
+    required ExerciseFilterParams filter,
+    bool isLocal = false,
+  });
+  Future<ExerciseModel?> get({
+    required String exerciseId,
+    bool isLocal = false,
+  });
 }
 
 class ExerciseRemoteDatasourceImpl implements ExerciseRemoteDataSource {
@@ -14,12 +20,17 @@ class ExerciseRemoteDatasourceImpl implements ExerciseRemoteDataSource {
   ExerciseRemoteDatasourceImpl({required this.firebaseFirestore});
 
   @override
-  Future<ExerciseModel?> get({required String exerciseId}) async {
+  Future<ExerciseModel?> get({
+    required String exerciseId,
+    bool isLocal = false,
+  }) async {
     try {
       final res = await firebaseFirestore
           .collection('exercises')
           .doc(exerciseId)
-          .get();
+          .get(
+            GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+          );
       final data = res.data();
       if (data == null) return null;
       return ExerciseModel.fromJson(data, documentId: exerciseId);
@@ -31,6 +42,7 @@ class ExerciseRemoteDatasourceImpl implements ExerciseRemoteDataSource {
   @override
   Future<List<ExerciseModel>> list({
     required ExerciseFilterParams filter,
+    bool isLocal = false,
   }) async {
     try {
       final collection = firebaseFirestore.collection('exercises');
@@ -41,8 +53,18 @@ class ExerciseRemoteDatasourceImpl implements ExerciseRemoteDataSource {
         // No search term: read the whole catalogue straight from Firestore so
         // the picker can list every exercise before the user types anything.
         final snapshot = limit > 0
-            ? await collection.limit(limit).get()
-            : await collection.get();
+            ? await collection
+                  .limit(limit)
+                  .get(
+                    GetOptions(
+                      source: isLocal ? Source.cache : Source.serverAndCache,
+                    ),
+                  )
+            : await collection.get(
+                GetOptions(
+                  source: isLocal ? Source.cache : Source.serverAndCache,
+                ),
+              );
         return _sorted(snapshot.docs.map(_toModel));
       }
 
@@ -51,8 +73,22 @@ class ExerciseRemoteDatasourceImpl implements ExerciseRemoteDataSource {
       // operator, and a single range query cannot span two different fields.
       final upperBound = '$query\u{F8FF}';
       final snapshots = await Future.wait([
-        _prefixQuery(collection, 'nameLowerEn', query, upperBound, limit),
-        _prefixQuery(collection, 'nameLowerAr', query, upperBound, limit),
+        _prefixQuery(
+          collection,
+          'nameLowerEn',
+          query,
+          upperBound,
+          limit,
+          isLocal,
+        ),
+        _prefixQuery(
+          collection,
+          'nameLowerAr',
+          query,
+          upperBound,
+          limit,
+          isLocal,
+        ),
       ]);
 
       final byId = <String, ExerciseModel>{};
@@ -78,12 +114,15 @@ class ExerciseRemoteDatasourceImpl implements ExerciseRemoteDataSource {
     String prefix,
     String upperBound,
     int limit,
+    bool isLocal,
   ) {
     Query<Map<String, dynamic>> query = collection
         .where(field, isGreaterThanOrEqualTo: prefix)
         .where(field, isLessThan: upperBound);
     if (limit > 0) query = query.limit(limit);
-    return query.get();
+    return query.get(
+      GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+    );
   }
 
   ExerciseModel _toModel(QueryDocumentSnapshot<Map<String, dynamic>> doc) {

@@ -9,23 +9,28 @@ abstract class SetRemoteDataSource {
     required String workoutId,
     required String plannedExerciseId,
     required SetSummary setSummary,
+    bool isLocal = false,
   });
 
   Future<List<SetSummaryModel>> getSetsFor({
     required String uid,
     required String workoutId,
     required String plannedExerciseId,
+    bool isLocal = false,
   });
   Future<void> deleteSet({
     required String uid,
     required String workoutId,
     required String plannedExerciseId,
     required String setId,
+    bool isLocal = false,
   });
 
-  Future<SetSummaryModel> update({required SetSummary setSummary});
+  Future<SetSummaryModel> update({
+    required SetSummary setSummary,
+    bool isLocal = false,
+  });
 }
-
 
 class SetRemoteDataSourceImpl implements SetRemoteDataSource {
   FirebaseFirestore firebaseFirestore;
@@ -50,13 +55,20 @@ class SetRemoteDataSourceImpl implements SetRemoteDataSource {
     required String workoutId,
     required String plannedExerciseId,
     required String setId,
+    bool isLocal = false,
   }) async {
     try {
-      await _setsRef(
-        uid: uid,
-        workoutId: workoutId,
-        plannedExerciseId: plannedExerciseId,
-      ).doc(setId).delete();
+      isLocal
+          ? _setsRef(
+              uid: uid,
+              workoutId: workoutId,
+              plannedExerciseId: plannedExerciseId,
+            ).doc(setId).delete()
+          : await _setsRef(
+              uid: uid,
+              workoutId: workoutId,
+              plannedExerciseId: plannedExerciseId,
+            ).doc(setId).delete();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
@@ -67,13 +79,14 @@ class SetRemoteDataSourceImpl implements SetRemoteDataSource {
     required String uid,
     required String workoutId,
     required String plannedExerciseId,
+    bool isLocal = false,
   }) async {
     try {
       final res = await _setsRef(
         uid: uid,
         workoutId: workoutId,
         plannedExerciseId: plannedExerciseId,
-      ).get();
+      ).get(GetOptions(source: isLocal ? Source.cache : Source.serverAndCache));
       final data = res.docs
           .map((doc) => SetSummaryModel.fromJson(doc.data()))
           .toList();
@@ -89,6 +102,7 @@ class SetRemoteDataSourceImpl implements SetRemoteDataSource {
     required String workoutId,
     required String plannedExerciseId,
     required SetSummary setSummary,
+    bool isLocal = false,
   }) async {
     try {
       SetSummaryModel setSummaryModel = SetSummaryModel.fromEntity(setSummary);
@@ -98,7 +112,9 @@ class SetRemoteDataSourceImpl implements SetRemoteDataSource {
         plannedExerciseId: plannedExerciseId,
       ).doc();
       setSummaryModel.setId = doc.id;
-      await doc.set(setSummaryModel.toJson(isCreating: true));
+      isLocal
+          ? doc.set(setSummaryModel.toJson(isCreating: true))
+          : await doc.set(setSummaryModel.toJson(isCreating: true));
       return setSummaryModel;
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -106,14 +122,23 @@ class SetRemoteDataSourceImpl implements SetRemoteDataSource {
   }
 
   @override
-  Future<SetSummaryModel> update({required SetSummary setSummary}) async {
+  Future<SetSummaryModel> update({
+    required SetSummary setSummary,
+    bool isLocal = false,
+  }) async {
     try {
       SetSummaryModel setSummaryModel = SetSummaryModel.fromEntity(setSummary);
-      await _setsRef(
-        uid: setSummary.uid,
-        workoutId: setSummary.workoutId,
-        plannedExerciseId: setSummary.plannedExerciseId,
-      ).doc(setSummary.setId).update(setSummaryModel.toJson());
+      isLocal
+          ? _setsRef(
+              uid: setSummary.uid,
+              workoutId: setSummary.workoutId,
+              plannedExerciseId: setSummary.plannedExerciseId,
+            ).doc(setSummary.setId).update(setSummaryModel.toJson())
+          : await _setsRef(
+              uid: setSummary.uid,
+              workoutId: setSummary.workoutId,
+              plannedExerciseId: setSummary.plannedExerciseId,
+            ).doc(setSummary.setId).update(setSummaryModel.toJson());
       return setSummaryModel;
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
