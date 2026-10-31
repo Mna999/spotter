@@ -9,10 +9,6 @@ class DietaryPreferencesModel extends DietaryPreferences {
     required super.prefsId,
     required super.excludedFoodIds,
     required super.excludedCategories,
-    required super.targetKcal,
-    required super.targetProteinG,
-    required super.targetCarbG,
-    required super.targetFatG,
     super.budgetEgp,
     super.dietTag,
     required super.schemaVersion,
@@ -27,10 +23,6 @@ class DietaryPreferencesModel extends DietaryPreferences {
       'prefsId': prefsId,
       'excludedFoodIds': excludedFoodIds.toList(),
       'excludedCategories': excludedCategories.toList(),
-      'targetKcal': targetKcal,
-      'targetProteinG': targetProteinG,
-      'targetCarbG': targetCarbG,
-      'targetFatG': targetFatG,
       'budgetEgp': budgetEgp,
       'dietTag': dietTag,
       'schemaVersion': schemaVersion,
@@ -50,13 +42,8 @@ class DietaryPreferencesModel extends DietaryPreferences {
       uid: json['uid'] ?? '',
       excludedFoodIds: Set<String>.from(json['excludedFoodIds'] ?? []),
       excludedCategories: Set<String>.from(json['excludedCategories'] ?? []),
-      targetKcal: (json['targetKcal'] as num?)?.toDouble() ?? 0,
-      targetProteinG: (json['targetProteinG'] as num?)?.toDouble() ?? 0,
-      targetCarbG: (json['targetCarbG'] as num?)?.toDouble() ?? 0,
-      targetFatG: (json['targetFatG'] as num?)?.toDouble() ?? 0,
-      budgetEgp: json['budgetEgp']?.toDouble(),
+      budgetEgp: (json['budgetEgp'] as num?)?.toDouble(),
       dietTag: json['dietTag'],
-
       schemaVersion: (json['schemaVersion'] as num?)?.toInt() ?? SCHEMA_VERSION,
       createdAt:
           InputParser.toDateTime(json['createdAt']) ??
@@ -74,15 +61,26 @@ class DietaryPreferencesModel extends DietaryPreferences {
       uid: entity.uid,
       excludedFoodIds: entity.excludedFoodIds,
       excludedCategories: entity.excludedCategories,
-      targetKcal: entity.targetKcal,
-      targetProteinG: entity.targetProteinG,
-      targetCarbG: entity.targetCarbG,
-      targetFatG: entity.targetFatG,
       budgetEgp: entity.budgetEgp,
       dietTag: entity.dietTag,
       schemaVersion: entity.schemaVersion,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+    );
+  }
+
+  /// Returns a copy of this model carrying [id] as its document id.
+  DietaryPreferencesModel withId(String id) {
+    return DietaryPreferencesModel(
+      prefsId: id,
+      uid: uid,
+      excludedFoodIds: excludedFoodIds,
+      excludedCategories: excludedCategories,
+      budgetEgp: budgetEgp,
+      dietTag: dietTag,
+      schemaVersion: schemaVersion,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 
@@ -93,10 +91,6 @@ class DietaryPreferencesModel extends DietaryPreferences {
       uid: uid,
       excludedFoodIds: excludedFoodIds,
       excludedCategories: excludedCategories,
-      targetKcal: targetKcal,
-      targetProteinG: targetProteinG,
-      targetCarbG: targetCarbG,
-      targetFatG: targetFatG,
       budgetEgp: budgetEgp,
       dietTag: dietTag,
       schemaVersion: schemaVersion,

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotter/core/app_dialog.dart';
 import 'package:spotter/core/route/routing.dart';
 import 'package:spotter/core/snack_bar_builder.dart';
+import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/meal_plan_bloc/meal_plan_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/nutrition_preferences_bloc/nutrition_preferences_bloc.dart';
@@ -29,6 +30,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
   List<MealPlan> _plans = const [];
   bool _awaitingPlan = false;
   String? _deletingPlanId;
+  TextEditingController budgetController = TextEditingController();
 
   @override
   void initState() {
@@ -41,6 +43,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
   @override
   void dispose() {
     _bloc.close();
+    budgetController.dispose();
     super.dispose();
   }
 
@@ -76,9 +79,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
       final deleting = _deletingPlanId;
       if (deleting != null) {
         setState(() {
-          _plans = _plans
-              .where((plan) => plan.mealPlanId != deleting)
-              .toList();
+          _plans = _plans.where((plan) => plan.mealPlanId != deleting).toList();
           _deletingPlanId = null;
         });
         _load();
@@ -106,13 +107,8 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
   }
 
   Future<void> _createPlan() async {
-    final prefs = context
-        .read<NutritionPreferencesBloc>()
-        .state
-        .preferences;
-    final input = await _showCreatePlanDialog(
-      defaultBudget: prefs?.budgetEgp,
-    );
+    final prefs = context.read<NutritionPreferencesBloc>().state.preferences;
+    final input = await _showCreatePlanDialog();
     if (input == null || !mounted) return;
     setState(() => _awaitingPlan = true);
     _bloc.add(
@@ -126,14 +122,11 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
 
   void _generatePlan() {
     setState(() => _awaitingPlan = true);
-    _bloc.add(PlanGenerated(uid: widget.uid,prefsId: ''));
+    _bloc.add(PlanGenerated(uid: widget.uid, prefsId: widget.uid));
   }
 
   Future<void> _openTargets() async {
-    await Routing.routePush(
-      MetabolicTargetsScreen(uid: widget.uid),
-      context,
-    );
+    await Routing.routePush(MetabolicTargetsScreen(uid: widget.uid), context);
   }
 
   void _deletePlan(MealPlan plan) {
@@ -165,10 +158,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
               if (!mounted) return;
               setState(() => _deletingPlanId = plan.mealPlanId);
               _bloc.add(
-                PlanDeleted(
-                  uid: widget.uid,
-                  mealPlanId: plan.mealPlanId,
-                ),
+                PlanDeleted(uid: widget.uid, mealPlanId: plan.mealPlanId),
               );
             },
             child: const Text('Delete'),
@@ -178,11 +168,9 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
     );
   }
 
-  Future<_PlanDraft?> _showCreatePlanDialog({double? defaultBudget}) async {
+  Future<_PlanDraft?> _showCreatePlanDialog() async {
     var date = dateOnly(DateTime.now());
-    final budgetController = TextEditingController(
-      text: defaultBudget == null ? '' : defaultBudget.toStringAsFixed(0),
-    );
+
     final result = await showAppDialog<_PlanDraft>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
@@ -195,9 +183,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.calendar_month_outlined),
                 title: Text(friendlyDate(date)),
-                subtitle: Text(
-                  '${date.day}/${date.month}/${date.year}',
-                ),
+                subtitle: Text('${date.day}/${date.month}/${date.year}'),
                 onTap: () async {
                   final picked = await showDatePicker(
                     context: dialogContext,
@@ -229,9 +215,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
             ),
             FilledButton(
               onPressed: () {
-                final budget = double.tryParse(
-                  budgetController.text.trim(),
-                );
+                final budget = double.tryParse(budgetController.text.trim());
                 Navigator.pop(
                   dialogContext,
                   _PlanDraft(date: date, budget: budget),
@@ -243,7 +227,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
         ),
       ),
     );
-    budgetController.dispose();
+
     return result;
   }
 
@@ -252,6 +236,10 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
     final text = Theme.of(context).textTheme;
     final cs = Theme.of(context).colorScheme;
     final prefs = context.watch<NutritionPreferencesBloc>().state.preferences;
+    final profileState = context.watch<ProfileBloc>().state;
+    final goals = profileState is ProfileLoaded
+        ? profileState.bodyMetrics.macroTargets
+        : null;
 
     return BlocProvider<MealPlanBloc>.value(
       value: _bloc,
@@ -270,10 +258,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
                 if (value == 'generate') _generatePlan();
               },
               itemBuilder: (_) => const [
-                PopupMenuItem(
-                  value: 'draft',
-                  child: Text('New empty plan'),
-                ),
+                PopupMenuItem(value: 'draft', child: Text('New empty plan')),
                 PopupMenuItem(
                   value: 'generate',
                   child: Text('Generate from preferences'),
@@ -305,7 +290,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
                   _PreferencesBanner(
-                    targetKcal: prefs?.targetKcal,
+                    targetKcal: goals?.calories.toDouble(),
                     budgetEgp: prefs?.budgetEgp,
                     onOpenTargets: _openTargets,
                   ),
@@ -318,7 +303,8 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
                   if (_plans.isEmpty)
                     NutritionMessageView(
                       title: 'No meal plans yet',
-                      message: 'Create an empty plan or generate one from your '
+                      message:
+                          'Create an empty plan or generate one from your '
                           'macro targets and EGP budget.',
                       icon: Icons.event_note_outlined,
                       onAction: _generatePlan,

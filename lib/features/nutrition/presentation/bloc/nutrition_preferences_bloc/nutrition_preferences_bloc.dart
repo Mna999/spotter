@@ -4,7 +4,6 @@ import 'package:spotter/features/nutrition/domain/entities/dietary_preferences.d
 import 'package:spotter/features/nutrition/domain/params/exclusion_params.dart';
 import 'package:spotter/features/nutrition/domain/params/prefs_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/save_dietary_pref_params.dart';
-import 'package:spotter/features/nutrition/domain/params/uid_params.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_dietary_preferences_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/save_dietary_preferences_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/update_exclusions_usecase.dart';

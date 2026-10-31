@@ -7,7 +7,9 @@ import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_blo
 import 'package:spotter/features/nutrition/domain/entities/dietary_preferences.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/nutrition_preferences_bloc/nutrition_preferences_bloc.dart';
 
-/// Daily calorie goal, macro split and EGP budget editor.
+/// Shows the calorie and macro goals calculated from the user's profile
+/// (`ProfileBloc` -> `BodyMetrics`) and lets the user edit the EGP budget and
+/// diet tag that are stored in their dietary preferences.
 class MetabolicTargetsScreen extends StatefulWidget {
   const MetabolicTargetsScreen({super.key, required this.uid});
 
@@ -19,10 +21,6 @@ class MetabolicTargetsScreen extends StatefulWidget {
 
 class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _kcalController = TextEditingController();
-  final _proteinController = TextEditingController();
-  final _carbsController = TextEditingController();
-  final _fatController = TextEditingController();
   final _budgetController = TextEditingController();
   final _dietTagController = TextEditingController();
   bool _initialized = false;
@@ -31,15 +29,6 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
   @override
   void initState() {
     super.initState();
-    final profileState = context.read<ProfileBloc>().state;
-    if (profileState is ProfileLoaded) {
-      final targets = profileState.bodyMetrics.macroTargets;
-      _kcalController.text = targets.calories.toString();
-      _proteinController.text = targets.proteinG.toString();
-      _carbsController.text = targets.carbsG.toString();
-      _fatController.text = targets.fatG.toString();
-    }
-
     final bloc = context.read<NutritionPreferencesBloc>();
     final prefs = bloc.state.preferences;
     if (prefs != null) {
@@ -51,7 +40,7 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
         bloc.add(
           NutritionPreferencesRequested(
             uid: widget.uid,
-            prefsId: prefs?.prefsId ?? '',
+            prefsId: widget.uid,
           ),
         );
       });
@@ -60,20 +49,12 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
 
   @override
   void dispose() {
-    _kcalController.dispose();
-    _proteinController.dispose();
-    _carbsController.dispose();
-    _fatController.dispose();
     _budgetController.dispose();
     _dietTagController.dispose();
     super.dispose();
   }
 
   void _applyPreferences(DietaryPreferences prefs) {
-    _kcalController.text = prefs.targetKcal.round().toString();
-    _proteinController.text = prefs.targetProteinG.round().toString();
-    _carbsController.text = prefs.targetCarbG.round().toString();
-    _fatController.text = prefs.targetFatG.round().toString();
     _budgetController.text = prefs.budgetEgp == null
         ? ''
         : prefs.budgetEgp!.toStringAsFixed(0);
@@ -92,7 +73,7 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
       setState(() => _saving = false);
       SnackBarBuilder.showSnackBar(
         context,
-        state.message ?? 'Macro targets saved.',
+        state.message ?? 'Preferences saved.',
         false,
         cs,
       );
@@ -112,30 +93,21 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
         prefs ??
         DietaryPreferences(
           uid: widget.uid,
+          prefsId: widget.uid,
           excludedFoodIds: const <String>{},
           excludedCategories: const <String>{},
-          prefsId: prefs?.prefsId ?? '',
-          targetKcal: 0,
-          targetProteinG: 0,
-          targetCarbG: 0,
-          targetFatG: 0,
           schemaVersion: 1,
           createdAt: DateTime.now(),
         );
     final budgetText = _budgetController.text.trim();
+    final dietTag = _dietTagController.text.trim();
     final updated = DietaryPreferences(
       uid: base.uid,
-      prefsId: prefs?.prefsId ?? '',
+      prefsId: base.prefsId,
       excludedFoodIds: base.excludedFoodIds,
       excludedCategories: base.excludedCategories,
-      targetKcal: double.parse(_kcalController.text.trim()),
-      targetProteinG: double.parse(_proteinController.text.trim()),
-      targetCarbG: double.parse(_carbsController.text.trim()),
-      targetFatG: double.parse(_fatController.text.trim()),
       budgetEgp: budgetText.isEmpty ? null : double.tryParse(budgetText),
-      dietTag: _dietTagController.text.trim().isEmpty
-          ? null
-          : _dietTagController.text.trim(),
+      dietTag: dietTag.isEmpty ? null : dietTag,
       schemaVersion: base.schemaVersion,
       createdAt: base.createdAt,
       updatedAt: DateTime.now(),
@@ -143,9 +115,6 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
     setState(() => _saving = true);
     bloc.add(NutritionPreferencesSaved(uid: widget.uid, preferences: updated));
   }
-
-  double _value(TextEditingController controller) =>
-      double.tryParse(controller.text.trim()) ?? 0;
 
   @override
   Widget build(BuildContext context) {
@@ -155,10 +124,11 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
     final metrics = profileState is ProfileLoaded
         ? profileState.bodyMetrics
         : null;
-    final kcal = _value(_kcalController);
-    final protein = _value(_proteinController);
-    final carbs = _value(_carbsController);
-    final fat = _value(_fatController);
+    final goals = metrics?.macroTargets;
+    final kcal = goals?.calories ?? 0;
+    final protein = (goals?.proteinG ?? 0).toDouble();
+    final carbs = (goals?.carbsG ?? 0).toDouble();
+    final fat = (goals?.fatG ?? 0).toDouble();
     final proteinKcal = protein * 4;
     final carbsKcal = carbs * 4;
     final fatKcal = fat * 9;
@@ -312,62 +282,41 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
                         label: 'Fats',
                         share: fatShare,
                       ),
+                      const SizedBox(height: 12),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 14,
+                            color: cs.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              'Calculated automatically from the body stats, '
+                              'activity level and goal saved in your profile.',
+                              style: text.bodySmall!.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'EDIT TARGETS',
+                  'PLANNER SETTINGS',
                   style: text.labelSmall!.copyWith(
                     color: cs.onSurfaceVariant,
                     letterSpacing: 1.2,
                   ),
                 ),
                 const SizedBox(height: 8),
-                _NumberField(
-                  controller: _kcalController,
-                  label: 'Daily calories',
-                  suffix: 'kcal',
-                  onChanged: () => setState(() {}),
-                  validator: _positiveValidator,
-                ),
-                const SizedBox(height: 10),
                 Row(
                   children: [
-                    Expanded(
-                      child: _NumberField(
-                        controller: _proteinController,
-                        label: 'Protein',
-                        suffix: 'g',
-                        onChanged: () => setState(() {}),
-                        validator: _nonNegativeValidator,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _NumberField(
-                        controller: _carbsController,
-                        label: 'Carbs',
-                        suffix: 'g',
-                        onChanged: () => setState(() {}),
-                        validator: _nonNegativeValidator,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _NumberField(
-                        controller: _fatController,
-                        label: 'Fats',
-                        suffix: 'g',
-                        onChanged: () => setState(() {}),
-                        validator: _nonNegativeValidator,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
                     Expanded(
                       child: _NumberField(
                         controller: _budgetController,
@@ -378,16 +327,18 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
                         validator: _budgetValidator,
                       ),
                     ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _dietTagController,
+                        textInputAction: TextInputAction.done,
+                        decoration: const InputDecoration(
+                          labelText: 'Diet tag (optional)',
+                          hintText: 'e.g. halal, vegan',
+                        ),
+                      ),
+                    ),
                   ],
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: _dietTagController,
-                  textInputAction: TextInputAction.done,
-                  decoration: const InputDecoration(
-                    labelText: 'Diet tag (optional)',
-                    hintText: 'e.g. halal, vegan, vegetarian',
-                  ),
                 ),
                 const SizedBox(height: 18),
                 SizedBox(
@@ -401,7 +352,7 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.save_outlined),
-                    label: const Text('SAVE TARGETS'),
+                    label: const Text('SAVE SETTINGS'),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -417,18 +368,6 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
         },
       ),
     );
-  }
-
-  String? _positiveValidator(String? value) {
-    final parsed = double.tryParse((value ?? '').trim());
-    if (parsed == null || parsed <= 0) return 'Enter a value above zero';
-    return null;
-  }
-
-  String? _nonNegativeValidator(String? value) {
-    final parsed = double.tryParse((value ?? '').trim());
-    if (parsed == null || parsed < 0) return 'Enter zero or more';
-    return null;
   }
 
   String? _budgetValidator(String? value) {

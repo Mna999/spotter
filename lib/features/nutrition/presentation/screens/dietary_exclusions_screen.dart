@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotter/core/snack_bar_builder.dart';
-import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
 import 'package:spotter/features/nutrition/domain/entities/dietary_preferences.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/nutrition_preferences_bloc/nutrition_preferences_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/utils/nutrition_ui_helpers.dart';
@@ -54,7 +53,7 @@ class _DietaryExclusionsScreenState extends State<DietaryExclusionsScreen> {
         bloc.add(
           NutritionPreferencesRequested(
             uid: widget.uid,
-            prefsId: prefs?.prefsId ?? '',
+            prefsId: widget.uid,
           ),
         );
       });
@@ -120,33 +119,21 @@ class _DietaryExclusionsScreenState extends State<DietaryExclusionsScreen> {
     if (_saving) return;
     final bloc = context.read<NutritionPreferencesBloc>();
     final prefs = bloc.state.preferences;
-    final profileState = context.read<ProfileBloc>().state;
-    final metrics = profileState is ProfileLoaded
-        ? profileState.bodyMetrics
-        : null;
     final base =
         prefs ??
         DietaryPreferences(
           uid: widget.uid,
-          prefsId: prefs?.prefsId ?? '',
+          prefsId: widget.uid,
           excludedFoodIds: const <String>{},
           excludedCategories: const <String>{},
-          targetKcal: metrics?.macroTargets.calories.toDouble() ?? 0,
-          targetProteinG: metrics?.macroTargets.proteinG.toDouble() ?? 0,
-          targetCarbG: metrics?.macroTargets.carbsG.toDouble() ?? 0,
-          targetFatG: metrics?.macroTargets.fatG.toDouble() ?? 0,
           schemaVersion: 1,
           createdAt: DateTime.now(),
         );
     final updated = DietaryPreferences(
       uid: base.uid,
+      prefsId: base.prefsId,
       excludedFoodIds: Set<String>.from(_foodIds),
-      prefsId: prefs?.prefsId ?? '',
       excludedCategories: Set<String>.from(_categories),
-      targetKcal: base.targetKcal,
-      targetProteinG: base.targetProteinG,
-      targetCarbG: base.targetCarbG,
-      targetFatG: base.targetFatG,
       budgetEgp: base.budgetEgp,
       dietTag: base.dietTag,
       schemaVersion: base.schemaVersion,

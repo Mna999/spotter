@@ -10,6 +10,32 @@ class MealPlanInitial extends MealPlanState {
   const MealPlanInitial();
 }
 
+
+class MealEntriesLoading extends MealPlanState {
+  const MealEntriesLoading();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class MealEntriesLoaded extends MealPlanState {
+  final List<MealEntry> entries;
+  final Map<String, FoodItem> foods;
+
+  const MealEntriesLoaded({required this.entries, required this.foods});
+
+  @override
+  List<Object?> get props => [entries, foods];
+}
+
+class MealEntriesError extends MealPlanState {
+  final String message;
+
+  const MealEntriesError({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
 class MealPlanEmpty extends MealPlanState {
   final String? message;
   const MealPlanEmpty({this.message});

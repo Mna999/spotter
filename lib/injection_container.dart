@@ -49,6 +49,7 @@ import 'package:spotter/features/nutrition/domain/usecases/get_dietary_preferenc
 import 'package:spotter/features/nutrition/domain/usecases/get_food_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_food_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/list_meal_entries_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_meal_logs_for_date_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_recent_meal_plans_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/log_food_usecase.dart';
@@ -294,11 +295,7 @@ Future<void> initNutrition() async {
 
   // Register Food Search Bloc
   sl.registerFactory(
-    () => FoodSearchBloc(
-      searchFood: sl(),
-      getFood: sl(),
-      listFoods: sl(),
-    ),
+    () => FoodSearchBloc(searchFood: sl(), getFood: sl(), listFoods: sl()),
   );
 
   // Register Nutrition Preferences Bloc
@@ -322,6 +319,7 @@ Future<void> initNutrition() async {
       deleteMealPlan: sl(),
       listRecentMealPlans: sl(),
       addMealEntry: sl(),
+      listMealEntries: sl(),
     ),
   );
 
@@ -341,7 +339,7 @@ Future<void> initNutrition() async {
   sl.registerLazySingleton(() => SearchFoodUsecase(foodRepo: sl()));
   sl.registerLazySingleton(() => GetFoodUsecase(foodRepo: sl()));
   sl.registerLazySingleton(() => ListFoodsUseCase(foodRepo: sl()));
-
+  sl.registerLazySingleton(() => ListMealEntriesUseCase(sl()));
   // Register Use Cases for Nutrition Preferences
   sl.registerLazySingleton(
     () => GetDietaryPreferencesUseCase(nutritionPrefRepo: sl()),
@@ -363,10 +361,14 @@ Future<void> initNutrition() async {
   sl.registerLazySingleton(() => UpdateMealPlanUseCase(mealPlanRepo: sl()));
   sl.registerLazySingleton(() => DeleteMealPlanUseCase(mealPlanRepo: sl()));
   sl.registerLazySingleton(
-    () => GenerateMealPlanUseCase(nutritionPrefRepo: sl()),
+    () =>
+        GenerateMealPlanUseCase(nutritionPrefRepo: sl(), getUserProfile: sl()),
   );
   sl.registerLazySingleton(
-    () => RegenerateUnderBudgetUseCase(nutritionPrefRepo: sl()),
+    () => RegenerateUnderBudgetUseCase(
+      nutritionPrefRepo: sl(),
+      getUserProfile: sl(),
+    ),
   );
   sl.registerLazySingleton(() => AddMealEntryUseCase(mealEntryRepo: sl()));
 

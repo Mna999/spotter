@@ -1,10 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:spotter/features/nutrition/domain/entities/food_item.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_entry.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
 import 'package:spotter/features/nutrition/domain/params/add_meal_entry_params.dart';
 import 'package:spotter/features/nutrition/domain/params/budget_params.dart';
 import 'package:spotter/features/nutrition/domain/params/create_meal_plan_params.dart';
+import 'package:spotter/features/nutrition/domain/params/list_meal_entries_params.dart';
 import 'package:spotter/features/nutrition/domain/params/meal_plan_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/prefs_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/save_plan_params.dart';
@@ -14,10 +16,12 @@ import 'package:spotter/features/nutrition/domain/usecases/create_meal_plan_usec
 import 'package:spotter/features/nutrition/domain/usecases/delete_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/generate_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/list_meal_entries_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_recent_meal_plans_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/regen_under_budget_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/save_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/update_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/presentation/utils/nutrition_ui_helpers.dart';
 import 'package:spotter/features/workouts/domain/params/limit_params.dart';
 
 part 'meal_plan_event.dart';
@@ -33,6 +37,10 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
   final DeleteMealPlanUseCase deleteMealPlan;
   final ListRecentMealPlansUsecase listRecentMealPlans;
   final AddMealEntryUseCase addMealEntry;
+  final ListMealEntriesUseCase listMealEntries;
+
+  /// Foods already fetched, so refreshes only fetch what's missing.
+  final Map<String, FoodItem> _foodCache = {};
 
   MealPlanBloc({
     required this.createMealPlan,
@@ -44,6 +52,7 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
     required this.deleteMealPlan,
     required this.listRecentMealPlans,
     required this.addMealEntry,
+    required this.listMealEntries,
   }) : super(const MealPlanInitial()) {
     on<MealPlanCreated>(_onCreated);
     on<PlanGenerated>(_onGenerated);
@@ -53,6 +62,7 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
     on<PlanUpdated>(_onUpdated);
     on<PlanDeleted>(_onDeleted);
     on<MealPlanListRequested>(_onListRequested);
+    on<MealEntriesRequested>(_onEntriesRequested);
     on<MealEntryAdded>(_onEntryAdded);
     on<MealEntryUpdated>(_onEntryUpdated);
     on<MealEntryRemoved>(_onEntryRemoved);
@@ -161,6 +171,45 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
         plans.isEmpty ? const MealPlanEmpty() : MealPlanLoaded(plans: plans),
       ),
     );
+  }
+
+  /// Loads the entries of one plan, then the foods they reference.
+  /// Emits entries first (so the list shows fast), then again once the
+  /// foods are in.
+  Future<void> _onEntriesRequested(
+    MealEntriesRequested e,
+    Emitter<MealPlanState> emit,
+  ) async {
+    emit(const MealEntriesLoading());
+    final r = await listMealEntries(
+      ListMealEntriesParams(uid: e.uid, mealPlanId: e.mealPlanId),
+    );
+    final entries = r.fold<List<MealEntry>?>((f) {
+      emit(MealEntriesError(message: f.message));
+      return null;
+    }, (value) => value);
+    if (entries == null) return;
+
+    emit(MealEntriesLoaded(entries: entries, foods: _foodsFor(entries)));
+
+    final missing = entries
+        .map((entry) => entry.foodId)
+        .where((id) => !_foodCache.containsKey(id))
+        .toSet();
+    if (missing.isEmpty) return;
+
+    final fetched = await fetchFoodsById(missing);
+    _foodCache.addAll(fetched);
+    emit(MealEntriesLoaded(entries: entries, foods: _foodsFor(entries)));
+  }
+
+  Map<String, FoodItem> _foodsFor(List<MealEntry> entries) {
+    final result = <String, FoodItem>{};
+    for (final entry in entries) {
+      final food = _foodCache[entry.foodId];
+      if (food != null) result[entry.foodId] = food;
+    }
+    return result;
   }
 
   Future<void> _onEntryAdded(

@@ -69,7 +69,7 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
     final uid = _uid;
     if (uid == null) return;
     context.read<NutritionPreferencesBloc>().add(
-      NutritionPreferencesRequested(uid: uid, prefsId: ''),
+      NutritionPreferencesRequested(uid: uid, prefsId: uid),
     );
   }
 
@@ -267,14 +267,13 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
     final metrics = profileState is ProfileLoaded
         ? profileState.bodyMetrics
         : null;
-    final targetKcal =
-        prefs?.targetKcal ?? metrics?.macroTargets.calories.toDouble();
-    final targetProtein =
-        prefs?.targetProteinG ?? metrics?.macroTargets.proteinG.toDouble();
-    final targetCarbs =
-        prefs?.targetCarbG ?? metrics?.macroTargets.carbsG.toDouble();
-    final targetFat =
-        prefs?.targetFatG ?? metrics?.macroTargets.fatG.toDouble();
+    // Macro goals come from the user's profile (ProfileBloc), not from the
+    // dietary preferences document.
+    final goals = metrics?.macroTargets;
+    final targetKcal = goals?.calories.toDouble();
+    final targetProtein = goals?.proteinG.toDouble();
+    final targetCarbs = goals?.carbsG.toDouble();
+    final targetFat = goals?.fatG.toDouble();
     final consumed = _logs.isEmpty ? _totals : macrosForLogs(_logs, _foods);
     final spent = estimatedCostForLogs(_logs, _foods);
 
@@ -374,7 +373,7 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
                       child: NutritionQuickAction(
                         icon: Icons.speed_outlined,
                         title: 'Macro targets',
-                        subtitle: 'Calories, macros and daily EGP budget.',
+                        subtitle: 'Profile-based goals and daily EGP budget.',
                         onTap: _openTargets,
                         accent: cs.secondary,
                       ),

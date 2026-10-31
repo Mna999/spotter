@@ -2,6 +2,9 @@ import 'package:dartz/dartz.dart';
 import 'package:spotter/core/constants.dart';
 import 'package:spotter/core/error/failure.dart';
 import 'package:spotter/core/usecases/usecase.dart';
+import 'package:spotter/features/auth/domain/entities/body_metrics.dart';
+import 'package:spotter/features/auth/domain/entities/user_profile.dart';
+import 'package:spotter/features/auth/domain/usecases/get_user_profile_usecase.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
 import 'package:spotter/features/nutrition/domain/entities/plan_status.dart';
 import 'package:spotter/features/nutrition/domain/params/budget_params.dart';
@@ -9,17 +12,32 @@ import 'package:spotter/features/nutrition/domain/repository/nutrition_pref_repo
 
 /// GENERATE: re-roll today's plan under a new budget.
 ///
-/// The user's calorie target still comes from their dietary preferences,
-/// while the budget is the one supplied in [BudgetParams]. The returned
-/// plan is a fresh draft (not persisted); persist it with
-/// SaveMealPlanUseCase after adding the entries.
+/// The calorie goal is derived from the user's profile (`BodyMetrics`), while
+/// the budget is the one supplied in [BudgetParams]. The returned plan is a
+/// fresh draft (not persisted); persist it with SaveMealPlanUseCase after
+/// adding the entries.
 class RegenerateUnderBudgetUseCase implements UseCase<MealPlan, BudgetParams> {
-  NutritionPrefRepo nutritionPrefRepo;
+  final NutritionPrefRepo nutritionPrefRepo;
+  final GetUserProfileUseCase getUserProfile;
 
-  RegenerateUnderBudgetUseCase({required this.nutritionPrefRepo});
+  RegenerateUnderBudgetUseCase({
+    required this.nutritionPrefRepo,
+    required this.getUserProfile,
+  });
 
   @override
   Future<Either<Failure, MealPlan>> call(BudgetParams params) async {
+    // Goal calories live in the user profile, not in dietary preferences.
+    final profileResult = await getUserProfile(ProfileParams(params.uid));
+    Failure? failure;
+    UserProfile? profile;
+    profileResult.fold((f) => failure = f, (p) => profile = p);
+    if (failure != null) return Left(failure!);
+
+    final targetKcal = profile == null
+        ? 0.0
+        : BodyMetrics.fromProfile(profile!).macroTargets.calories.toDouble();
+
     final prefsOrFailure = await nutritionPrefRepo.get(
       uid: params.uid,
       prefsId: params.prefsId,
@@ -33,7 +51,7 @@ class RegenerateUnderBudgetUseCase implements UseCase<MealPlan, BudgetParams> {
           uid: params.uid,
           date: DateTime(now.year, now.month, now.day),
           budgetEgp: params.budgetEgp,
-          totalKcal: prefs?.targetKcal ?? 0,
+          totalKcal: targetKcal,
           costEgp: 0,
           status: PlanStatus.draft,
           schemaVersion: SCHEMA_VERSION,

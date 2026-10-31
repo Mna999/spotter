@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotter/core/app_dialog.dart';
 import 'package:spotter/core/route/routing.dart';
 import 'package:spotter/core/snack_bar_builder.dart';
+import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
 import 'package:spotter/features/nutrition/domain/entities/food_item.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_entry.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_type.dart';
 import 'package:spotter/features/nutrition/domain/params/log_food_params.dart';
-import 'package:spotter/features/nutrition/domain/repository/meal_entry_repo.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/food_log_bloc/food_log_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/meal_plan_bloc/meal_plan_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/nutrition_preferences_bloc/nutrition_preferences_bloc.dart';
@@ -53,7 +53,9 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _loadEntries();
+      if (!mounted) return;
+      _loadPlan();
+      _loadEntries();
     });
   }
 
@@ -63,7 +65,15 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     super.dispose();
   }
 
-  Future<void> _loadEntries() async {
+  /// Asks the bloc for the latest version of this plan (saved plans only).
+  void _loadPlan() {
+    if (_isDraft) return;
+    _bloc.add(PlanLoaded(uid: widget.uid, mealPlanId: _plan.mealPlanId));
+  }
+
+  /// Asks the bloc for this plan's entries. Result arrives through
+  /// [_onMealPlanState] as MealEntriesLoading / Loaded / Error.
+  void _loadEntries() {
     final planId = _plan.mealPlanId.trim();
     if (planId.isEmpty) {
       setState(() {
@@ -74,42 +84,42 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
       });
       return;
     }
-    setState(() => _loadingEntries = true);
-    final result = await sl<MealEntryRepo>().list(
-      uid: widget.uid,
-      mealPlanId: planId,
-    );
-    if (!mounted) return;
-    result.fold(
-      (failure) => setState(() {
-        _loadingEntries = false;
-        _entryError = failure.message;
-      }),
-      (entries) {
-        setState(() {
-          _entries = entries;
-          _loadingEntries = false;
-          _entryError = null;
-        });
-        _loadFoods(entries);
-      },
-    );
+    _bloc.add(MealEntriesRequested(uid: widget.uid, mealPlanId: planId));
   }
 
-  Future<void> _loadFoods(List<MealEntry> entries) async {
-    final missing = entries
-        .map((entry) => entry.foodId)
-        .where((id) => !_foods.containsKey(id))
-        .toSet();
-    if (missing.isEmpty) return;
-    final foods = await fetchFoodsById(missing);
-    if (!mounted) return;
-    setState(() => _foods = {..._foods, ...foods});
+  Future<void> _refresh() async {
+    _loadPlan();
+    _loadEntries();
+    if (_isDraft) return;
+    try {
+      await _bloc.stream
+          .firstWhere(
+            (s) => s is MealEntriesLoaded || s is MealEntriesError,
+          )
+          .timeout(const Duration(seconds: 15));
+    } catch (_) {
+      // Timeout or bloc closed: just stop the refresh indicator.
+    }
   }
 
   void _onMealPlanState(MealPlanState state) {
     final cs = Theme.of(context).colorScheme;
-    if (state is MealPlanLoaded) {
+    if (state is MealEntriesLoading) {
+      if (!_loadingEntries) setState(() => _loadingEntries = true);
+    } else if (state is MealEntriesLoaded) {
+      setState(() {
+        _entries = state.entries;
+        _foods = state.foods;
+        _loadingEntries = false;
+        _entryError = null;
+      });
+    } else if (state is MealEntriesError) {
+      setState(() {
+        _loadingEntries = false;
+        _entryError = state.message;
+      });
+    } else if (state is MealPlanLoaded) {
+      // Regeneration finished: open the new draft.
       if (_regenerating && state.mealPlan != null) {
         _regenerating = false;
         final draft = state.mealPlan!;
@@ -122,6 +132,9 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
         );
         return;
       }
+      // Ignore states that carry nothing for this screen (e.g. list results).
+      if (state.mealPlan == null && state.entries.isEmpty) return;
+
       if (state.mealPlan != null) {
         setState(() => _plan = state.mealPlan!);
       }
@@ -144,8 +157,10 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
         _isDraft,
         cs,
       );
+      // Now that the plan has an id, load its entries.
+      _loadEntries();
     } else if (state is MealPlanEmpty) {
-      _savingPlan = false;
+      if (_savingPlan) setState(() => _savingPlan = false);
       if (state.message != null) {
         SnackBarBuilder.showSnackBar(context, state.message!, false, cs);
         Navigator.pop(context);
@@ -223,11 +238,16 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   }
 
   Future<void> _regenerate() async {
+    if (_regenerating) return;
     final budget = await _askBudget(initial: _plan.budgetEgp);
     if (budget == null || !mounted) return;
     setState(() => _regenerating = true);
     _bloc.add(
-      PlanRegeneratedUnderBudget(uid: widget.uid, budgetEgp: budget,prefsId: ''),
+      PlanRegeneratedUnderBudget(
+        uid: widget.uid,
+        budgetEgp: budget,
+        prefsId: widget.uid,
+      ),
     );
   }
 
@@ -313,11 +333,17 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     final text = Theme.of(context).textTheme;
     final cs = Theme.of(context).colorScheme;
     final prefs = context.watch<NutritionPreferencesBloc>().state.preferences;
+    final profileState = context.watch<ProfileBloc>().state;
+    final metrics = profileState is ProfileLoaded
+        ? profileState.bodyMetrics
+        : null;
+    final goals = metrics?.macroTargets;
     final consumed = macrosForEntries(_entries, _foods);
     final spent = _plan.costEgp > 0
         ? _plan.costEgp
         : estimatedCostForEntries(_entries, _foods);
-    final targetKcal = prefs?.targetKcal ??
+    final targetKcal =
+        goals?.calories.toDouble() ??
         (_plan.totalKcal > 0 ? _plan.totalKcal : null);
     final budget = _plan.budgetEgp ?? prefs?.budgetEgp;
 
@@ -341,14 +367,14 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
                     icon: const Icon(Icons.delete_outline),
                   ),
                   IconButton(
-                    onPressed: _loadEntries,
+                    onPressed: _refresh,
                     tooltip: 'Refresh entries',
                     icon: const Icon(Icons.refresh),
                   ),
                 ],
               ),
               body: RefreshIndicator(
-                onRefresh: _loadEntries,
+                onRefresh: _refresh,
                 child: ListView(
                   padding: const EdgeInsets.all(16),
                   physics: const AlwaysScrollableScrollPhysics(),
@@ -363,9 +389,9 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
                     NutritionSummaryCard(
                       consumed: consumed,
                       targetKcal: targetKcal,
-                      targetProteinG: prefs?.targetProteinG,
-                      targetCarbsG: prefs?.targetCarbG,
-                      targetFatG: prefs?.targetFatG,
+                      targetProteinG: goals?.proteinG.toDouble(),
+                      targetCarbsG: goals?.carbsG.toDouble(),
+                      targetFatG: goals?.fatG.toDouble(),
                       budgetEgp: budget,
                       spentEgp: spent,
                       logCount: _entries.length,
@@ -416,8 +442,16 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
-                        onPressed: _regenerate,
-                        icon: const Icon(Icons.auto_awesome),
+                        onPressed: _regenerating ? null : _regenerate,
+                        icon: _regenerating
+                            ? const SizedBox(
+                                width: 15,
+                                height: 15,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.auto_awesome),
                         label: const Text('REGENERATE UNDER BUDGET'),
                       ),
                     ),

@@ -39,6 +39,13 @@ class NutritionPreferencesRemoteDataSourceImpl
 
   NutritionPreferencesRemoteDataSourceImpl({required this._firestore});
 
+  /// There is exactly one preferences document per user, stored as
+  /// `users/{uid}/dietaryPreferences/{uid}`. Callers that do not know the id
+  /// yet pass an empty string, so fall back to the uid instead of asking
+  /// Firestore for a document with an empty id (which throws).
+  String _docId({required String uid, required String prefsId}) =>
+      prefsId.trim().isEmpty ? uid : prefsId.trim();
+
   @override
   Future<DietaryPreferences?> get({
     required String uid,
@@ -49,7 +56,7 @@ class NutritionPreferencesRemoteDataSourceImpl
           .collection('users')
           .doc(uid)
           .collection('dietaryPreferences')
-          .doc(prefsId)
+          .doc(_docId(uid: uid, prefsId: prefsId))
           .get();
 
       final data = doc.data();
@@ -67,16 +74,17 @@ class NutritionPreferencesRemoteDataSourceImpl
     required DietaryPreferences prefs,
   }) async {
     try {
-      final model = DietaryPreferencesModel.fromEntity(prefs);
+      final docId = _docId(uid: uid, prefsId: prefs.prefsId);
+      final model = DietaryPreferencesModel.fromEntity(prefs).withId(docId);
 
       await _firestore
           .collection('users')
           .doc(uid)
           .collection('dietaryPreferences')
-          .doc(prefs.prefsId)
+          .doc(docId)
           .set(model.toJson());
 
-      return prefs;
+      return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
@@ -93,7 +101,7 @@ class NutritionPreferencesRemoteDataSourceImpl
           .collection('users')
           .doc(uid)
           .collection('dietaryPreferences')
-          .doc(prefsId);
+          .doc(_docId(uid: uid, prefsId: prefsId));
 
       await docRef.set({
         'excludedFoodIds': excludedFoodIds.toList(),
@@ -123,12 +131,13 @@ class NutritionPreferencesRemoteDataSourceImpl
           .collection('users')
           .doc(uid)
           .collection('dietaryPreferences')
-          .doc(prefsId);
+          .doc(_docId(uid: uid, prefsId: prefsId));
 
       // Add timestamp for update
       partial['updatedAt'] = FieldValue.serverTimestamp();
 
-      await docRef.update(partial);
+      // Merge so a partial update also creates the document the first time.
+      await docRef.set(partial, SetOptions(merge: true));
 
       // Get updated document
       final doc = await docRef.get();

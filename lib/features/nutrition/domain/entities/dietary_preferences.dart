@@ -1,16 +1,18 @@
 import 'package:equatable/equatable.dart';
 
-/// One document per user (Firestore: `users/{uid}/dietaryPrefs`).
+/// Per-user nutrition settings (Firestore:
+/// `users/{uid}/dietaryPreferences/{uid}`).
+///
+/// Calorie and macro goals are derived from the user's profile
+/// (`ProfileBloc` -> `BodyMetrics.macroTargets`) and are deliberately not
+/// stored here. This document only holds the planner guardrails and the EGP
+/// budget.
 class DietaryPreferences extends Equatable {
-  /// Primary key, equal to the Firestore document id (`users/{uid}`).
+  /// Primary key, equal to the Firestore document id (the user's uid).
   final String uid;
   final String prefsId;
   final Set<String> excludedFoodIds;
   final Set<String> excludedCategories;
-  final double targetKcal;
-  final double targetProteinG;
-  final double targetCarbG;
-  final double targetFatG;
   final double? budgetEgp;
 
   /// Free-form diet tag, e.g. `vegan`, `halal`, `vegetarian`.
@@ -26,10 +28,6 @@ class DietaryPreferences extends Equatable {
     required this.uid,
     required this.excludedFoodIds,
     required this.excludedCategories,
-    required this.targetKcal,
-    required this.targetProteinG,
-    required this.targetCarbG,
-    required this.targetFatG,
     this.budgetEgp,
     this.dietTag,
     required this.schemaVersion,
@@ -40,12 +38,9 @@ class DietaryPreferences extends Equatable {
   @override
   List<Object?> get props => [
     uid,
+    prefsId,
     excludedFoodIds,
     excludedCategories,
-    targetKcal,
-    targetProteinG,
-    targetCarbG,
-    targetFatG,
     budgetEgp,
     dietTag,
     schemaVersion,
