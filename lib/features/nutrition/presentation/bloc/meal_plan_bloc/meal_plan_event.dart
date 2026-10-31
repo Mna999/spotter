@@ -21,20 +21,23 @@ class MealPlanCreated extends MealPlanEvent {
 
 class PlanGenerated extends MealPlanEvent {
   final String uid;
-  const PlanGenerated({required this.uid});
+  final String prefsId;
+  const PlanGenerated({required this.uid,required this.prefsId});
   @override
   List<Object?> get props => [uid];
 }
 
 class PlanRegeneratedUnderBudget extends MealPlanEvent {
   final String uid;
+  final String prefsId;
   final double budgetEgp;
   const PlanRegeneratedUnderBudget({
     required this.uid,
     required this.budgetEgp,
+    required this.prefsId
   });
   @override
-  List<Object?> get props => [uid, budgetEgp];
+  List<Object?> get props => [uid, budgetEgp,prefsId];
 }
 
 class PlanSaved extends MealPlanEvent {

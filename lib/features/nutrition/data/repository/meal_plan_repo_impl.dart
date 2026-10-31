@@ -23,6 +23,10 @@ class MealPlanRepoImpl implements MealPlanRepo {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
       );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     } 
   }
 
@@ -40,6 +44,10 @@ class MealPlanRepoImpl implements MealPlanRepo {
     } on ServerException catch (e) {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
       );
     } 
   }
@@ -61,6 +69,10 @@ class MealPlanRepoImpl implements MealPlanRepo {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
       );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     }
   }
 
@@ -81,6 +93,10 @@ class MealPlanRepoImpl implements MealPlanRepo {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
       );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     }
   }
 
@@ -95,6 +111,10 @@ class MealPlanRepoImpl implements MealPlanRepo {
     } on ServerException catch (e) {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
       );
     }
   }
@@ -115,6 +135,10 @@ class MealPlanRepoImpl implements MealPlanRepo {
     } on ServerException catch (e) {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
       );
     } 
   }

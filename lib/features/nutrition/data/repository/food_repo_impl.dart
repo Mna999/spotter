@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dartz/dartz.dart';
 import 'package:spotter/core/error/exception.dart';
 import 'package:spotter/core/error/exception_handler.dart';
@@ -18,7 +20,14 @@ class FoodRepoImpl implements FoodRepo {
       final foodItem = await remoteDataSource.getById(foodId: foodId);
       return Right(foodItem);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)));
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (e) {
+      log(e.toString());
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     }
   }
 
@@ -30,17 +39,32 @@ class FoodRepoImpl implements FoodRepo {
       final foodItems = await remoteDataSource.list(filter: filter);
       return Right(foodItems);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)));
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (e) {
+      log(e.toString());
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     }
   }
 
   @override
-  Future<Either<Failure, List<FoodItem>>> search({required String query}) async {
+  Future<Either<Failure, List<FoodItem>>> search({
+    required String query,
+  }) async {
     try {
       final foodItems = await remoteDataSource.search(query: query);
       return Right(foodItems);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)));
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     }
   }
 }

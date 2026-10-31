@@ -20,7 +20,10 @@ class RegenerateUnderBudgetUseCase implements UseCase<MealPlan, BudgetParams> {
 
   @override
   Future<Either<Failure, MealPlan>> call(BudgetParams params) async {
-    final prefsOrFailure = await nutritionPrefRepo.get(uid: params.uid);
+    final prefsOrFailure = await nutritionPrefRepo.get(
+      uid: params.uid,
+      prefsId: params.prefsId,
+    );
 
     return prefsOrFailure.fold((failure) => Left(failure), (prefs) {
       final now = DateTime.now();

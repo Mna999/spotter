@@ -32,16 +32,22 @@ class MacroNutrientsModel extends MacroNutrients {
 
   // Create model from JSON (Firestore document)
   factory MacroNutrientsModel.fromJson(Map<String, dynamic> json) {
+    final minerals = json['mineralsMg'] as Map?;
     return MacroNutrientsModel(
-      energyKcal: json['energyKcal'],
-      proteinG: json['proteinG'],
-      fatG: json['fatG'],
-      carbohydrateG: json['carbohydrateG'],
-      fiberG: json['fiberG'],
-      waterG: json['waterG'],
-      ashG: json['ashG'],
-      refusePct: json['refusePct'],
-      mineralsMg: Map<String, double>.from(json['mineralsMg'] ?? {}),
+      energyKcal: (json['energyKcal'] as num?)?.toDouble() ?? 0,
+      proteinG: (json['proteinG'] as num?)?.toDouble() ?? 0,
+      fatG: (json['fatG'] as num?)?.toDouble() ?? 0,
+      carbohydrateG: (json['carbohydrateG'] as num?)?.toDouble() ?? 0,
+      fiberG: (json['fiberG'] as num?)?.toDouble() ?? 0,
+      waterG: (json['waterG'] as num?)?.toDouble() ?? 0,
+      ashG: (json['ashG'] as num?)?.toDouble() ?? 0,
+      refusePct: (json['refusePct'] as num?)?.toInt() ?? 0,
+      mineralsMg: minerals == null
+          ? const <String, double>{}
+          : minerals.map(
+              (key, value) =>
+                  MapEntry(key as String, (value as num?)?.toDouble() ?? 0),
+            ),
       vitamins: Map<String, dynamic>.from(json['vitamins'] ?? {}),
     );
   }

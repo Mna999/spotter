@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:spotter/core/constants.dart';
+import 'package:spotter/core/input_converter/input_parser.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
-import 'package:spotter/features/nutrition/domain/entities/plan_status.dart';
 import 'package:spotter/features/nutrition/domain/entities/plan_status.dart';
 
 class MealPlanModel extends MealPlan {
@@ -26,26 +27,31 @@ class MealPlanModel extends MealPlan {
       'budgetEgp': budgetEgp,
       'totalKcal': totalKcal,
       'costEgp': costEgp,
-      'status': status.toString(),
+      'status': status.name,
       'schemaVersion': schemaVersion,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
     };
   }
 
-  // Create model from JSON (Firestore document)
-  factory MealPlanModel.fromJson(Map<String, dynamic> json) {
+  // Create model from JSON (Firestore document). [docId] is the document id,
+  // which is the source of truth when the stored body predates that field.
+  factory MealPlanModel.fromJson(Map<String, dynamic> json, {String? docId}) {
     return MealPlanModel(
-      mealPlanId: json['mealPlanId'],
+      mealPlanId: docId ?? json['mealPlanId'] ?? '',
       uid: json['uid'],
       date: (json['date'] as Timestamp).toDate(),
-      budgetEgp: json['budgetEgp']?.toDouble(),
-      totalKcal: json['totalKcal'],
-      costEgp: json['costEgp'],
-      status: PlanStatus.fromString(json['status']),
-      schemaVersion: json['schemaVersion'],
-      createdAt: (json['createdAt'] as Timestamp).toDate(),
-      updatedAt: json['updatedAt'] != null ? (json['updatedAt'] as Timestamp).toDate() : null,
+      budgetEgp: (json['budgetEgp'] as num?)?.toDouble(),
+      totalKcal: (json['totalKcal'] as num?)?.toDouble() ?? 0,
+      costEgp: (json['costEgp'] as num?)?.toDouble() ?? 0,
+      status: PlanStatus.fromString(json['status'] ?? 'draft'),
+      schemaVersion: (json['schemaVersion'] as num?)?.toInt() ?? SCHEMA_VERSION,
+      createdAt:
+          InputParser.toDateTime(json['createdAt']) ??
+          DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt:
+          InputParser.toDateTime(json['updatedAt']) ??
+          DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
 
@@ -69,6 +75,22 @@ class MealPlanModel extends MealPlan {
   MealPlan toEntity() {
     return MealPlan(
       mealPlanId: mealPlanId,
+      uid: uid,
+      date: date,
+      budgetEgp: budgetEgp,
+      totalKcal: totalKcal,
+      costEgp: costEgp,
+      status: status,
+      schemaVersion: schemaVersion,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
+  /// Returns a copy of this model carrying [id] as its document id.
+  MealPlanModel withId(String id) {
+    return MealPlanModel(
+      mealPlanId: id,
       uid: uid,
       date: date,
       budgetEgp: budgetEgp,

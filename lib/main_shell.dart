@@ -4,7 +4,7 @@ import 'package:spotter/core/route/routing.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:spotter/features/auth/presentation/screens/profile_screen.dart';
 import 'package:spotter/features/auth/presentation/screens/sign_in_screen.dart';
-// import 'package:spotter/features/nutrition/presentation/screens/nutrition_dashboard_screen.dart';
+import 'package:spotter/features/nutrition/presentation/screens/nutrition_dashboard_screen.dart';
 import 'package:spotter/features/workouts/presentation/screens/workout_list_screen.dart';
 import 'package:spotter/home_screen.dart';
 
@@ -69,7 +69,7 @@ class _MainShellState extends State<MainShell> {
               ),
             ),
             const _KeepAlivePage(child: WorkoutListScreen()),
-           // const _KeepAlivePage(child: NutritionDashboardScreen()),
+            const _KeepAlivePage(child: NutritionDashboardScreen()),
             const _KeepAlivePage(child: ProfileScreen()),
           ],
         ),

@@ -9,6 +9,7 @@ import 'package:spotter/features/auth/presentation/screens/onBoarding_screen.dar
 import 'package:spotter/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/food_log_bloc/food_log_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/meal_plan_bloc/meal_plan_bloc.dart';
+import 'package:spotter/features/nutrition/presentation/bloc/nutrition_preferences_bloc/nutrition_preferences_bloc.dart';
 import 'package:spotter/features/workouts/presentation/blocs/workout_session_bloc/workout_session_bloc.dart';
 import 'package:spotter/firebase_options.dart';
 import 'package:spotter/injection_container.dart';
@@ -43,6 +44,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<MealPlanBloc>(
           create: (_) => sl<MealPlanBloc>(),
+        ),
+        BlocProvider<NutritionPreferencesBloc>(
+          create: (_) => sl<NutritionPreferencesBloc>(),
         ),
       ],
       child: MaterialApp(

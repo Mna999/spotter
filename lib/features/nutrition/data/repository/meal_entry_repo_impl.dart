@@ -28,6 +28,10 @@ class MealEntryRepoImpl implements MealEntryRepo {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
       );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     } 
   }
 
@@ -48,6 +52,10 @@ class MealEntryRepoImpl implements MealEntryRepo {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
       );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     } 
   }
 
@@ -65,6 +73,10 @@ class MealEntryRepoImpl implements MealEntryRepo {
     } on ServerException catch (e) {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
       );
     }
   }
@@ -85,6 +97,10 @@ class MealEntryRepoImpl implements MealEntryRepo {
     } on ServerException catch (e) {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
       );
     }
   }
@@ -107,6 +123,10 @@ class MealEntryRepoImpl implements MealEntryRepo {
     } on ServerException catch (e) {
       return Left(
         ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
       );
     } 
   }

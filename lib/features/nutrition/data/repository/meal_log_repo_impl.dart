@@ -21,7 +21,13 @@ class MealLogRepoImpl implements MealLogRepo {
       await remoteDataSource.delete(uid: uid, mealLogId: mealLogId);
       return const Right(unit);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)));
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     }
   }
 
@@ -34,7 +40,13 @@ class MealLogRepoImpl implements MealLogRepo {
       final mealLog = await remoteDataSource.get(uid: uid, mealLogId: mealLogId);
       return Right(mealLog);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)));
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     } 
   }
 
@@ -48,7 +60,13 @@ class MealLogRepoImpl implements MealLogRepo {
       final mealLogs = await remoteDataSource.inRange(uid: uid, start: start, end: end);
       return Right(mealLogs);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)));
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     }
   }
 
@@ -61,7 +79,13 @@ class MealLogRepoImpl implements MealLogRepo {
       final mealLogs = await remoteDataSource.listForDate(uid: uid, date: date);
       return Right(mealLogs);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)));
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     }
   }
 
@@ -74,7 +98,13 @@ class MealLogRepoImpl implements MealLogRepo {
       final savedLog = await remoteDataSource.save(uid: uid, log: log);
       return Right(savedLog);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)));
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     }
   }
 
@@ -92,7 +122,13 @@ class MealLogRepoImpl implements MealLogRepo {
       );
       return Right(updatedLog);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)));
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (_) {
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
     } 
   }
 }

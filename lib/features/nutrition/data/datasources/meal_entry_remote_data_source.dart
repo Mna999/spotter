@@ -83,7 +83,7 @@ class MealEntryRemoteDataSourceImpl implements MealEntryRemoteDataSource {
         return null;
       }
 
-      final model = MealEntryModel.fromJson(data);
+      final model = MealEntryModel.fromJson(data, docId: doc.id);
       return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -104,7 +104,8 @@ class MealEntryRemoteDataSourceImpl implements MealEntryRemoteDataSource {
           .get();
 
       return snapshot.docs
-          .map((doc) => MealEntryModel.fromJson(doc.data()).toEntity())
+          .map((doc) => MealEntryModel.fromJson(doc.data(), docId: doc.id))
+          .map((model) => model.toEntity())
           .toList();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -118,16 +119,19 @@ class MealEntryRemoteDataSourceImpl implements MealEntryRemoteDataSource {
     required MealEntry entry,
   }) async {
     try {
-      final model = MealEntryModel.fromEntity(entry);
-
-      await _firestore
+      final collection = _firestore
           .collection('mealPlans')
           .doc(mealPlanId)
-          .collection('entries')
-          .doc(entry.mealEntryId)
-          .set(model.toJson());
+          .collection('entries');
+      // New entries arrive with an empty id; let Firestore assign one.
+      final docRef = entry.mealEntryId.trim().isEmpty
+          ? collection.doc()
+          : collection.doc(entry.mealEntryId);
+      final model = MealEntryModel.fromEntity(entry).withId(docRef.id);
 
-      return entry;
+      await docRef.set(model.toJson());
+
+      return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
@@ -154,7 +158,7 @@ class MealEntryRemoteDataSourceImpl implements MealEntryRemoteDataSource {
 
       // Get updated document
       final doc = await docRef.get();
-      final model = MealEntryModel.fromJson(doc.data()!);
+      final model = MealEntryModel.fromJson(doc.data()!, docId: doc.id);
       return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);

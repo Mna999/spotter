@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:spotter/core/constants.dart';
+import 'package:spotter/core/input_converter/input_parser.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_entry.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_type.dart';
 import 'package:spotter/features/nutrition/data/models/portion_model.dart';
-import 'package:spotter/features/nutrition/domain/entities/meal_type.dart';
-import 'package:spotter/features/nutrition/domain/entities/portion.dart';
 
 class MealEntryModel extends MealEntry {
   MealEntryModel({
@@ -28,7 +28,7 @@ class MealEntryModel extends MealEntry {
       'mealPlanId': mealPlanId,
       'uid': uid,
       'foodId': foodId,
-      'mealType': mealType.toString(),
+      'mealType': mealType.name,
       'order': order,
       'portion': PortionModel.fromEntity(portion).toJson(),
       'servingsCount': servingsCount,
@@ -39,21 +39,26 @@ class MealEntryModel extends MealEntry {
     };
   }
 
-  // Create model from JSON (Firestore document)
-  factory MealEntryModel.fromJson(Map<String, dynamic> json) {
+  // Create model from JSON (Firestore document). [docId] is the document id,
+  // which is the source of truth when the stored body predates that field.
+  factory MealEntryModel.fromJson(Map<String, dynamic> json, {String? docId}) {
     return MealEntryModel(
-      mealEntryId: json['mealEntryId'],
+      mealEntryId: docId ?? json['mealEntryId'] ?? '',
       mealPlanId: json['mealPlanId'],
       uid: json['uid'],
       foodId: json['foodId'],
-      mealType: MealType.fromString(json['mealType']),
-      order: json['order'],
+      mealType: MealType.fromString(json['mealType'] ?? 'snack'),
+      order: (json['order'] as num?)?.toInt() ?? 0,
       portion: PortionModel.fromJson(json['portion']).toEntity(),
-      servingsCount: json['servingsCount'],
+      servingsCount: (json['servingsCount'] as num?)?.toDouble() ?? 1,
       note: json['note'],
-      schemaVersion: json['schemaVersion'],
-      createdAt: (json['createdAt'] as Timestamp).toDate(),
-      updatedAt: json['updatedAt'] != null ? (json['updatedAt'] as Timestamp).toDate() : null,
+     schemaVersion: (json['schemaVersion'] as num?)?.toInt() ?? SCHEMA_VERSION,
+      createdAt:
+          InputParser.toDateTime(json['createdAt']) ??
+          DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt:
+          InputParser.toDateTime(json['updatedAt']) ??
+          DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
 
@@ -79,6 +84,24 @@ class MealEntryModel extends MealEntry {
   MealEntry toEntity() {
     return MealEntry(
       mealEntryId: mealEntryId,
+      mealPlanId: mealPlanId,
+      uid: uid,
+      foodId: foodId,
+      mealType: mealType,
+      order: order,
+      portion: portion,
+      servingsCount: servingsCount,
+      note: note,
+      schemaVersion: schemaVersion,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
+  /// Returns a copy of this model carrying [id] as its document id.
+  MealEntryModel withId(String id) {
+    return MealEntryModel(
+      mealEntryId: id,
       mealPlanId: mealPlanId,
       uid: uid,
       foodId: foodId,

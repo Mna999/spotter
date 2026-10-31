@@ -128,7 +128,8 @@ class FoodLogBloc extends Bloc<FoodLogEvent, FoodLogState> {
     final results = await listMealLogsForDate(
       DateParams(uid: event.uid, date: event.date),
     );
-    results.fold((f) async => emit(FoodLogError(message: f.message)), (
+
+    await results.fold((f) async => emit(FoodLogError(message: f.message)), (
       logs,
     ) async {
       final totals = await getDailyTotals(

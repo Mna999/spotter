@@ -45,17 +45,25 @@ import 'package:spotter/features/nutrition/domain/usecases/delete_meal_log_useca
 import 'package:spotter/features/nutrition/domain/usecases/delete_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/generate_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_daily_totals_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_dietary_preferences_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_food_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/list_food_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_meal_logs_for_date_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_recent_meal_plans_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/log_food_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/regen_under_budget_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/repeat_yesterday_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/save_dietary_preferences_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/save_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/search_food_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/update_exclusions_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/update_meal_log_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/update_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/food_log_bloc/food_log_bloc.dart';
+import 'package:spotter/features/nutrition/presentation/bloc/food_search_bloc/food_search_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/meal_plan_bloc/meal_plan_bloc.dart';
+import 'package:spotter/features/nutrition/presentation/bloc/nutrition_preferences_bloc/nutrition_preferences_bloc.dart';
 import 'package:spotter/features/workouts/data/datasources/exercise_remote_datasource.dart';
 import 'package:spotter/features/workouts/data/datasources/planned_exercise_remote_datasource.dart';
 import 'package:spotter/features/workouts/data/datasources/set_remote_datasource.dart';
@@ -284,6 +292,24 @@ Future<void> initNutrition() async {
     ),
   );
 
+  // Register Food Search Bloc
+  sl.registerFactory(
+    () => FoodSearchBloc(
+      searchFood: sl(),
+      getFood: sl(),
+      listFoods: sl(),
+    ),
+  );
+
+  // Register Nutrition Preferences Bloc
+  sl.registerFactory(
+    () => NutritionPreferencesBloc(
+      getPreferences: sl(),
+      savePreferences: sl(),
+      updateExclusions: sl(),
+    ),
+  );
+
   // Register Meal Plan Bloc
   sl.registerFactory(
     () => MealPlanBloc(
@@ -310,6 +336,22 @@ Future<void> initNutrition() async {
   );
   sl.registerLazySingleton(() => DeleteMealLogUseCase(mealLogRepo: sl()));
   sl.registerLazySingleton(() => RepeatYesterdayUseCase(mealLogRepo: sl()));
+
+  // Register Use Cases for Food Search
+  sl.registerLazySingleton(() => SearchFoodUsecase(foodRepo: sl()));
+  sl.registerLazySingleton(() => GetFoodUsecase(foodRepo: sl()));
+  sl.registerLazySingleton(() => ListFoodsUseCase(foodRepo: sl()));
+
+  // Register Use Cases for Nutrition Preferences
+  sl.registerLazySingleton(
+    () => GetDietaryPreferencesUseCase(nutritionPrefRepo: sl()),
+  );
+  sl.registerLazySingleton(
+    () => SaveDietaryPreferencesUseCase(nutritionPrefRepo: sl()),
+  );
+  sl.registerLazySingleton(
+    () => UpdateExclusionsUseCase(nutritionPrefRepo: sl()),
+  );
 
   // Register Use Cases for Meal Plan
   sl.registerLazySingleton(() => CreateMealPlanUseCase(mealPlanRepo: sl()));

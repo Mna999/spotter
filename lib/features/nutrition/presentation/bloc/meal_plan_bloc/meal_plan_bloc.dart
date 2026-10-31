@@ -6,8 +6,8 @@ import 'package:spotter/features/nutrition/domain/params/add_meal_entry_params.d
 import 'package:spotter/features/nutrition/domain/params/budget_params.dart';
 import 'package:spotter/features/nutrition/domain/params/create_meal_plan_params.dart';
 import 'package:spotter/features/nutrition/domain/params/meal_plan_id_params.dart';
+import 'package:spotter/features/nutrition/domain/params/prefs_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/save_plan_params.dart';
-import 'package:spotter/features/nutrition/domain/params/uid_params.dart';
 import 'package:spotter/features/nutrition/domain/params/update_meal_plan_params.dart';
 import 'package:spotter/features/nutrition/domain/usecases/add_meal_entry_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/create_meal_plan_usecase.dart';
@@ -80,7 +80,9 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
     Emitter<MealPlanState> emit,
   ) async {
     emit(const MealPlanLoading());
-    final r = await generateMealPlan(UidParams(uid: e.uid));
+    final r = await generateMealPlan(
+      PrefsIdParams(uid: e.uid, prefsId: e.prefsId),
+    );
     r.fold(
       (f) => emit(MealPlanError(message: f.message)),
       (p) => emit(MealPlanLoaded(mealPlan: p, message: 'Meal plan generated.')),
@@ -93,7 +95,7 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
   ) async {
     emit(const MealPlanLoading());
     final r = await regenerateUnderBudget(
-      BudgetParams(uid: e.uid, budgetEgp: e.budgetEgp),
+      BudgetParams(uid: e.uid, budgetEgp: e.budgetEgp, prefsId: e.prefsId),
     );
     r.fold(
       (f) => emit(MealPlanError(message: f.message)),

@@ -7,7 +7,10 @@ import 'package:spotter/features/nutrition/domain/entities/dietary_preferences.d
 
 abstract class NutritionPreferencesRemoteDataSource {
   /// Get dietary preferences for a user
-  Future<DietaryPreferences?> get({required String uid});
+  Future<DietaryPreferences?> get({
+    required String uid,
+    required String prefsId,
+  });
 
   /// Save dietary preferences for a user
   Future<DietaryPreferences> save({
@@ -19,12 +22,14 @@ abstract class NutritionPreferencesRemoteDataSource {
   Future<DietaryPreferences> updateExclusions({
     required String uid,
     required Set<String> excludedFoodIds,
+    required String prefsId,
   });
 
   /// Update partial preferences
   Future<DietaryPreferences> update({
     required String uid,
     required Map<String, dynamic> partial,
+    required String prefsId,
   });
 }
 
@@ -35,16 +40,21 @@ class NutritionPreferencesRemoteDataSourceImpl
   NutritionPreferencesRemoteDataSourceImpl({required this._firestore});
 
   @override
-  Future<DietaryPreferences?> get({required String uid}) async {
+  Future<DietaryPreferences?> get({
+    required String uid,
+    required String prefsId,
+  }) async {
     try {
       final doc = await _firestore
-          .collection('dietaryPreferences')
+          .collection('users')
           .doc(uid)
+          .collection('dietaryPreferences')
+          .doc(prefsId)
           .get();
 
       final data = doc.data();
       if (data == null || data.isEmpty) return null;
-      final model = DietaryPreferencesModel.fromJson(data);
+      final model = DietaryPreferencesModel.fromJson(data, docId: doc.id);
       return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -60,8 +70,10 @@ class NutritionPreferencesRemoteDataSourceImpl
       final model = DietaryPreferencesModel.fromEntity(prefs);
 
       await _firestore
-          .collection('dietaryPreferences')
+          .collection('users')
           .doc(uid)
+          .collection('dietaryPreferences')
+          .doc(prefs.prefsId)
           .set(model.toJson());
 
       return prefs;
@@ -73,19 +85,27 @@ class NutritionPreferencesRemoteDataSourceImpl
   @override
   Future<DietaryPreferences> updateExclusions({
     required String uid,
+    required String prefsId,
     required Set<String> excludedFoodIds,
   }) async {
     try {
-      final docRef = _firestore.collection('dietaryPreferences').doc(uid);
+      final docRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('dietaryPreferences')
+          .doc(prefsId);
 
-      await docRef.update({
-        'excludedFoodIds': excludedFoodIds,
+      await docRef.set({
+        'excludedFoodIds': excludedFoodIds.toList(),
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      }, SetOptions(merge: true));
 
       // Get updated document
       final doc = await docRef.get();
-      final model = DietaryPreferencesModel.fromJson(doc.data()!);
+      final model = DietaryPreferencesModel.fromJson(
+        doc.data()!,
+        docId: doc.id,
+      );
       return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -95,10 +115,15 @@ class NutritionPreferencesRemoteDataSourceImpl
   @override
   Future<DietaryPreferences> update({
     required String uid,
+    required String prefsId,
     required Map<String, dynamic> partial,
   }) async {
     try {
-      final docRef = _firestore.collection('dietaryPreferences').doc(uid);
+      final docRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('dietaryPreferences')
+          .doc(prefsId);
 
       // Add timestamp for update
       partial['updatedAt'] = FieldValue.serverTimestamp();
@@ -107,7 +132,10 @@ class NutritionPreferencesRemoteDataSourceImpl
 
       // Get updated document
       final doc = await docRef.get();
-      final model = DietaryPreferencesModel.fromJson(doc.data()!);
+      final model = DietaryPreferencesModel.fromJson(
+        doc.data()!,
+        docId: doc.id,
+      );
       return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);

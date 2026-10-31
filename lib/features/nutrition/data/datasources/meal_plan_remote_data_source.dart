@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:spotter/core/error/exception.dart';
 import 'package:spotter/features/nutrition/data/models/meal_plan_model.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
-import 'package:spotter/features/nutrition/domain/entities/plan_status.dart';
 
 abstract class MealPlanRemoteDataSource {
   /// Create or overwrite a meal plan
@@ -64,7 +63,7 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
           .get();
       final data = doc.data();
       if (data == null || data.isEmpty) return null;
-      final model = MealPlanModel.fromJson(data);
+      final model = MealPlanModel.fromJson(data, docId: doc.id);
       return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -87,7 +86,8 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
           .get();
 
       return snapshot.docs
-          .map((doc) => MealPlanModel.fromJson(doc.data()).toEntity())
+          .map((doc) => MealPlanModel.fromJson(doc.data(), docId: doc.id))
+          .map((model) => model.toEntity())
           .toList();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -121,7 +121,8 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
 
       final snapshot = await query.get();
       return snapshot.docs
-          .map((doc) => MealPlanModel.fromJson(doc.data()).toEntity())
+          .map((doc) => MealPlanModel.fromJson(doc.data(), docId: doc.id))
+          .map((model) => model.toEntity())
           .toList();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -131,14 +132,16 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
   @override
   Future<MealPlan> save({required String uid, required MealPlan plan}) async {
     try {
-      final model = MealPlanModel.fromEntity(plan);
+      final collection = _firestore.collection('mealPlans');
+      // New plans arrive with an empty id; let Firestore assign one.
+      final docRef = plan.mealPlanId.trim().isEmpty
+          ? collection.doc()
+          : collection.doc(plan.mealPlanId);
+      final model = MealPlanModel.fromEntity(plan).withId(docRef.id);
 
-      await _firestore
-          .collection('mealPlans')
-          .doc(plan.mealPlanId)
-          .set(model.toJson());
+      await docRef.set(model.toJson());
 
-      return plan;
+      return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
@@ -160,7 +163,7 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
 
       // Get updated document
       final doc = await docRef.get();
-      final model = MealPlanModel.fromJson(doc.data()!);
+      final model = MealPlanModel.fromJson(doc.data()!, docId: doc.id);
       return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);

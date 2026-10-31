@@ -5,10 +5,13 @@ enum PlanStatus {
 
   archived;
 
+  /// Parses the stored value. Accepts both the plain name (`draft`) and the
+  /// legacy `toString()` form (`PlanStatus.draft`).
   static PlanStatus fromString(String value) {
+    final normalized = value.split('.').last;
     return PlanStatus.values.firstWhere(
-      (s) => s.name == value,
-      orElse: () => throw ArgumentError('Unknown PlanStatus: $value'),
+      (s) => s.name == normalized,
+      orElse: () => PlanStatus.draft,
     );
   }
 }

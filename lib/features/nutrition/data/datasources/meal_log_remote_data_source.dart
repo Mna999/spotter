@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:spotter/core/error/exception.dart';
 import 'package:spotter/features/nutrition/data/models/meal_log_model.dart';
+import 'package:spotter/features/nutrition/data/models/portion_model.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_log.dart';
+import 'package:spotter/features/nutrition/domain/entities/portion.dart';
 
 abstract class MealLogRemoteDataSource {
   /// Save a meal log
@@ -59,7 +61,7 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
 
       if (data == null || data.isEmpty) return null;
 
-      final model = MealLogModel.fromJson(data);
+      final model = MealLogModel.fromJson(data, docId: doc.id);
       return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -86,7 +88,8 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
           .get();
 
       return snapshot.docs
-          .map((doc) => MealLogModel.fromJson(doc.data()).toEntity())
+          .map((doc) => MealLogModel.fromJson(doc.data(), docId: doc.id))
+          .map((model) => model.toEntity())
           .toList();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -112,7 +115,8 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
           .get();
 
       return snapshot.docs
-          .map((doc) => MealLogModel.fromJson(doc.data()).toEntity())
+          .map((doc) => MealLogModel.fromJson(doc.data(), docId: doc.id))
+          .map((model) => model.toEntity())
           .toList();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -122,14 +126,16 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
   @override
   Future<MealLog> save({required String uid, required MealLog log}) async {
     try {
-      final model = MealLogModel.fromEntity(log);
+      final collection = _firestore.collection('mealLogs');
+      // New logs arrive with an empty id; let Firestore assign one.
+      final docRef = log.mealLogId.trim().isEmpty
+          ? collection.doc()
+          : collection.doc(log.mealLogId);
+      final model = MealLogModel.fromEntity(log).withId(docRef.id);
 
-      await _firestore
-          .collection('mealLogs')
-          .doc(log.mealLogId)
-          .set(model.toJson());
+      await docRef.set(model.toJson());
 
-      return log;
+      return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
@@ -144,6 +150,12 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
     try {
       final docRef = _firestore.collection('mealLogs').doc(mealLogId);
 
+      // A portion may arrive as a domain object; Firestore only stores maps.
+      final portion = partial['portion'];
+      if (portion is Portion) {
+        partial['portion'] = PortionModel.fromEntity(portion).toJson();
+      }
+
       // Add timestamp for update
       partial['updatedAt'] = FieldValue.serverTimestamp();
 
@@ -151,7 +163,7 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
 
       // Get updated document
       final doc = await docRef.get();
-      final model = MealLogModel.fromJson(doc.data()!);
+      final model = MealLogModel.fromJson(doc.data()!, docId: doc.id);
       return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);

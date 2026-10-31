@@ -3,7 +3,7 @@ import 'package:spotter/core/error/failure.dart';
 import 'package:spotter/features/nutrition/domain/entities/dietary_preferences.dart';
 
 abstract class NutritionPrefRepo {
-  Future<Either<Failure, DietaryPreferences?>> get({required String uid});
+  Future<Either<Failure, DietaryPreferences?>> get({required String uid,required String prefsId});
   Future<Either<Failure, DietaryPreferences>> save({
     required String uid,
     required DietaryPreferences prefs,

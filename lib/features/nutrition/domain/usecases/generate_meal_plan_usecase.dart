@@ -4,7 +4,7 @@ import 'package:spotter/core/error/failure.dart';
 import 'package:spotter/core/usecases/usecase.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
 import 'package:spotter/features/nutrition/domain/entities/plan_status.dart';
-import 'package:spotter/features/nutrition/domain/params/uid_params.dart';
+import 'package:spotter/features/nutrition/domain/params/prefs_id_params.dart';
 import 'package:spotter/features/nutrition/domain/repository/nutrition_pref_repo.dart';
 
 /// GENERATE: build a new draft plan for today from the user's dietary
@@ -15,14 +15,17 @@ import 'package:spotter/features/nutrition/domain/repository/nutrition_pref_repo
 /// header with the target calories and budget taken from the user's
 /// dietary preferences. The caller adds the actual foods through
 /// AddMealEntryUseCase and persists the result with SaveMealPlanUseCase.
-class GenerateMealPlanUseCase implements UseCase<MealPlan?, UidParams> {
+class GenerateMealPlanUseCase implements UseCase<MealPlan?, PrefsIdParams> {
   NutritionPrefRepo nutritionPrefRepo;
 
   GenerateMealPlanUseCase({required this.nutritionPrefRepo});
 
   @override
-  Future<Either<Failure, MealPlan?>> call(UidParams params) async {
-    final prefsOrFailure = await nutritionPrefRepo.get(uid: params.uid);
+  Future<Either<Failure, MealPlan?>> call(PrefsIdParams params) async {
+    final prefsOrFailure = await nutritionPrefRepo.get(
+      uid: params.uid,
+      prefsId: params.prefsId,
+    );
 
     return prefsOrFailure.fold((failure) => Left(failure), (prefs) {
       final now = DateTime.now();

@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 class DietaryPreferences extends Equatable {
   /// Primary key, equal to the Firestore document id (`users/{uid}`).
   final String uid;
+  final String prefsId;
   final Set<String> excludedFoodIds;
   final Set<String> excludedCategories;
   final double targetKcal;
@@ -21,6 +22,7 @@ class DietaryPreferences extends Equatable {
   final DateTime? updatedAt;
 
   const DietaryPreferences({
+    required this.prefsId,
     required this.uid,
     required this.excludedFoodIds,
     required this.excludedCategories,

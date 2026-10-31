@@ -30,7 +30,7 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
       final data = doc.data();
       if (data == null || data.isEmpty) return null;
 
-      final model = FoodItemModel.fromJson(doc.data()!);
+      final model = FoodItemModel.fromJson(doc.data()!, docId: doc.id);
       return model.toEntity();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -58,7 +58,8 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
 
       final snapshot = await query.get();
       return snapshot.docs
-          .map((doc) => FoodItemModel.fromJson(doc.data()).toEntity())
+          .map((doc) => FoodItemModel.fromJson(doc.data(), docId: doc.id))
+          .map((model) => model.toEntity())
           .toList();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
@@ -67,19 +68,50 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
 
   @override
   Future<List<FoodItem>> search({required String query}) async {
+    final needle = query.trim().toLowerCase();
+    if (needle.isEmpty) return const [];
+
     try {
-      // Use Firestore's search capability
+      // Preferred path: prefix match on the denormalized lowercase
+      // `searchText` field.
       final snapshot = await _firestore
           .collection('foods')
-          .where('searchText', arrayContains: query.toLowerCase())
+          .where('searchText', isGreaterThanOrEqualTo: needle)
+          .where('searchText', isLessThanOrEqualTo: '$needle\uf8ff')
           .limit(20)
           .get();
 
-      return snapshot.docs
-          .map((doc) => FoodItemModel.fromJson(doc.data()).toEntity())
-          .toList();
+      final prefixMatches = _toFoods(snapshot);
+      if (prefixMatches.isNotEmpty) return prefixMatches;
+
+      // Fallback: older catalogues store `searchText` as a token list (or not
+      // at all), which the range query above cannot match. Filter a page of
+      // the catalogue in memory so search still returns results.
+      final page = await _firestore
+          .collection('foods')
+          .orderBy('nameEn')
+          .limit(200)
+          .get();
+
+      return _toFoods(
+        page,
+      ).where((food) => _matches(food, needle)).take(20).toList();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
+  }
+
+  List<FoodItem> _toFoods(QuerySnapshot<Map<String, dynamic>> snapshot) {
+    return snapshot.docs
+        .map((doc) => FoodItemModel.fromJson(doc.data(), docId: doc.id))
+        .map((model) => model.toEntity())
+        .toList();
+  }
+
+  bool _matches(FoodItem food, String needle) {
+    return food.searchText.contains(needle) ||
+        food.nameEn.toLowerCase().contains(needle) ||
+        (food.nameAr?.toLowerCase().contains(needle) ?? false) ||
+        food.aliases.any((alias) => alias.toLowerCase().contains(needle));
   }
 }
