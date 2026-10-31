@@ -126,6 +126,8 @@ class WorkoutSessionBloc
         workout.scheduledFor = scheduledFor;
       }
 
+      emit(const WorkoutLoading());
+
       final res = await updateWorkoutUseCase(workout);
       res.fold(
         (failure) => emit(WorkoutError(message: failure.message)),
