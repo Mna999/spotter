@@ -4,6 +4,7 @@ import 'package:spotter/core/route/routing.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:spotter/features/auth/presentation/screens/profile_screen.dart';
 import 'package:spotter/features/auth/presentation/screens/sign_in_screen.dart';
+import 'package:spotter/features/nutrition/presentation/screens/nutrition_dashboard_screen.dart';
 import 'package:spotter/features/workouts/presentation/screens/workout_list_screen.dart';
 import 'package:spotter/home_screen.dart';
 
@@ -61,8 +62,14 @@ class _MainShellState extends State<MainShell> {
           controller: _pageController,
           onPageChanged: _onPageChanged,
           children: [
-            _KeepAlivePage(child: HomeScreen(onOpenWorkouts: () => _select(1))),
+            _KeepAlivePage(
+              child: HomeScreen(
+                onOpenWorkouts: () => _select(1),
+                onOpenNutrition: () => _select(2),
+              ),
+            ),
             const _KeepAlivePage(child: WorkoutListScreen()),
+            const _KeepAlivePage(child: NutritionDashboardScreen()),
             const _KeepAlivePage(child: ProfileScreen()),
           ],
         ),
@@ -79,6 +86,11 @@ class _MainShellState extends State<MainShell> {
               icon: Icon(Icons.fitness_center_outlined),
               selectedIcon: Icon(Icons.fitness_center),
               label: 'Workouts',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.restaurant_outlined),
+              selectedIcon: Icon(Icons.restaurant),
+              label: 'Nutrition',
             ),
             NavigationDestination(
               icon: Icon(Icons.person_outline),

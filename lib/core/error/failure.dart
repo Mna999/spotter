@@ -39,3 +39,7 @@ class PoseFailure extends Failure {
 class InvalidInputFailure extends Failure {
   const InvalidInputFailure({super.message = 'Invalid Input'});
 }
+
+class NotFoundFailure extends Failure {
+  const NotFoundFailure({super.message = 'Resource not found'});
+}

@@ -6,6 +6,9 @@ import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart
 import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
 import 'package:spotter/features/auth/presentation/widgets/macro_goals_card.dart';
 import 'package:spotter/features/auth/presentation/widgets/spotter_title.dart';
+import 'package:spotter/features/nutrition/presentation/widgets/nutrition_macro_card.dart';
+import 'package:spotter/features/nutrition/presentation/widgets/nutrition_quick_stats.dart';
+import 'package:spotter/features/nutrition/presentation/widgets/nutrition_status_icon.dart';
 import 'package:spotter/features/workouts/domain/entities/session_status.dart';
 import 'package:spotter/features/workouts/domain/entities/workout_session.dart';
 import 'package:spotter/features/workouts/presentation/blocs/workout_session_bloc/workout_session_bloc.dart';
@@ -15,11 +18,14 @@ import 'package:spotter/features/workouts/presentation/widgets/workout_card.dart
 import 'package:spotter/features/workouts/presentation/widgets/workout_week_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, this.onOpenWorkouts});
+  const HomeScreen({super.key, this.onOpenWorkouts, this.onOpenNutrition});
 
   /// Called when the dashboard wants to hand the user over to the workout tab
   /// (for example from the "see all" / "plan a workout" actions).
   final VoidCallback? onOpenWorkouts;
+  
+  /// Called when the dashboard wants to hand the user over to the nutrition tab
+  final VoidCallback? onOpenNutrition;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -67,6 +73,11 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const SpotterTitle(),
         actions: [
+          NutritionStatusIcon(
+            totalCalories: 0, // This would be populated from actual nutrition data
+            targetCalories: 2000, // This would be populated from user's goals
+          ),
+          const SizedBox(width: 16),
           IconButton(
             onPressed: _load,
             tooltip: 'Refresh dashboard',
@@ -134,6 +145,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     goal: profile.goal,
                   ),
                 ],
+                const SizedBox(height: 16),
+                NutritionQuickStats(
+                  totalCalories: 0, // This would be populated from actual nutrition data
+                  targetCalories: profile != null ? metrics?.macroTargets.calories?.toDouble() ?? 2000 : 2000,
+                  protein: 0, // This would be populated from actual nutrition data
+                  carbs: 0, // This would be populated from actual nutrition data
+                  fat: 0, // This would be populated from actual nutrition data
+                ),
                 if (profile != null) ...[
                   const SizedBox(height: 16),
                   _WeeklyTargetCard(

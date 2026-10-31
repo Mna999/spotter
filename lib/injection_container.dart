@@ -24,6 +24,38 @@ import 'package:spotter/features/auth/domain/usecases/verify_account_usecase.dar
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:spotter/features/auth/presentation/bloc/onBoarding_bloc/on_boarding_bloc.dart';
 import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
+import 'package:spotter/features/nutrition/data/datasources/food_remote_data_source.dart';
+import 'package:spotter/features/nutrition/data/datasources/meal_entry_remote_data_source.dart';
+import 'package:spotter/features/nutrition/data/datasources/meal_log_remote_data_source.dart';
+import 'package:spotter/features/nutrition/data/datasources/meal_plan_remote_data_source.dart';
+import 'package:spotter/features/nutrition/data/datasources/nutrition_preferences_remote_data_source.dart';
+import 'package:spotter/features/nutrition/data/repository/food_repo_impl.dart';
+import 'package:spotter/features/nutrition/data/repository/meal_entry_repo_impl.dart';
+import 'package:spotter/features/nutrition/data/repository/meal_log_repo_impl.dart';
+import 'package:spotter/features/nutrition/data/repository/meal_plan_repo_impl.dart';
+import 'package:spotter/features/nutrition/data/repository/nutrition_pref_repo_impl.dart';
+import 'package:spotter/features/nutrition/domain/repository/food_repo.dart';
+import 'package:spotter/features/nutrition/domain/repository/meal_entry_repo.dart';
+import 'package:spotter/features/nutrition/domain/repository/meal_log_repo.dart';
+import 'package:spotter/features/nutrition/domain/repository/meal_plan_repo.dart';
+import 'package:spotter/features/nutrition/domain/repository/nutrition_pref_repo.dart';
+import 'package:spotter/features/nutrition/domain/usecases/add_meal_entry_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/create_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/delete_meal_log_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/delete_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/generate_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_daily_totals_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/list_meal_logs_for_date_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/list_recent_meal_plans_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/log_food_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/regen_under_budget_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/repeat_yesterday_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/save_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/update_meal_log_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/update_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/presentation/bloc/food_log_bloc/food_log_bloc.dart';
+import 'package:spotter/features/nutrition/presentation/bloc/meal_plan_bloc/meal_plan_bloc.dart';
 import 'package:spotter/features/workouts/data/datasources/exercise_remote_datasource.dart';
 import 'package:spotter/features/workouts/data/datasources/planned_exercise_remote_datasource.dart';
 import 'package:spotter/features/workouts/data/datasources/set_remote_datasource.dart';
@@ -64,6 +96,7 @@ Future<void> init() async {
   await initProfile();
   await initOnBoarding();
   await initWorkouts();
+  await initNutrition();
 }
 
 Future<void> initAuth() async {
@@ -236,4 +269,96 @@ Future<void> initWorkouts() async {
   );
 
   sl.registerLazySingleton(() => InternetConnection());
+}
+
+Future<void> initNutrition() async {
+  // Register Food Log Bloc
+  sl.registerFactory(
+    () => FoodLogBloc(
+      logFood: sl(),
+      listMealLogsForDate: sl(),
+      getDailyTotals: sl(),
+      updateMealLog: sl(),
+      deleteMealLog: sl(),
+      repeatYesterday: sl(),
+    ),
+  );
+
+  // Register Meal Plan Bloc
+  sl.registerFactory(
+    () => MealPlanBloc(
+      createMealPlan: sl(),
+      generateMealPlan: sl(),
+      regenerateUnderBudget: sl(),
+      saveMealPlan: sl(),
+      getMealPlan: sl(),
+      updateMealPlan: sl(),
+      deleteMealPlan: sl(),
+      listRecentMealPlans: sl(),
+      addMealEntry: sl(),
+    ),
+  );
+
+  // Register Use Cases for Food Log
+  sl.registerLazySingleton(
+    () => LogFoodUseCase(foodRepo: sl(), mealLogRepo: sl()),
+  );
+  sl.registerLazySingleton(() => ListMealLogsForDateUseCase(mealLogRepo: sl()));
+  sl.registerLazySingleton(() => GetDailyTotalsUseCase(mealLogRepo: sl()));
+  sl.registerLazySingleton(
+    () => UpdateMealLogUseCase(foodRepo: sl(), mealLogRepo: sl()),
+  );
+  sl.registerLazySingleton(() => DeleteMealLogUseCase(mealLogRepo: sl()));
+  sl.registerLazySingleton(() => RepeatYesterdayUseCase(mealLogRepo: sl()));
+
+  // Register Use Cases for Meal Plan
+  sl.registerLazySingleton(() => CreateMealPlanUseCase(mealPlanRepo: sl()));
+  sl.registerLazySingleton(() => GetMealPlanUseCase(mealPlanRepo: sl()));
+  sl.registerLazySingleton(
+    () => ListRecentMealPlansUsecase(mealPlanRepo: sl()),
+  );
+  sl.registerLazySingleton(() => SaveMealPlanUsecase(mealPlanRepo: sl()));
+  sl.registerLazySingleton(() => UpdateMealPlanUseCase(mealPlanRepo: sl()));
+  sl.registerLazySingleton(() => DeleteMealPlanUseCase(mealPlanRepo: sl()));
+  sl.registerLazySingleton(
+    () => GenerateMealPlanUseCase(nutritionPrefRepo: sl()),
+  );
+  sl.registerLazySingleton(
+    () => RegenerateUnderBudgetUseCase(nutritionPrefRepo: sl()),
+  );
+  sl.registerLazySingleton(() => AddMealEntryUseCase(mealEntryRepo: sl()));
+
+  // Register Repositories
+  sl.registerLazySingleton<FoodRepo>(
+    () => FoodRepoImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<MealLogRepo>(
+    () => MealLogRepoImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<MealPlanRepo>(
+    () => MealPlanRepoImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<MealEntryRepo>(
+    () => MealEntryRepoImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<NutritionPrefRepo>(
+    () => NutritionPrefRepoImpl(remoteDataSource: sl()),
+  );
+
+  // Register Data Sources
+  sl.registerLazySingleton<FoodRemoteDataSource>(
+    () => FoodRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<MealLogRemoteDataSource>(
+    () => MealLogRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<MealPlanRemoteDataSource>(
+    () => MealPlanRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<MealEntryRemoteDataSource>(
+    () => MealEntryRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<NutritionPreferencesRemoteDataSource>(
+    () => NutritionPreferencesRemoteDataSourceImpl(firestore: sl()),
+  );
 }
