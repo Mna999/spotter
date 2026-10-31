@@ -67,7 +67,7 @@ class NutritionPreferencesBloc
   ) async {
     emit(const NutritionPreferencesLoading());
     final result = await updateExclusions(
-      ExclusionParams(uid: event.uid, excludedFoodIds: event.excludedFoodIds),
+      ExclusionParams(uid: event.uid, excludedFoodIds: event.excludedFoodIds,prefsId: event.prefsId),
     );
     result.fold(
       (failure) => emit(NutritionPreferencesError(message: failure.message)),

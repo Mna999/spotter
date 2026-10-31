@@ -32,13 +32,15 @@ class NutritionPreferencesSaved extends NutritionPreferencesEvent {
 
 class NutritionExclusionsUpdated extends NutritionPreferencesEvent {
   final String uid;
+  final String prefsId;
   final Set<String> excludedFoodIds;
 
   const NutritionExclusionsUpdated({
     required this.uid,
     required this.excludedFoodIds,
+    required this.prefsId
   });
 
   @override
-  List<Object?> get props => [uid, excludedFoodIds];
+  List<Object?> get props => [uid, excludedFoodIds,prefsId];
 }

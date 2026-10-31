@@ -17,6 +17,7 @@ class UpdateExclusionsUseCase
     return nutritionPrefRepo.updateExclusions(
       uid: params.uid,
       excludedFoodIds: params.excludedFoodIds,
+      prefsId: params.prefsId
     );
   }
 }

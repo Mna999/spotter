@@ -52,11 +52,13 @@ class NutritionPrefRepoImpl implements NutritionPrefRepo {
   @override
   Future<Either<Failure, DietaryPreferences>> update({
     required String uid,
+    required String prefsId,
     required Map<String, dynamic> partial,
   }) async {
     try {
       final updatedPrefs = await remoteDataSource.update(
         uid: uid,
+        prefsId: prefsId,
         partial: partial,
       );
       return Right(updatedPrefs);
@@ -74,12 +76,15 @@ class NutritionPrefRepoImpl implements NutritionPrefRepo {
   @override
   Future<Either<Failure, DietaryPreferences>> updateExclusions({
     required String uid,
+    required String prefsId,
     required Set<String> excludedFoodIds,
+
   }) async {
     try {
       final updatedPrefs = await remoteDataSource.updateExclusions(
         uid: uid,
         excludedFoodIds: excludedFoodIds,
+        prefsId: prefsId
       );
       return Right(updatedPrefs);
     } on ServerException catch (e) {
