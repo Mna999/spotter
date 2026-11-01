@@ -11,8 +11,8 @@ import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_type.dart';
 import 'package:spotter/features/nutrition/domain/entities/plan_status.dart';
 import 'package:spotter/features/nutrition/domain/params/date_params.dart';
-import 'package:spotter/features/nutrition/domain/params/meal_entry_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/log_food_params.dart';
+import 'package:spotter/features/nutrition/domain/params/meal_entry_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/update_meal_plan_params.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_meal_logs_for_date_usecase.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/food_log_bloc/food_log_bloc.dart';
@@ -54,6 +54,9 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   String? _loggingEntryId;
   String? _undoingEntryId;
   String? _deletingEntryId;
+
+  TextEditingController nameController = TextEditingController();
+  TextEditingController budgetController = TextEditingController();
 
   /// Today's logs created from a plan entry, keyed by the source entry id.
   /// Keeping the log lets the user undo a "LOG" action from this screen.
@@ -97,6 +100,8 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   @override
   void dispose() {
     _bloc.close();
+    nameController.dispose();
+    budgetController.dispose();
     super.dispose();
   }
 
@@ -128,9 +133,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     if (_isDraft) return;
     try {
       await _bloc.stream
-          .firstWhere(
-            (s) => s is MealEntriesLoaded || s is MealEntriesError,
-          )
+          .firstWhere((s) => s is MealEntriesLoaded || s is MealEntriesError)
           .timeout(const Duration(seconds: 15));
     } catch (_) {
       // Timeout or bloc closed: just stop the refresh indicator.
@@ -273,7 +276,9 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     final estimatedCost = estimatedCostForEntries(_entries, _foods);
     final plan = copyMealPlan(
       _plan,
-      totalKcal: consumed.energyKcal > 0 ? consumed.energyKcal : _plan.totalKcal,
+      totalKcal: consumed.energyKcal > 0
+          ? consumed.energyKcal
+          : _plan.totalKcal,
       costEgp: estimatedCost > 0 ? estimatedCost : _plan.costEgp,
       // Saving is an explicit commit: the plan stops being a draft.
       status: PlanStatus.committed,
@@ -309,10 +314,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
             onPressed: () {
               Navigator.pop(dialogContext);
               _bloc.add(
-                PlanDeleted(
-                  uid: widget.uid,
-                  mealPlanId: _plan.mealPlanId,
-                ),
+                PlanDeleted(uid: widget.uid, mealPlanId: _plan.mealPlanId),
               );
             },
             child: const Text('Delete'),
@@ -457,8 +459,9 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
                 UnloggedMealEntriesRemoved(
                   uid: widget.uid,
                   mealPlanId: _plan.mealPlanId,
-                  mealEntryIds:
-                      unloggedEntries.map((e) => e.mealEntryId).toList(),
+                  mealEntryIds: unloggedEntries
+                      .map((e) => e.mealEntryId)
+                      .toList(),
                   mealPlan: _plan,
                 ),
               );
@@ -469,6 +472,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
       ),
     );
   }
+
   /// Reverses a previous "LOG" on this plan entry by deleting the meal log
   /// that was created from it. Goes through FoodLogBloc so the diary on the
   /// dashboard stays in sync.
@@ -493,6 +497,10 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
 
   /// Opens the edit sheet for the plan header (name, date and budget).
   Future<void> _editPlan() async {
+    nameController.text = _plan.name;
+    budgetController.text = _plan.budgetEgp == null || _plan.budgetEgp == 0
+        ? ''
+        : _plan.budgetEgp!.toStringAsFixed(0);
     if (_savingPlan) return;
     final input = await _showEditPlanDialog();
     if (input == null || !mounted) return;
@@ -529,12 +537,6 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   }
 
   Future<_PlanEditInput?> _showEditPlanDialog() async {
-    final nameController = TextEditingController(text: _plan.name);
-    final budgetController = TextEditingController(
-      text: _plan.budgetEgp == null || _plan.budgetEgp == 0
-          ? ''
-          : _plan.budgetEgp!.toStringAsFixed(0),
-    );
     var date = _plan.date;
 
     final result = await showAppDialog<_PlanEditInput>(
@@ -604,8 +606,6 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
       ),
     );
 
-    nameController.dispose();
-    budgetController.dispose();
     return result;
   }
 
@@ -832,8 +832,10 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
                   tooltip: 'Delete unlogged foods in ${mealTypeLabel(type)}',
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
-                  constraints:
-                      const BoxConstraints(minWidth: 32, minHeight: 32),
+                  constraints: const BoxConstraints(
+                    minWidth: 32,
+                    minHeight: 32,
+                  ),
                   onPressed: () =>
                       _deleteUnloggedEntries(type, unloggedEntries),
                 ),
@@ -869,11 +871,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
 }
 
 class _PlanEditInput {
-  const _PlanEditInput({
-    required this.name,
-    required this.date,
-    this.budget,
-  });
+  const _PlanEditInput({required this.name, required this.date, this.budget});
 
   final String name;
   final DateTime date;
@@ -912,10 +910,7 @@ class _PlanHeader extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
