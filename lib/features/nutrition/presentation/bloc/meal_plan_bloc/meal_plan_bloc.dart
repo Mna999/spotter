@@ -7,12 +7,14 @@ import 'package:spotter/features/nutrition/domain/params/add_meal_entry_params.d
 import 'package:spotter/features/nutrition/domain/params/budget_params.dart';
 import 'package:spotter/features/nutrition/domain/params/create_meal_plan_params.dart';
 import 'package:spotter/features/nutrition/domain/params/list_meal_entries_params.dart';
+import 'package:spotter/features/nutrition/domain/params/meal_entry_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/meal_plan_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/prefs_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/save_plan_params.dart';
 import 'package:spotter/features/nutrition/domain/params/update_meal_plan_params.dart';
 import 'package:spotter/features/nutrition/domain/usecases/add_meal_entry_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/create_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/delete_meal_entry_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/delete_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/generate_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_meal_plan_usecase.dart';
@@ -37,6 +39,7 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
   final DeleteMealPlanUseCase deleteMealPlan;
   final ListRecentMealPlansUsecase listRecentMealPlans;
   final AddMealEntryUseCase addMealEntry;
+  final DeleteMealEntryUseCase deleteMealEntry;
   final ListMealEntriesUseCase listMealEntries;
 
   /// Foods already fetched, so refreshes only fetch what's missing.
@@ -52,6 +55,7 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
     required this.deleteMealPlan,
     required this.listRecentMealPlans,
     required this.addMealEntry,
+    required this.deleteMealEntry,
     required this.listMealEntries,
   }) : super(const MealPlanInitial()) {
     on<MealPlanCreated>(_onCreated);
@@ -66,6 +70,7 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
     on<MealEntryAdded>(_onEntryAdded);
     on<MealEntryUpdated>(_onEntryUpdated);
     on<MealEntryRemoved>(_onEntryRemoved);
+    on<UnloggedMealEntriesRemoved>(_onUnloggedEntriesRemoved);
     on<ExclusionsChanged>(_onExclusionsChanged);
   }
 
@@ -167,7 +172,7 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
     );
     r.fold(
       (f) => emit(MealPlanError(message: f.message)),
-      (_) => emit(const MealPlanEmpty(message: 'Meal plan deleted.')),
+      (p) => emit(const MealPlanEmpty(message: 'Meal plan deleted.')),
     );
   }
 
@@ -255,6 +260,116 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
     );
   }
 
+  Future<void> _onEntryRemoved(
+    MealEntryRemoved e,
+    Emitter<MealPlanState> emit,
+  ) async {
+    emit(const MealPlanLoading());
+    final r = await deleteMealEntry(e.params);
+    String? error;
+    r.fold((f) => error = f.message, (_) {});
+    if (error != null) {
+      emit(MealPlanError(message: error!));
+      return;
+    }
+
+    MealPlan? plan;
+    if (e.mealPlan != null) {
+      plan = await _withFreshTotals(e.mealPlan!);
+    }
+
+    // Refresh entries for this meal plan
+    final entriesResult = await listMealEntries(
+      ListMealEntriesParams(
+        uid: e.params.uid,
+        mealPlanId: e.params.mealPlanId,
+      ),
+    );
+
+    final entries = entriesResult.fold<List<MealEntry>>(
+      (_) => const [],
+      (list) => list,
+    );
+
+    final missing = entries
+        .map((entry) => entry.foodId)
+        .where((id) => !_foodCache.containsKey(id))
+        .toSet();
+    if (missing.isNotEmpty) {
+      final fetched = await fetchFoodsById(missing);
+      _foodCache.addAll(fetched);
+    }
+
+    final foods = _foodsFor(entries);
+    emit(
+      MealPlanLoaded(
+        mealPlan: plan,
+        message: 'Food removed from meal plan.',
+      ),
+    );
+    emit(MealEntriesLoaded(entries: entries, foods: foods));
+  }
+
+  Future<void> _onUnloggedEntriesRemoved(
+    UnloggedMealEntriesRemoved e,
+    Emitter<MealPlanState> emit,
+  ) async {
+    if (e.mealEntryIds.isEmpty) return;
+    emit(const MealPlanLoading());
+
+    for (final entryId in e.mealEntryIds) {
+      final r = await deleteMealEntry(
+        MealEntryIdParams(
+          uid: e.uid,
+          mealPlanId: e.mealPlanId,
+          mealEntryId: entryId,
+        ),
+      );
+      String? error;
+      r.fold((f) => error = f.message, (_) {});
+      if (error != null) {
+        emit(MealPlanError(message: error!));
+        return;
+      }
+    }
+
+    MealPlan? plan;
+    if (e.mealPlan != null) {
+      plan = await _withFreshTotals(e.mealPlan!);
+    }
+
+    // Refresh entries for this meal plan
+    final entriesResult = await listMealEntries(
+      ListMealEntriesParams(
+        uid: e.uid,
+        mealPlanId: e.mealPlanId,
+      ),
+    );
+
+    final entries = entriesResult.fold<List<MealEntry>>(
+      (_) => const [],
+      (list) => list,
+    );
+
+    final missing = entries
+        .map((entry) => entry.foodId)
+        .where((id) => !_foodCache.containsKey(id))
+        .toSet();
+    if (missing.isNotEmpty) {
+      final fetched = await fetchFoodsById(missing);
+      _foodCache.addAll(fetched);
+    }
+
+    final foods = _foodsFor(entries);
+    emit(
+      MealPlanLoaded(
+        mealPlan: plan,
+        message: 'Unlogged foods removed.',
+      ),
+    );
+    emit(MealEntriesLoaded(entries: entries, foods: foods));
+  }
+
   /// Recomputes [plan]'s kcal and EGP cost from its entries and persists them.
   Future<MealPlan> _withFreshTotals(MealPlan plan) async {
     final planId = plan.mealPlanId.trim();
@@ -267,7 +382,22 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
       (_) => const [],
       (value) => value,
     );
-    if (entries.isEmpty) return plan;
+    if (entries.isEmpty) {
+      final updated = copyMealPlan(
+        plan,
+        totalKcal: 0,
+        costEgp: 0,
+      );
+      final updateResult = await updateMealPlan(
+        UpdateMealPlanParams(
+          uid: plan.uid,
+          mealPlanId: planId,
+          totalKcal: 0,
+          costEgp: 0,
+        ),
+      );
+      return updateResult.fold((_) => updated, (saved) => saved);
+    }
 
     final missing = entries
         .map((entry) => entry.foodId)
@@ -302,12 +432,7 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
           'MealEntryUpdated is defined in the class diagram, but UpdateMealEntryUseCase is not present in this project yet.',
     ),
   );
-  void _onEntryRemoved(MealEntryRemoved e, Emitter<MealPlanState> emit) => emit(
-    const MealPlanError(
-      message:
-          'MealEntryRemoved is defined in the class diagram, but DeleteMealEntryUseCase is not present in this project yet.',
-    ),
-  );
+
   void _onExclusionsChanged(
     ExclusionsChanged e,
     Emitter<MealPlanState> emit,

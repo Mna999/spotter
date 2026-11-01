@@ -11,6 +11,7 @@ import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_type.dart';
 import 'package:spotter/features/nutrition/domain/entities/plan_status.dart';
 import 'package:spotter/features/nutrition/domain/params/date_params.dart';
+import 'package:spotter/features/nutrition/domain/params/meal_entry_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/log_food_params.dart';
 import 'package:spotter/features/nutrition/domain/params/update_meal_plan_params.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_meal_logs_for_date_usecase.dart';
@@ -52,6 +53,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   String? _entryError;
   String? _loggingEntryId;
   String? _undoingEntryId;
+  String? _deletingEntryId;
 
   /// Today's logs created from a plan entry, keyed by the source entry id.
   /// Keeping the log lets the user undo a "LOG" action from this screen.
@@ -137,6 +139,14 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
 
   void _onMealPlanState(MealPlanState state) {
     final cs = Theme.of(context).colorScheme;
+    if (state is MealPlanLoaded ||
+        state is MealPlanError ||
+        state is MealEntriesLoaded ||
+        state is MealEntriesError) {
+      if (_deletingEntryId != null) {
+        setState(() => _deletingEntryId = null);
+      }
+    }
     if (state is MealEntriesLoading) {
       if (!_loadingEntries) setState(() => _loadingEntries = true);
     } else if (state is MealEntriesLoaded) {
@@ -385,6 +395,80 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     _loadEntries();
   }
 
+  /// Deletes a single unlogged food entry from this meal plan.
+  void _deleteEntry(MealEntry entry) {
+    if (_isDraft) return;
+    final food = _foods[entry.foodId];
+    final foodName = food?.nameEn ?? 'this food';
+    final mealName = mealTypeLabel(entry.mealType);
+    showAppDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete food from meal?'),
+        content: Text('Remove $foodName from $mealName?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              if (!mounted) return;
+              setState(() => _deletingEntryId = entry.mealEntryId);
+              _bloc.add(
+                MealEntryRemoved(
+                  params: MealEntryIdParams(
+                    uid: widget.uid,
+                    mealPlanId: _plan.mealPlanId,
+                    mealEntryId: entry.mealEntryId,
+                  ),
+                  mealPlan: _plan,
+                ),
+              );
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteUnloggedEntries(MealType type, List<MealEntry> unloggedEntries) {
+    if (_isDraft || unloggedEntries.isEmpty) return;
+    final label = mealTypeLabel(type);
+    showAppDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete unlogged foods?'),
+        content: Text(
+          'Remove all unlogged foods (${unloggedEntries.length}) from $label?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              if (!mounted) return;
+              _bloc.add(
+                UnloggedMealEntriesRemoved(
+                  uid: widget.uid,
+                  mealPlanId: _plan.mealPlanId,
+                  mealEntryIds:
+                      unloggedEntries.map((e) => e.mealEntryId).toList(),
+                  mealPlan: _plan,
+                ),
+              );
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
   /// Reverses a previous "LOG" on this plan entry by deleting the meal log
   /// that was created from it. Goes through FoodLogBloc so the diary on the
   /// dashboard stays in sync.
@@ -715,6 +799,9 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     final widgets = <Widget>[];
     for (final type in types) {
       final entries = groups[type]!..sort((a, b) => a.order.compareTo(b.order));
+      final unloggedEntries = entries
+          .where((e) => !_loggedByEntry.containsKey(e.mealEntryId))
+          .toList();
       widgets.add(
         Padding(
           padding: const EdgeInsets.only(top: 10, bottom: 6),
@@ -734,11 +821,29 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
                 '${entries.length} ${entries.length == 1 ? 'item' : 'items'}',
                 style: text.labelSmall!.copyWith(color: cs.onSurfaceVariant),
               ),
+              if (!_isDraft && unloggedEntries.isNotEmpty) ...[
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: Icon(
+                    Icons.delete_sweep_outlined,
+                    size: 19,
+                    color: cs.error.withValues(alpha: 0.85),
+                  ),
+                  tooltip: 'Delete unlogged foods in ${mealTypeLabel(type)}',
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
+                  onPressed: () =>
+                      _deleteUnloggedEntries(type, unloggedEntries),
+                ),
+              ],
             ],
           ),
         ),
       );
       for (final entry in entries) {
+        final isLogged = _loggedByEntry.containsKey(entry.mealEntryId);
         widgets.add(
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
@@ -746,10 +851,14 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
               entry: entry,
               food: _foods[entry.foodId],
               isLogging: _loggingEntryId == entry.mealEntryId,
-              isLogged: _loggedByEntry.containsKey(entry.mealEntryId),
+              isLogged: isLogged,
               isUndoing: _undoingEntryId == entry.mealEntryId,
+              isDeleting: _deletingEntryId == entry.mealEntryId,
               onLog: () => _logEntry(entry),
               onUndo: () => _undoEntry(entry),
+              onDelete: !_isDraft && !isLogged
+                  ? () => _deleteEntry(entry)
+                  : null,
             ),
           ),
         );

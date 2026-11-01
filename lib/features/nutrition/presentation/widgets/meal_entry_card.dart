@@ -10,19 +10,23 @@ class MealEntryCard extends StatelessWidget {
     required this.entry,
     required this.onLog,
     this.onUndo,
+    this.onDelete,
     this.food,
     this.isLogging = false,
     this.isLogged = false,
     this.isUndoing = false,
+    this.isDeleting = false,
   });
 
   final MealEntry entry;
   final FoodItem? food;
   final VoidCallback onLog;
   final VoidCallback? onUndo;
+  final VoidCallback? onDelete;
   final bool isLogging;
   final bool isLogged;
   final bool isUndoing;
+  final bool isDeleting;
 
   @override
   Widget build(BuildContext context) {
@@ -162,21 +166,58 @@ class MealEntryCard extends StatelessWidget {
                               : const Icon(Icons.undo, size: 14),
                           label: const Text('UNDO'),
                         )
-                      : FilledButton(
-                          onPressed: isLogging ? null : onLog,
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size(0, 36),
-                            padding: const EdgeInsets.symmetric(horizontal: 14),
-                          ),
-                          child: isLogging
-                              ? const SizedBox(
-                                  width: 14,
-                                  height: 14,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text('LOG'),
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (onDelete != null) ...[
+                              IconButton(
+                                onPressed: (isLogging || isDeleting)
+                                    ? null
+                                    : onDelete,
+                                style: IconButton.styleFrom(
+                                  foregroundColor: cs.error,
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(36, 36),
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                icon: isDeleting
+                                    ? const SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Icon(
+                                        Icons.delete_outline,
+                                        size: 20,
+                                      ),
+                                tooltip: 'Delete food',
+                              ),
+                              const SizedBox(width: 4),
+                            ],
+                            FilledButton(
+                              onPressed: (isLogging || isDeleting)
+                                  ? null
+                                  : onLog,
+                              style: FilledButton.styleFrom(
+                                minimumSize: const Size(0, 36),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                ),
+                              ),
+                              child: isLogging
+                                  ? const SizedBox(
+                                      width: 14,
+                                      height: 14,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Text('LOG'),
+                            ),
+                          ],
                         ),
                 ),
               ],

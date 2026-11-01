@@ -42,6 +42,7 @@ import 'package:spotter/features/nutrition/domain/repository/nutrition_pref_repo
 import 'package:spotter/features/nutrition/domain/usecases/add_meal_entry_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/create_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/delete_meal_log_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/delete_meal_entry_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/delete_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/generate_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_daily_totals_usecase.dart';
@@ -319,6 +320,7 @@ Future<void> initNutrition() async {
       deleteMealPlan: sl(),
       listRecentMealPlans: sl(),
       addMealEntry: sl(),
+      deleteMealEntry: sl(),
       listMealEntries: sl(),
     ),
   );
@@ -371,6 +373,7 @@ Future<void> initNutrition() async {
     ),
   );
   sl.registerLazySingleton(() => AddMealEntryUseCase(mealEntryRepo: sl()));
+  sl.registerLazySingleton(() => DeleteMealEntryUseCase(mealEntryRepo: sl()));
 
   // Register Repositories
   sl.registerLazySingleton<FoodRepo>(

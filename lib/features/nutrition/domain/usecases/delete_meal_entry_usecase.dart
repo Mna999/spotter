@@ -6,9 +6,9 @@ import 'package:spotter/features/nutrition/domain/repository/meal_entry_repo.dar
 
 /// DELETE: remove one entry by id from its meal plan.
 class DeleteMealEntryUseCase implements UseCase<Unit, MealEntryIdParams> {
-  MealEntryRepo mealEntryRepo;
+  final MealEntryRepo mealEntryRepo;
 
-  DeleteMealEntryUseCase({required this.mealEntryRepo});
+  const DeleteMealEntryUseCase({required this.mealEntryRepo});
 
   @override
   Future<Either<Failure, Unit>> call(MealEntryIdParams params) {

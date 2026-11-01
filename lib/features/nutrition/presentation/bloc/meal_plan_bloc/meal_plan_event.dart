@@ -112,10 +112,49 @@ class MealEntryUpdated extends MealPlanEvent {
 }
 
 class MealEntryRemoved extends MealPlanEvent {
-  final String mealEntryId;
-  const MealEntryRemoved({required this.mealEntryId});
+  final MealEntryIdParams params;
+  final MealPlan? mealPlan;
+
+  const MealEntryRemoved({
+    required this.params,
+    this.mealPlan,
+  });
+
+  MealEntryRemoved.fromId({
+    required String uid,
+    required String mealPlanId,
+    required String mealEntryId,
+    MealPlan? mealPlan,
+  }) : this(
+          params: MealEntryIdParams(
+            uid: uid,
+            mealPlanId: mealPlanId,
+            mealEntryId: mealEntryId,
+          ),
+          mealPlan: mealPlan,
+        );
+
+  String get mealEntryId => params.mealEntryId;
+
   @override
-  List<Object?> get props => [mealEntryId];
+  List<Object?> get props => [params, mealPlan];
+}
+
+class UnloggedMealEntriesRemoved extends MealPlanEvent {
+  final String uid;
+  final String mealPlanId;
+  final List<String> mealEntryIds;
+  final MealPlan? mealPlan;
+
+  const UnloggedMealEntriesRemoved({
+    required this.uid,
+    required this.mealPlanId,
+    required this.mealEntryIds,
+    this.mealPlan,
+  });
+
+  @override
+  List<Object?> get props => [uid, mealPlanId, mealEntryIds, mealPlan];
 }
 
 class ExclusionsChanged extends MealPlanEvent {
