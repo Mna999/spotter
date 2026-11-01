@@ -52,7 +52,7 @@ class MealEntryModel extends MealEntry {
       portion: PortionModel.fromJson(json['portion']).toEntity(),
       servingsCount: (json['servingsCount'] as num?)?.toDouble() ?? 1,
       note: json['note'],
-     schemaVersion: (json['schemaVersion'] as num?)?.toInt() ?? SCHEMA_VERSION,
+      schemaVersion: (json['schemaVersion'] as num?)?.toInt() ?? SCHEMA_VERSION,
       createdAt:
           InputParser.toDateTime(json['createdAt']) ??
           DateTime.fromMillisecondsSinceEpoch(0),

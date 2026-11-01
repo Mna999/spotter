@@ -49,6 +49,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   Map<String, FoodItem> _foods = const {};
   bool _loadingEntries = true;
   bool _savingPlan = false;
+  bool _autoSavingDraft = false;
   bool _regenerating = false;
   String? _entryError;
   String? _loggingEntryId;
@@ -69,6 +70,12 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      if (_isDraft) {
+        // A generated plan starts without a Firestore id, which entries need.
+        // Persist it silently so there is no SAVE PLAN step.
+        _autoSaveDraft();
+        return;
+      }
       _loadPlan();
       _loadEntries();
       _loadLoggedEntries();
@@ -193,22 +200,32 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     } else if (state is MealPlanSaved) {
       final saved = state.mealPlan;
       final stillDraft = saved.mealPlanId.trim().isEmpty;
+      final autoSaved = _autoSavingDraft;
       setState(() {
         if (!stillDraft) _plan = saved;
         _savingPlan = false;
+        _autoSavingDraft = false;
       });
-      SnackBarBuilder.showSnackBar(
-        context,
-        stillDraft
-            ? 'Could not save this plan. Please try again.'
-            : 'Meal plan saved.',
-        stillDraft,
-        cs,
-      );
+      // The auto-saved draft needs no confirmation toast.
+      if (!autoSaved) {
+        SnackBarBuilder.showSnackBar(
+          context,
+          stillDraft
+              ? 'Could not save this plan. Please try again.'
+              : 'Meal plan saved.',
+          stillDraft,
+          cs,
+        );
+      }
       // Now that the plan has an id, load its entries.
       if (!stillDraft) _loadEntries();
     } else if (state is MealPlanEmpty) {
-      if (_savingPlan) setState(() => _savingPlan = false);
+      if (_savingPlan) {
+        setState(() {
+          _savingPlan = false;
+          _autoSavingDraft = false;
+        });
+      }
       if (state.message != null) {
         SnackBarBuilder.showSnackBar(context, state.message!, false, cs);
         Navigator.pop(context);
@@ -216,6 +233,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     } else if (state is MealPlanError) {
       setState(() {
         _savingPlan = false;
+        _autoSavingDraft = false;
         _regenerating = false;
       });
       SnackBarBuilder.showSnackBar(context, state.message, true, cs);
@@ -266,6 +284,17 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
         cs,
       );
     }
+  }
+
+  /// Persists a generated draft without user interaction. The plan keeps its
+  /// draft status; only its missing id is filled in by Firestore.
+  void _autoSaveDraft() {
+    if (_savingPlan) return;
+    setState(() {
+      _savingPlan = true;
+      _autoSavingDraft = true;
+    });
+    _bloc.add(PlanSaved(uid: widget.uid, mealPlan: _plan));
   }
 
   void _savePlan() {
@@ -690,12 +719,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
                   padding: const EdgeInsets.all(16),
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    _PlanHeader(
-                      plan: _plan,
-                      isDraft: _isDraft,
-                      saving: _savingPlan,
-                      onSave: _savePlan,
-                    ),
+                    _PlanHeader(plan: _plan, isDraft: _isDraft),
                     const SizedBox(height: 12),
                     NutritionSummaryCard(
                       consumed: consumed,
@@ -879,17 +903,10 @@ class _PlanEditInput {
 }
 
 class _PlanHeader extends StatelessWidget {
-  const _PlanHeader({
-    required this.plan,
-    required this.isDraft,
-    required this.saving,
-    required this.onSave,
-  });
+  const _PlanHeader({required this.plan, required this.isDraft});
 
   final MealPlan plan;
   final bool isDraft;
-  final bool saving;
-  final VoidCallback onSave;
 
   @override
   Widget build(BuildContext context) {
@@ -965,24 +982,6 @@ class _PlanHeader extends StatelessWidget {
                 ? '${friendlyDate(plan.date)} · Daily Egyptian plan'
                 : 'Daily Egyptian plan',
             style: text.bodySmall!.copyWith(color: cs.onSurfaceVariant),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: saving ? null : onSave,
-                  icon: saving
-                      ? const SizedBox(
-                          width: 15,
-                          height: 15,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.save_outlined, size: 18),
-                  label: const Text('SAVE PLAN'),
-                ),
-              ),
-            ],
           ),
         ],
       ),
