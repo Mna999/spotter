@@ -31,6 +31,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
   bool _awaitingPlan = false;
   String? _deletingPlanId;
   TextEditingController budgetController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
   void dispose() {
     _bloc.close();
     budgetController.dispose();
+    nameController.dispose();
     super.dispose();
   }
 
@@ -116,6 +118,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
         uid: widget.uid,
         date: input.date,
         budgetEgp: input.budget,
+        name: input.name,
       ),
     );
   }
@@ -170,6 +173,8 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
 
   Future<_PlanDraft?> _showCreatePlanDialog() async {
     var date = dateOnly(DateTime.now());
+    nameController.clear();
+    budgetController.clear();
 
     final result = await showAppDialog<_PlanDraft>(
       context: context,
@@ -179,6 +184,15 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              TextField(
+                controller: nameController,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: const InputDecoration(
+                  labelText: 'Plan name (optional)',
+                  hintText: 'e.g. High-protein day',
+                ),
+              ),
+              const SizedBox(height: 8),
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.calendar_month_outlined),
@@ -216,9 +230,14 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
             FilledButton(
               onPressed: () {
                 final budget = double.tryParse(budgetController.text.trim());
+                final name = nameController.text.trim();
                 Navigator.pop(
                   dialogContext,
-                  _PlanDraft(date: date, budget: budget),
+                  _PlanDraft(
+                    date: date,
+                    budget: budget,
+                    name: name.isEmpty ? null : name,
+                  ),
                 );
               },
               child: const Text('CREATE'),
@@ -358,10 +377,11 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
 }
 
 class _PlanDraft {
-  const _PlanDraft({required this.date, this.budget});
+  const _PlanDraft({required this.date, this.budget, this.name});
 
   final DateTime date;
   final double? budget;
+  final String? name;
 }
 
 class _PreferencesBanner extends StatelessWidget {

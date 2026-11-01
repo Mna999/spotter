@@ -9,6 +9,10 @@ class MealPlan extends Equatable {
   final String mealPlanId;
   final String uid;
 
+  /// User-editable title shown in the plan list and detail screen.
+  /// Empty means "untitled": the UI falls back to the plan date.
+  final String name;
+
   /// The planned day (time part is meaningless).
   final DateTime date;
 
@@ -30,6 +34,7 @@ class MealPlan extends Equatable {
   const MealPlan({
     required this.mealPlanId,
     required this.uid,
+    this.name = '',
     required this.date,
     this.budgetEgp,
     required this.totalKcal,
@@ -50,6 +55,7 @@ class MealPlan extends Equatable {
   List<Object?> get props => [
     mealPlanId,
     uid,
+    name,
     date,
     budgetEgp,
     totalKcal,

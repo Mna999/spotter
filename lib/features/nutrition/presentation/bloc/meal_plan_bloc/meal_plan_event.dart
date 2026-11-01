@@ -10,13 +10,15 @@ class MealPlanCreated extends MealPlanEvent {
   final String uid;
   final DateTime date;
   final double? budgetEgp;
+  final String? name;
   const MealPlanCreated({
     required this.uid,
     required this.date,
     this.budgetEgp,
+    this.name,
   });
   @override
-  List<Object?> get props => [uid, date, budgetEgp];
+  List<Object?> get props => [uid, date, budgetEgp, name];
 }
 
 class PlanGenerated extends MealPlanEvent {

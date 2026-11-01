@@ -175,9 +175,29 @@ class FoodLogBloc extends Bloc<FoodLogEvent, FoodLogState> {
     final result = await deleteMealLog(
       MealLogIdParams(uid: event.uid, mealLogId: event.mealLogId),
     );
-    result.fold(
-      (f) => emit(FoodLogError(message: f.message)),
-      (_) => add(DailyTotalsRequested(uid: event.uid, date: event.date)),
-    );
+    await result.fold((f) async => emit(FoodLogError(message: f.message)), (
+      _,
+    ) async {
+      // Re-read the day so every listener (dashboard and meal plan detail)
+      // receives the remaining logs rather than only the new totals.
+      final logsResult = await listMealLogsForDate(
+        DateParams(uid: event.uid, date: event.date),
+      );
+      await logsResult.fold((f) async => emit(FoodLogError(message: f.message)), (
+        logs,
+      ) async {
+        final totalsResult = await getDailyTotals(
+          DateParams(uid: event.uid, date: event.date),
+        );
+        totalsResult.fold(
+          (f) => emit(FoodLogError(message: f.message)),
+          (totals) => emit(
+            logs.isEmpty
+                ? FoodLogEmpty(date: event.date, totals: totals)
+                : FoodLogLoaded(logs: logs, totals: totals),
+          ),
+        );
+      });
+    });
   }
 }

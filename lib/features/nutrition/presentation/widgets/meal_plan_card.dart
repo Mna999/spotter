@@ -22,9 +22,7 @@ class MealPlanCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final budget = plan.budgetEgp;
     final hasBudget = budget != null && budget > 0;
-    final progress = hasBudget
-        ? (plan.costEgp / budget).clamp(0.0, 1.0)
-        : 0.0;
+    final progress = hasBudget ? (plan.costEgp / budget).clamp(0.0, 1.0) : 0.0;
     final over = plan.isOverBudget;
     final statusColor = switch (plan.status) {
       _ when plan.status.name == 'committed' => cs.primary,
@@ -81,7 +79,7 @@ class MealPlanCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                friendlyDate(plan.date),
+                plan.name == '' ? friendlyDate(plan.date) : plan.name,
                 style: text.titleLarge!.copyWith(fontWeight: FontWeight.w700),
               ),
               Text(
@@ -141,11 +139,7 @@ class MealPlanCard extends StatelessWidget {
 }
 
 class _Metric extends StatelessWidget {
-  const _Metric({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
+  const _Metric({required this.icon, required this.label, required this.color});
 
   final IconData icon;
   final String label;

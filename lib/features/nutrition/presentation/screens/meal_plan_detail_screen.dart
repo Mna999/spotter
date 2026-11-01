@@ -6,11 +6,13 @@ import 'package:spotter/core/snack_bar_builder.dart';
 import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
 import 'package:spotter/features/nutrition/domain/entities/food_item.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_entry.dart';
+import 'package:spotter/features/nutrition/domain/entities/meal_log.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_type.dart';
 import 'package:spotter/features/nutrition/domain/entities/plan_status.dart';
 import 'package:spotter/features/nutrition/domain/params/date_params.dart';
 import 'package:spotter/features/nutrition/domain/params/log_food_params.dart';
+import 'package:spotter/features/nutrition/domain/params/update_meal_plan_params.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_meal_logs_for_date_usecase.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/food_log_bloc/food_log_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/meal_plan_bloc/meal_plan_bloc.dart';
@@ -49,10 +51,11 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   bool _regenerating = false;
   String? _entryError;
   String? _loggingEntryId;
+  String? _undoingEntryId;
 
-  /// Entries already copied to today's diary, so a planned food can only be
-  /// logged once. Restored from today's logs when the screen opens.
-  final Set<String> _loggedEntryIds = {};
+  /// Today's logs created from a plan entry, keyed by the source entry id.
+  /// Keeping the log lets the user undo a "LOG" action from this screen.
+  final Map<String, MealLog?> _loggedByEntry = {};
 
   bool get _isDraft => _plan.mealPlanId.trim().isEmpty;
 
@@ -76,13 +79,16 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     );
     if (!mounted) return;
     result.fold((_) {}, (logs) {
-      final logged = logs
-          .map((log) => log.sourceMealEntryId)
-          .whereType<String>()
-          .where((id) => id.isNotEmpty)
-          .toSet();
-      if (logged.isEmpty) return;
-      setState(() => _loggedEntryIds.addAll(logged));
+      final logged = <String, MealLog?>{};
+      for (final log in logs) {
+        final entryId = log.sourceMealEntryId;
+        if (entryId != null && entryId.isNotEmpty) logged[entryId] = log;
+      }
+      setState(() {
+        _loggedByEntry
+          ..clear()
+          ..addAll(logged);
+      });
     });
   }
 
@@ -204,20 +210,45 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   }
 
   void _onFoodLogState(FoodLogState state) {
-    final entryId = _loggingEntryId;
-    if (entryId == null) return;
+    final loggingEntryId = _loggingEntryId;
+    final undoingEntryId = _undoingEntryId;
+    if (loggingEntryId == null && undoingEntryId == null) return;
     final cs = Theme.of(context).colorScheme;
+
     if (state is FoodLogError) {
-      setState(() => _loggingEntryId = null);
-      SnackBarBuilder.showSnackBar(context, state.message, true, cs);
-    } else if (state is FoodLogLoaded) {
       setState(() {
         _loggingEntryId = null;
-        _loggedEntryIds.add(entryId);
+        _undoingEntryId = null;
+      });
+      SnackBarBuilder.showSnackBar(context, state.message, true, cs);
+      return;
+    }
+
+    final finished = state is FoodLogLoaded || state is FoodLogEmpty;
+    if (!finished) return;
+
+    if (loggingEntryId != null) {
+      final log = state is FoodLogLoaded && state.logs.isNotEmpty
+          ? state.logs.first
+          : null;
+      setState(() {
+        _loggingEntryId = null;
+        _loggedByEntry[loggingEntryId] = log;
       });
       SnackBarBuilder.showSnackBar(
         context,
         'Entry logged to today.',
+        false,
+        cs,
+      );
+    } else if (undoingEntryId != null) {
+      setState(() {
+        _undoingEntryId = null;
+        _loggedByEntry.remove(undoingEntryId);
+      });
+      SnackBarBuilder.showSnackBar(
+        context,
+        'Logged meal removed. You can log it again.',
         false,
         cs,
       );
@@ -354,9 +385,149 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     _loadEntries();
   }
 
+  /// Reverses a previous "LOG" on this plan entry by deleting the meal log
+  /// that was created from it. Goes through FoodLogBloc so the diary on the
+  /// dashboard stays in sync.
+  void _undoEntry(MealEntry entry) {
+    if (_undoingEntryId != null || _loggingEntryId != null) return;
+    final log = _loggedByEntry[entry.mealEntryId];
+    if (log == null) {
+      // No log id available (e.g. it was removed on another screen): refresh
+      // the mapping so the button state is accurate.
+      _loadLoggedEntries();
+      return;
+    }
+    setState(() => _undoingEntryId = entry.mealEntryId);
+    context.read<FoodLogBloc>().add(
+      MealLogDeleted(
+        uid: widget.uid,
+        mealLogId: log.mealLogId,
+        date: dateOnly(log.loggedAt),
+      ),
+    );
+  }
+
+  /// Opens the edit sheet for the plan header (name, date and budget).
+  Future<void> _editPlan() async {
+    if (_savingPlan) return;
+    final input = await _showEditPlanDialog();
+    if (input == null || !mounted) return;
+
+    final updated = copyMealPlan(
+      _plan,
+      name: input.name,
+      date: input.date,
+      budgetEgp: input.budget ?? 0,
+    );
+
+    if (_isDraft) {
+      setState(() => _plan = updated);
+      SnackBarBuilder.showSnackBar(
+        context,
+        'Plan details updated.',
+        false,
+        Theme.of(context).colorScheme,
+      );
+      return;
+    }
+
+    _bloc.add(
+      PlanUpdated(
+        UpdateMealPlanParams(
+          uid: widget.uid,
+          mealPlanId: _plan.mealPlanId,
+          name: input.name,
+          date: input.date,
+          budgetEgp: input.budget ?? 0,
+        ),
+      ),
+    );
+  }
+
+  Future<_PlanEditInput?> _showEditPlanDialog() async {
+    final nameController = TextEditingController(text: _plan.name);
+    final budgetController = TextEditingController(
+      text: _plan.budgetEgp == null || _plan.budgetEgp == 0
+          ? ''
+          : _plan.budgetEgp!.toStringAsFixed(0),
+    );
+    var date = _plan.date;
+
+    final result = await showAppDialog<_PlanEditInput>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Edit meal plan'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: const InputDecoration(
+                  labelText: 'Plan name',
+                  hintText: 'e.g. High-protein day',
+                ),
+              ),
+              const SizedBox(height: 8),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.calendar_month_outlined),
+                title: Text(friendlyDate(date)),
+                subtitle: Text('${date.day}/${date.month}/${date.year}'),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: dialogContext,
+                    initialDate: date,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (picked != null) {
+                    setDialogState(() => date = dateOnly(picked));
+                  }
+                },
+              ),
+              TextField(
+                controller: budgetController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Daily budget (EGP, optional)',
+                  hintText: 'e.g. 180',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(
+                dialogContext,
+                _PlanEditInput(
+                  name: nameController.text.trim(),
+                  date: date,
+                  budget: double.tryParse(budgetController.text.trim()),
+                ),
+              ),
+              child: const Text('SAVE'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    nameController.dispose();
+    budgetController.dispose();
+    return result;
+  }
+
   void _logEntry(MealEntry entry) {
-    if (_loggingEntryId != null) return;
-    if (_loggedEntryIds.contains(entry.mealEntryId)) return;
+    if (_loggingEntryId != null || _undoingEntryId != null) return;
+    if (_loggedByEntry.containsKey(entry.mealEntryId)) return;
     setState(() => _loggingEntryId = entry.mealEntryId);
     context.read<FoodLogBloc>().add(
       FoodLogged(
@@ -400,8 +571,10 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
       value: _bloc,
       child: BlocListener<FoodLogBloc, FoodLogState>(
         listenWhen: (_, state) =>
-            _loggingEntryId != null &&
-            (state is FoodLogLoaded || state is FoodLogError),
+            (_loggingEntryId != null || _undoingEntryId != null) &&
+            (state is FoodLogLoaded ||
+                state is FoodLogEmpty ||
+                state is FoodLogError),
         listener: (context, state) => _onFoodLogState(state),
         child: BlocConsumer<MealPlanBloc, MealPlanState>(
           listener: (context, state) => _onMealPlanState(state),
@@ -410,6 +583,11 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
               appBar: AppBar(
                 title: Text('Meal plan', style: text.headlineMedium),
                 actions: [
+                  IconButton(
+                    onPressed: _editPlan,
+                    tooltip: 'Edit plan',
+                    icon: const Icon(Icons.edit_outlined),
+                  ),
                   IconButton(
                     onPressed: _deletePlan,
                     tooltip: 'Delete plan',
@@ -568,8 +746,10 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
               entry: entry,
               food: _foods[entry.foodId],
               isLogging: _loggingEntryId == entry.mealEntryId,
-              isLogged: _loggedEntryIds.contains(entry.mealEntryId),
+              isLogged: _loggedByEntry.containsKey(entry.mealEntryId),
+              isUndoing: _undoingEntryId == entry.mealEntryId,
               onLog: () => _logEntry(entry),
+              onUndo: () => _undoEntry(entry),
             ),
           ),
         );
@@ -577,6 +757,18 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     }
     return widgets;
   }
+}
+
+class _PlanEditInput {
+  const _PlanEditInput({
+    required this.name,
+    required this.date,
+    this.budget,
+  });
+
+  final String name;
+  final DateTime date;
+  final double? budget;
 }
 
 class _PlanHeader extends StatelessWidget {
@@ -659,11 +851,15 @@ class _PlanHeader extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            friendlyDate(plan.date),
+            plan.name.trim().isNotEmpty
+                ? plan.name.trim()
+                : friendlyDate(plan.date),
             style: text.headlineMedium!.copyWith(fontWeight: FontWeight.w700),
           ),
           Text(
-            'Daily Egyptian plan',
+            plan.name.trim().isNotEmpty
+                ? '${friendlyDate(plan.date)} · Daily Egyptian plan'
+                : 'Daily Egyptian plan',
             style: text.bodySmall!.copyWith(color: cs.onSurfaceVariant),
           ),
           const SizedBox(height: 12),

@@ -394,13 +394,13 @@ Future<void> initNutrition() async {
     () => FoodRemoteDataSourceImpl(firestore: sl()),
   );
   sl.registerLazySingleton<MealLogRemoteDataSource>(
-    () => MealLogRemoteDataSourceImpl(firestore: sl()),
+    () => MealLogRemoteDataSourceImpl(firebaseFirestore: sl()),
   );
   sl.registerLazySingleton<MealPlanRemoteDataSource>(
-    () => MealPlanRemoteDataSourceImpl(firestore: sl()),
+    () => MealPlanRemoteDataSourceImpl(firebaseFirestore: sl()),
   );
   sl.registerLazySingleton<MealEntryRemoteDataSource>(
-    () => MealEntryRemoteDataSourceImpl(firestore: sl()),
+    () => MealEntryRemoteDataSourceImpl(firebaseFirestore: sl()),
   );
   sl.registerLazySingleton<NutritionPreferencesRemoteDataSource>(
     () => NutritionPreferencesRemoteDataSourceImpl(firestore: sl()),

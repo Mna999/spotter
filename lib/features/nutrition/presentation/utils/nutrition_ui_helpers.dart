@@ -165,6 +165,7 @@ String friendlyDate(DateTime date) {
 MealPlan copyMealPlan(
   MealPlan plan, {
   String? mealPlanId,
+  String? name,
   DateTime? date,
   double? budgetEgp,
   double? totalKcal,
@@ -174,6 +175,7 @@ MealPlan copyMealPlan(
   return MealPlan(
     mealPlanId: mealPlanId ?? plan.mealPlanId,
     uid: plan.uid,
+    name: name ?? plan.name,
     date: date ?? plan.date,
     budgetEgp: budgetEgp ?? plan.budgetEgp,
     totalKcal: totalKcal ?? plan.totalKcal,

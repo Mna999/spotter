@@ -20,6 +20,7 @@ class CreateMealPlanUseCase implements UseCase<MealPlan, CreateMealPlanParams> {
     final plan = MealPlan(
       mealPlanId: '', // assigned by Firestore on save
       uid: params.uid,
+      name: params.name?.trim() ?? '',
       date: params.date,
       budgetEgp: params.budgetEgp,
       totalKcal: 0,

@@ -9,16 +9,20 @@ class MealEntryCard extends StatelessWidget {
     super.key,
     required this.entry,
     required this.onLog,
+    this.onUndo,
     this.food,
     this.isLogging = false,
     this.isLogged = false,
+    this.isUndoing = false,
   });
 
   final MealEntry entry;
   final FoodItem? food;
   final VoidCallback onLog;
+  final VoidCallback? onUndo;
   final bool isLogging;
   final bool isLogged;
+  final bool isUndoing;
 
   @override
   Widget build(BuildContext context) {
@@ -114,32 +118,66 @@ class MealEntryCard extends StatelessWidget {
                     egp(price),
                     style: text.labelMedium!.copyWith(color: cs.secondary),
                   ),
+                if (isLogged) ...[
+                  const SizedBox(height: 2),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        size: 13,
+                        color: cs.primary,
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        'LOGGED',
+                        style: text.labelSmall!.copyWith(
+                          color: cs.primary,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 6),
                 SizedBox(
                   height: 36,
-                  child: FilledButton(
-                    onPressed: (isLogging || isLogged) ? null : onLog,
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(0, 36),
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                    ),
-                    child: isLogging
-                        ? const SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : isLogged
-                        ? const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.check, size: 14),
-                              SizedBox(width: 4),
-                              Text('LOGGED'),
-                            ],
-                          )
-                        : const Text('LOG'),
-                  ),
+                  child: isLogged
+                      ? OutlinedButton.icon(
+                          onPressed: (isUndoing || onUndo == null)
+                              ? null
+                              : onUndo,
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(0, 36),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                          ),
+                          icon: isUndoing
+                              ? const SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.undo, size: 14),
+                          label: const Text('UNDO'),
+                        )
+                      : FilledButton(
+                          onPressed: isLogging ? null : onLog,
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size(0, 36),
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                          ),
+                          child: isLogging
+                              ? const SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text('LOG'),
+                        ),
                 ),
               ],
             ),

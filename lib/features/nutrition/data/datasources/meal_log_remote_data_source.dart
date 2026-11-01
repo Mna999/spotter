@@ -39,14 +39,21 @@ abstract class MealLogRemoteDataSource {
 }
 
 class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
-  final FirebaseFirestore _firestore;
+  FirebaseFirestore firebaseFirestore;
 
-  MealLogRemoteDataSourceImpl({required this._firestore});
+  MealLogRemoteDataSourceImpl({required this.firebaseFirestore});
+
+  CollectionReference<Map<String, dynamic>> _logsRef({
+    required String uid,
+  }) => firebaseFirestore
+      .collection('users')
+      .doc(uid)
+      .collection('mealLogs');
 
   @override
   Future<void> delete({required String uid, required String mealLogId}) async {
     try {
-      await _firestore.collection('mealLogs').doc(mealLogId).delete();
+      await _logsRef(uid: uid).doc(mealLogId).delete();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
@@ -55,7 +62,7 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
   @override
   Future<MealLog?> get({required String uid, required String mealLogId}) async {
     try {
-      final doc = await _firestore.collection('mealLogs').doc(mealLogId).get();
+      final doc = await _logsRef(uid: uid).doc(mealLogId).get();
 
       final data = doc.data();
 
@@ -79,9 +86,7 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
       final startOfDay = DateTime(start.year, start.month, start.day);
       final endOfDay = DateTime(end.year, end.month, end.day, 23, 59, 59);
 
-      final snapshot = await _firestore
-          .collection('mealLogs')
-          .where('uid', isEqualTo: uid)
+      final snapshot = await _logsRef(uid: uid)
           .where('loggedAt', isGreaterThanOrEqualTo: startOfDay)
           .where('loggedAt', isLessThanOrEqualTo: endOfDay)
           .orderBy('loggedAt', descending: true)
@@ -106,9 +111,7 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
       final startOfDay = DateTime(date.year, date.month, date.day);
       final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
-      final snapshot = await _firestore
-          .collection('mealLogs')
-          .where('uid', isEqualTo: uid)
+      final snapshot = await _logsRef(uid: uid)
           .where('loggedAt', isGreaterThanOrEqualTo: startOfDay)
           .where('loggedAt', isLessThanOrEqualTo: endOfDay)
           .orderBy('loggedAt', descending: true)
@@ -126,7 +129,7 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
   @override
   Future<MealLog> save({required String uid, required MealLog log}) async {
     try {
-      final collection = _firestore.collection('mealLogs');
+      final collection = _logsRef(uid: uid);
       // New logs arrive with an empty id; let Firestore assign one.
       final docRef = log.mealLogId.trim().isEmpty
           ? collection.doc()
@@ -148,7 +151,7 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
     required Map<String, dynamic> partial,
   }) async {
     try {
-      final docRef = _firestore.collection('mealLogs').doc(mealLogId);
+      final docRef = _logsRef(uid: uid).doc(mealLogId);
 
       // A portion may arrive as a domain object; Firestore only stores maps.
       final portion = partial['portion'];

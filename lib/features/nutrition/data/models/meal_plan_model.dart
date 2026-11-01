@@ -8,6 +8,7 @@ class MealPlanModel extends MealPlan {
   MealPlanModel({
     required super.mealPlanId,
     required super.uid,
+    super.name,
     required super.date,
     super.budgetEgp,
     required super.totalKcal,
@@ -23,6 +24,7 @@ class MealPlanModel extends MealPlan {
     return {
       'mealPlanId': mealPlanId,
       'uid': uid,
+      'name': name,
       'date': Timestamp.fromDate(date),
       'budgetEgp': budgetEgp,
       'totalKcal': totalKcal,
@@ -40,6 +42,7 @@ class MealPlanModel extends MealPlan {
     return MealPlanModel(
       mealPlanId: docId ?? json['mealPlanId'] ?? '',
       uid: json['uid'],
+      name: json['name'] as String? ?? '',
       date: (json['date'] as Timestamp).toDate(),
       budgetEgp: (json['budgetEgp'] as num?)?.toDouble(),
       totalKcal: (json['totalKcal'] as num?)?.toDouble() ?? 0,
@@ -60,6 +63,7 @@ class MealPlanModel extends MealPlan {
     return MealPlanModel(
       mealPlanId: entity.mealPlanId,
       uid: entity.uid,
+      name: entity.name,
       date: entity.date,
       budgetEgp: entity.budgetEgp,
       totalKcal: entity.totalKcal,
@@ -76,6 +80,7 @@ class MealPlanModel extends MealPlan {
     return MealPlan(
       mealPlanId: mealPlanId,
       uid: uid,
+      name: name,
       date: date,
       budgetEgp: budgetEgp,
       totalKcal: totalKcal,
@@ -92,6 +97,7 @@ class MealPlanModel extends MealPlan {
     return MealPlanModel(
       mealPlanId: id,
       uid: uid,
+      name: name,
       date: date,
       budgetEgp: budgetEgp,
       totalKcal: totalKcal,

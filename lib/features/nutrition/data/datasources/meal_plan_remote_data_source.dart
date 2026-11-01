@@ -38,14 +38,21 @@ abstract class MealPlanRemoteDataSource {
 }
 
 class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
-  final FirebaseFirestore _firestore;
+  FirebaseFirestore firebaseFirestore;
 
-  MealPlanRemoteDataSourceImpl({required this._firestore});
+  MealPlanRemoteDataSourceImpl({required this.firebaseFirestore});
+
+  CollectionReference<Map<String, dynamic>> _plansRef({
+    required String uid,
+  }) => firebaseFirestore
+      .collection('users')
+      .doc(uid)
+      .collection('mealPlans');
 
   @override
   Future<void> delete({required String uid, required String mealPlanId}) async {
     try {
-      await _firestore.collection('mealPlans').doc(mealPlanId).delete();
+      await _plansRef(uid: uid).doc(mealPlanId).delete();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
@@ -57,10 +64,7 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
     required String mealPlanId,
   }) async {
     try {
-      final doc = await _firestore
-          .collection('mealPlans')
-          .doc(mealPlanId)
-          .get();
+      final doc = await _plansRef(uid: uid).doc(mealPlanId).get();
       final data = doc.data();
       if (data == null || data.isEmpty) return null;
       final model = MealPlanModel.fromJson(data, docId: doc.id);
@@ -77,9 +81,7 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
     required DateTime end,
   }) async {
     try {
-      final snapshot = await _firestore
-          .collection('mealPlans')
-          .where('uid', isEqualTo: uid)
+      final snapshot = await _plansRef(uid: uid)
           .where('date', isGreaterThanOrEqualTo: start)
           .where('date', isLessThanOrEqualTo: end)
           .orderBy('date', descending: true)
@@ -101,18 +103,13 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
     String? cursor,
   }) async {
     try {
-      Query<Map<String, dynamic>> query = _firestore
-          .collection('mealPlans')
-          .where('uid', isEqualTo: uid)
+      Query<Map<String, dynamic>> query = _plansRef(uid: uid)
           .orderBy('createdAt', descending: true)
           .limit(limit);
 
       // Apply pagination if cursor is provided
       if (cursor != null) {
-        final lastDoc = await _firestore
-            .collection('mealPlans')
-            .doc(cursor)
-            .get();
+        final lastDoc = await _plansRef(uid: uid).doc(cursor).get();
 
         if (lastDoc.exists) {
           query = query.startAfterDocument(lastDoc);
@@ -132,7 +129,7 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
   @override
   Future<MealPlan> save({required String uid, required MealPlan plan}) async {
     try {
-      final collection = _firestore.collection('mealPlans');
+      final collection = _plansRef(uid: uid);
       // New plans arrive with an empty id; let Firestore assign one.
       final docRef = plan.mealPlanId.trim().isEmpty
           ? collection.doc()
@@ -154,7 +151,7 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
     required Map<String, dynamic> partial,
   }) async {
     try {
-      final docRef = _firestore.collection('mealPlans').doc(mealPlanId);
+      final docRef = _plansRef(uid: uid).doc(mealPlanId);
 
       // Add timestamp for update
       partial['updatedAt'] = FieldValue.serverTimestamp();

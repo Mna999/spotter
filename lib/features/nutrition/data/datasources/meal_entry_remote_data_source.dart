@@ -43,9 +43,19 @@ abstract class MealEntryRemoteDataSource {
 }
 
 class MealEntryRemoteDataSourceImpl implements MealEntryRemoteDataSource {
-  final FirebaseFirestore _firestore;
+  FirebaseFirestore firebaseFirestore;
 
-  MealEntryRemoteDataSourceImpl({required this._firestore});
+  MealEntryRemoteDataSourceImpl({required this.firebaseFirestore});
+
+  CollectionReference<Map<String, dynamic>> _entriesRef({
+    required String uid,
+    required String mealPlanId,
+  }) => firebaseFirestore
+      .collection('users')
+      .doc(uid)
+      .collection('mealPlans')
+      .doc(mealPlanId)
+      .collection('entries');
 
   @override
   Future<void> delete({
@@ -54,12 +64,10 @@ class MealEntryRemoteDataSourceImpl implements MealEntryRemoteDataSource {
     required String mealEntryId,
   }) async {
     try {
-      await _firestore
-          .collection('mealPlans')
-          .doc(mealPlanId)
-          .collection('entries')
-          .doc(mealEntryId)
-          .delete();
+      await _entriesRef(
+        uid: uid,
+        mealPlanId: mealPlanId,
+      ).doc(mealEntryId).delete();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
@@ -72,12 +80,10 @@ class MealEntryRemoteDataSourceImpl implements MealEntryRemoteDataSource {
     required String mealEntryId,
   }) async {
     try {
-      final doc = await _firestore
-          .collection('mealPlans')
-          .doc(mealPlanId)
-          .collection('entries')
-          .doc(mealEntryId)
-          .get();
+      final doc = await _entriesRef(
+        uid: uid,
+        mealPlanId: mealPlanId,
+      ).doc(mealEntryId).get();
       final data = doc.data();
       if (data == null || data.isEmpty) {
         return null;
@@ -96,16 +102,12 @@ class MealEntryRemoteDataSourceImpl implements MealEntryRemoteDataSource {
     required String mealPlanId,
   }) async {
     try {
-      // The owner-only `read` rule is evaluated against `resource.data.uid`,
-      // and Firestore rules are not filters: the query itself must constrain
-      // `uid`, otherwise the whole list request is denied. Ordering is done in
-      // memory so no composite (uid + order) index is required.
-      final snapshot = await _firestore
-          .collection('mealPlans')
-          .doc(mealPlanId)
-          .collection('entries')
-          .where('uid', isEqualTo: uid)
-          .get();
+      // Entries are scoped by the `users/{uid}/mealPlans/{planId}/entries`
+      // path, so no uid filter is needed. Ordering is done in memory.
+      final snapshot = await _entriesRef(
+        uid: uid,
+        mealPlanId: mealPlanId,
+      ).get();
 
       final entries = snapshot.docs
           .map((doc) => MealEntryModel.fromJson(doc.data(), docId: doc.id))
@@ -126,10 +128,7 @@ class MealEntryRemoteDataSourceImpl implements MealEntryRemoteDataSource {
     required MealEntry entry,
   }) async {
     try {
-      final collection = _firestore
-          .collection('mealPlans')
-          .doc(mealPlanId)
-          .collection('entries');
+      final collection = _entriesRef(uid: uid, mealPlanId: mealPlanId);
       // New entries arrive with an empty id; let Firestore assign one.
       final docRef = entry.mealEntryId.trim().isEmpty
           ? collection.doc()
@@ -152,11 +151,10 @@ class MealEntryRemoteDataSourceImpl implements MealEntryRemoteDataSource {
     required Map<String, dynamic> partial,
   }) async {
     try {
-      final docRef = _firestore
-          .collection('mealPlans')
-          .doc(mealPlanId)
-          .collection('entries')
-          .doc(mealEntryId);
+      final docRef = _entriesRef(
+        uid: uid,
+        mealPlanId: mealPlanId,
+      ).doc(mealEntryId);
 
       // Add timestamp for update
       partial['updatedAt'] = FieldValue.serverTimestamp();

@@ -13,6 +13,9 @@ class UpdateMealPlanUseCase implements UseCase<MealPlan, UpdateMealPlanParams> {
   @override
   Future<Either<Failure, MealPlan>> call(UpdateMealPlanParams params) async {
     final partial = <String, dynamic>{};
+    if (params.name != null) partial['name'] = params.name!.trim();
+    if (params.date != null) partial['date'] = params.date;
+    if (params.budgetEgp != null) partial['budgetEgp'] = params.budgetEgp;
     if (params.totalKcal != null) partial['totalKcal'] = params.totalKcal;
     if (params.costEgp != null) partial['costEgp'] = params.costEgp;
     if (params.status != null) partial['status'] = params.status!.name;

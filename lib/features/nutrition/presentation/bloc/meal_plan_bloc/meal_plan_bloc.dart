@@ -75,7 +75,12 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
   ) async {
     emit(const MealPlanLoading());
     final r = await createMealPlan(
-      CreateMealPlanParams(uid: e.uid, date: e.date, budgetEgp: e.budgetEgp),
+      CreateMealPlanParams(
+        uid: e.uid,
+        date: e.date,
+        budgetEgp: e.budgetEgp,
+        name: e.name,
+      ),
     );
     r.fold(
       (f) => emit(MealPlanError(message: f.message)),
