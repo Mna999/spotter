@@ -24,6 +24,10 @@ class AuthRepoImpl implements AuthRepo {
       return Left(
         AuthFailure(message: ExceptionHandler.authExceptionHandler(e.code)),
       );
+    } on ServerException catch (e) {
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
     }
   }
 

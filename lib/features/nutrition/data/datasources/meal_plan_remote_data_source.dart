@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:spotter/core/error/exception.dart';
+import 'package:spotter/core/firestore_recursive_delete.dart';
 import 'package:spotter/features/nutrition/data/models/meal_plan_model.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
 
@@ -42,17 +43,17 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
 
   MealPlanRemoteDataSourceImpl({required this.firebaseFirestore});
 
-  CollectionReference<Map<String, dynamic>> _plansRef({
-    required String uid,
-  }) => firebaseFirestore
-      .collection('users')
-      .doc(uid)
-      .collection('mealPlans');
+  CollectionReference<Map<String, dynamic>> _plansRef({required String uid}) =>
+      firebaseFirestore.collection('users').doc(uid).collection('mealPlans');
 
   @override
   Future<void> delete({required String uid, required String mealPlanId}) async {
     try {
-      await _plansRef(uid: uid).doc(mealPlanId).delete();
+      // Also removes the plan's entries subcollection.
+      await deleteDocumentRecursively(
+        _plansRef(uid: uid).doc(mealPlanId),
+        subcollectionPaths: ['entries'],
+      );
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
@@ -103,9 +104,9 @@ class MealPlanRemoteDataSourceImpl implements MealPlanRemoteDataSource {
     String? cursor,
   }) async {
     try {
-      Query<Map<String, dynamic>> query = _plansRef(uid: uid)
-          .orderBy('createdAt', descending: true)
-          .limit(limit);
+      Query<Map<String, dynamic>> query = _plansRef(
+        uid: uid,
+      ).orderBy('createdAt', descending: true).limit(limit);
 
       // Apply pagination if cursor is provided
       if (cursor != null) {

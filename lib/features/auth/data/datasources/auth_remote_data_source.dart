@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:spotter/core/error/exception.dart';
+import 'package:spotter/core/firestore_recursive_delete.dart';
 import 'package:spotter/features/auth/data/models/user_account_model.dart';
 
 abstract class AuthRemoteDataSource {
@@ -57,10 +58,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     User? user = firebaseAuth.currentUser;
     if (user == null) throw AuthException(code: 'user-not-found');
     try {
-      await firebaseFirestore.collection('users').doc(user.uid).delete();
+      // The user document owns workouts, meal plans, meal logs, preferences
+      // and their nested subcollections; remove them all before deleting the
+      // Auth account.
+      await deleteDocumentRecursively(
+        firebaseFirestore.collection('users').doc(user.uid),
+        subcollectionPaths: [
+          'workouts/plannedExercises/sets',
+          'mealPlans/entries',
+          'mealLogs',
+          'dietaryPreferences',
+        ],
+      );
       await user.delete();
     } on FirebaseAuthException catch (e) {
       throw AuthException(code: e.code);
+    } on FirebaseException catch (e) {
+      throw ServerException(code: e.code);
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:spotter/core/error/exception.dart';
+import 'package:spotter/core/firestore_recursive_delete.dart';
 import 'package:spotter/features/workouts/data/models/planned_exercise_model.dart';
 import 'package:spotter/features/workouts/domain/entities/planned_exercise.dart';
 
@@ -49,23 +50,21 @@ class PlannedExerciseRemoteDataSourceImpl
     bool isLocal = false,
   }) async {
     try {
-      isLocal
-          ? firebaseFirestore
-                .collection('users')
-                .doc(uid)
-                .collection('workouts')
-                .doc(workoutId)
-                .collection('plannedExercises')
-                .doc(plannedExerciseId)
-                .delete()
-          : await firebaseFirestore
-                .collection('users')
-                .doc(uid)
-                .collection('workouts')
-                .doc(workoutId)
-                .collection('plannedExercises')
-                .doc(plannedExerciseId)
-                .delete();
+      final doc = firebaseFirestore
+          .collection('users')
+          .doc(uid)
+          .collection('workouts')
+          .doc(workoutId)
+          .collection('plannedExercises')
+          .doc(plannedExerciseId);
+      if (isLocal) {
+        // Offline: subcollections cannot be listed from the cache, so only
+        // the planned exercise itself is removed.
+        await doc.delete();
+        return;
+      }
+      // Also removes the exercise's sets subcollection.
+      await deleteDocumentRecursively(doc, subcollectionPaths: ['sets']);
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }

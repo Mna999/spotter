@@ -35,6 +35,10 @@ service cloud.firestore {
         allow read, create, update, delete: if isOwner(uid);
       }
 
+      match /dietaryPreferences/{prefsId} {
+        allow read, create, update, delete: if isOwner(uid);
+      }
+
       match /workouts/{workoutId} {
         allow read, create, update, delete: if isOwner(uid);
 
