@@ -17,6 +17,11 @@ class MealLog extends Equatable {
   final double computedKcal;
   final DateTime loggedAt;
   final String? note;
+
+  /// Set when this log was created from a planned meal entry ("LOG" on a meal
+  /// plan). Plans use it to keep the entry's button disabled after it has been
+  /// logged, even across screen visits.
+  final String? sourceMealEntryId;
   final int schemaVersion;
   final DateTime createdAt;
 
@@ -33,6 +38,7 @@ class MealLog extends Equatable {
     required this.computedKcal,
     required this.loggedAt,
     this.note,
+    this.sourceMealEntryId,
     required this.schemaVersion,
     required this.createdAt,
     this.updatedAt,
@@ -52,6 +58,7 @@ class MealLog extends Equatable {
     computedKcal,
     loggedAt,
     note,
+    sourceMealEntryId,
     schemaVersion,
     createdAt,
     updatedAt,

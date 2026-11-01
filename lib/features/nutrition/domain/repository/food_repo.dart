@@ -4,7 +4,11 @@ import 'package:spotter/features/nutrition/domain/entities/food_item.dart';
 import 'package:spotter/features/nutrition/domain/params/food_filter_params.dart';
 
 abstract class FoodRepo {
-  Future<Either<Failure, List<FoodItem>>> search({required String query});
+  Future<Either<Failure, List<FoodItem>>> search({
+    required String query,
+    int limit = 20,
+    String? cursor,
+  });
 
   Future<Either<Failure, FoodItem?>> getById({required String foodId});
 

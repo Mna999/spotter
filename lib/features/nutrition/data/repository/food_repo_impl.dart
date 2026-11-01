@@ -53,9 +53,15 @@ class FoodRepoImpl implements FoodRepo {
   @override
   Future<Either<Failure, List<FoodItem>>> search({
     required String query,
+    int limit = 20,
+    String? cursor,
   }) async {
     try {
-      final foodItems = await remoteDataSource.search(query: query);
+      final foodItems = await remoteDataSource.search(
+        query: query,
+        limit: limit,
+        cursor: cursor,
+      );
       return Right(foodItems);
     } on ServerException catch (e) {
       return Left(

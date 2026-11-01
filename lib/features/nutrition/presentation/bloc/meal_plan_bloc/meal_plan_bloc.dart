@@ -117,13 +117,22 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
 
   Future<void> _onSaved(PlanSaved e, Emitter<MealPlanState> emit) async {
     emit(const MealPlanLoading());
-    final r = await saveMealPlan(
-      SavePlanParams(uid: e.uid, mealPlan: e.mealPlan),
-    );
-    r.fold(
-      (f) => emit(MealPlanError(message: f.message)),
-      (p) => emit(MealPlanSaved(mealPlan: p)),
-    );
+    try {
+      final r = await saveMealPlan(
+        SavePlanParams(uid: e.uid, mealPlan: e.mealPlan),
+      );
+      r.fold(
+        (f) => emit(MealPlanError(message: f.message)),
+        (p) => emit(MealPlanSaved(mealPlan: p)),
+      );
+    } catch (_) {
+      // Never leave the screen stuck on its saving spinner.
+      emit(
+        const MealPlanError(
+          message: 'Could not save the meal plan. Please try again.',
+        ),
+      );
+    }
   }
 
   Future<void> _onLoaded(PlanLoaded e, Emitter<MealPlanState> emit) async {
@@ -218,16 +227,68 @@ class MealPlanBloc extends Bloc<MealPlanEvent, MealPlanState> {
   ) async {
     emit(const MealPlanLoading());
     final r = await addMealEntry(e.params);
-    r.fold(
-      (f) => emit(MealPlanError(message: f.message)),
-      (entry) => emit(
-        MealPlanLoaded(
-          mealPlan: e.mealPlan,
-          entries: [entry],
-          message: 'Meal entry added.',
-        ),
+    MealEntry? added;
+    String? error;
+    r.fold((f) => error = f.message, (entry) => added = entry);
+    final entry = added;
+    if (entry == null) {
+      emit(
+        MealPlanError(message: error ?? 'Could not add the meal entry.'),
+      );
+      return;
+    }
+
+    // Keep the plan document's stored totals in sync with its entries so the
+    // meal-plan list shows the updated price without a manual save.
+    final plan = await _withFreshTotals(e.mealPlan);
+    emit(
+      MealPlanLoaded(
+        mealPlan: plan,
+        entries: [entry],
+        message: 'Meal entry added.',
       ),
     );
+  }
+
+  /// Recomputes [plan]'s kcal and EGP cost from its entries and persists them.
+  Future<MealPlan> _withFreshTotals(MealPlan plan) async {
+    final planId = plan.mealPlanId.trim();
+    if (planId.isEmpty) return plan;
+
+    final entriesResult = await listMealEntries(
+      ListMealEntriesParams(uid: plan.uid, mealPlanId: planId),
+    );
+    final entries = entriesResult.fold<List<MealEntry>>(
+      (_) => const [],
+      (value) => value,
+    );
+    if (entries.isEmpty) return plan;
+
+    final missing = entries
+        .map((entry) => entry.foodId)
+        .where((id) => !_foodCache.containsKey(id))
+        .toSet();
+    if (missing.isNotEmpty) {
+      final fetched = await fetchFoodsById(missing);
+      _foodCache.addAll(fetched);
+    }
+
+    final foods = _foodsFor(entries);
+    final updated = copyMealPlan(
+      plan,
+      totalKcal: macrosForEntries(entries, foods).energyKcal,
+      costEgp: estimatedCostForEntries(entries, foods),
+    );
+
+    final updateResult = await updateMealPlan(
+      UpdateMealPlanParams(
+        uid: plan.uid,
+        mealPlanId: planId,
+        totalKcal: updated.totalKcal,
+        costEgp: updated.costEgp,
+      ),
+    );
+    return updateResult.fold((_) => updated, (saved) => saved);
   }
 
   void _onEntryUpdated(MealEntryUpdated e, Emitter<MealPlanState> emit) => emit(

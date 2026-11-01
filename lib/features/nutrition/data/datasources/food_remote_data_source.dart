@@ -7,8 +7,12 @@ import 'package:spotter/features/nutrition/domain/entities/food_item.dart';
 import 'package:spotter/features/nutrition/domain/params/food_filter_params.dart';
 
 abstract class FoodRemoteDataSource {
-  /// Search for food items by query
-  Future<List<FoodItem>> search({required String query});
+  /// Search for food items by query (cursor = last document id).
+  Future<List<FoodItem>> search({
+    required String query,
+    int limit = 20,
+    String? cursor,
+  });
 
   /// Get a food item by ID
   Future<FoodItem?> getById({required String foodId});
@@ -40,23 +44,28 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
   @override
   Future<List<FoodItem>> list({required FoodFilterParams filter}) async {
     try {
-      Query<Map<String, dynamic>> query = _firestore.collection('foods');
+      // Order first, then paginate from the last document of the previous
+      // page. Using the document snapshot (instead of a raw value) keeps
+      // pagination correct even when several foods share the same name.
+      Query<Map<String, dynamic>> query = _firestore
+          .collection('foods')
+          .orderBy('nameEn');
 
       if (filter.category != null) {
         query = query.where('category', isEqualTo: filter.category);
       }
 
-      // Apply pagination if cursor is provided
-      if (filter.cursor != null) {
-        query = query.startAfter([filter.cursor]).limit(filter.limit);
-      } else {
-        query = query.limit(filter.limit);
+      if (filter.cursor != null && filter.cursor!.trim().isNotEmpty) {
+        final cursorDoc = await _firestore
+            .collection('foods')
+            .doc(filter.cursor)
+            .get();
+        if (cursorDoc.exists) {
+          query = query.startAfterDocument(cursorDoc);
+        }
       }
 
-      // Order by name for consistent results
-      query = query.orderBy('nameEn');
-
-      final snapshot = await query.get();
+      final snapshot = await query.limit(filter.limit).get();
       return snapshot.docs
           .map((doc) => FoodItemModel.fromJson(doc.data(), docId: doc.id))
           .map((model) => model.toEntity())
@@ -67,35 +76,61 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
   }
 
   @override
-  Future<List<FoodItem>> search({required String query}) async {
+  Future<List<FoodItem>> search({
+    required String query,
+    int limit = 20,
+    String? cursor,
+  }) async {
     final needle = query.trim().toLowerCase();
     if (needle.isEmpty) return const [];
 
+    List<FoodItem> prefixMatches = const [];
+
     try {
       // Preferred path: prefix match on the denormalized lowercase
-      // `searchText` field.
-      final snapshot = await _firestore
+      // `searchText` field, paged from the last document of the previous page.
+      Query<Map<String, dynamic>> request = _firestore
           .collection('foods')
           .where('searchText', isGreaterThanOrEqualTo: needle)
           .where('searchText', isLessThanOrEqualTo: '$needle\uf8ff')
-          .limit(20)
-          .get();
+          .orderBy('searchText');
 
-      final prefixMatches = _toFoods(snapshot);
-      if (prefixMatches.isNotEmpty) return prefixMatches;
+      if (cursor != null && cursor.trim().isNotEmpty) {
+        final cursorDoc = await _firestore
+            .collection('foods')
+            .doc(cursor)
+            .get();
+        if (cursorDoc.exists) {
+          request = request.startAfterDocument(cursorDoc);
+        }
+      }
 
+      prefixMatches = _toFoods(await request.limit(limit).get());
+    } on FirebaseException catch (e) {
+      // Auth/network problems must not be hidden by the in-memory fallback.
+      if (e.code == 'permission-denied' ||
+          e.code == 'unauthenticated' ||
+          e.code == 'unavailable' ||
+          e.code == 'deadline-exceeded') {
+        throw ServerException(code: e.code);
+      }
+    }
+
+    if (prefixMatches.isNotEmpty) return prefixMatches;
+    // There is no next page when we already paged past the first one.
+    if (cursor != null && cursor.trim().isNotEmpty) return const [];
+
+    try {
       // Fallback: older catalogues store `searchText` as a token list (or not
       // at all), which the range query above cannot match. Filter a page of
       // the catalogue in memory so search still returns results.
       final page = await _firestore
           .collection('foods')
           .orderBy('nameEn')
-          .limit(200)
+          .limit(500)
           .get();
 
-      return _toFoods(
-        page,
-      ).where((food) => _matches(food, needle)).take(20).toList();
+      return _toFoods(page).where((food) => _matches(food, needle)).toList();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }

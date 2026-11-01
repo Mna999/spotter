@@ -11,12 +11,14 @@ class MealEntryCard extends StatelessWidget {
     required this.onLog,
     this.food,
     this.isLogging = false,
+    this.isLogged = false,
   });
 
   final MealEntry entry;
   final FoodItem? food;
   final VoidCallback onLog;
   final bool isLogging;
+  final bool isLogged;
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +118,7 @@ class MealEntryCard extends StatelessWidget {
                 SizedBox(
                   height: 36,
                   child: FilledButton(
-                    onPressed: isLogging ? null : onLog,
+                    onPressed: (isLogging || isLogged) ? null : onLog,
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(0, 36),
                       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -126,6 +128,15 @@ class MealEntryCard extends StatelessWidget {
                             width: 14,
                             height: 14,
                             child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : isLogged
+                        ? const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.check, size: 14),
+                              SizedBox(width: 4),
+                              Text('LOGGED'),
+                            ],
                           )
                         : const Text('LOG'),
                   ),

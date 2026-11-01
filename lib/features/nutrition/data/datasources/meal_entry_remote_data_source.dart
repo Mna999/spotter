@@ -96,17 +96,24 @@ class MealEntryRemoteDataSourceImpl implements MealEntryRemoteDataSource {
     required String mealPlanId,
   }) async {
     try {
+      // The owner-only `read` rule is evaluated against `resource.data.uid`,
+      // and Firestore rules are not filters: the query itself must constrain
+      // `uid`, otherwise the whole list request is denied. Ordering is done in
+      // memory so no composite (uid + order) index is required.
       final snapshot = await _firestore
           .collection('mealPlans')
           .doc(mealPlanId)
           .collection('entries')
-          .orderBy('order')
+          .where('uid', isEqualTo: uid)
           .get();
 
-      return snapshot.docs
+      final entries = snapshot.docs
           .map((doc) => MealEntryModel.fromJson(doc.data(), docId: doc.id))
           .map((model) => model.toEntity())
           .toList();
+
+      entries.sort((a, b) => a.order.compareTo(b.order));
+      return entries;
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }

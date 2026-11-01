@@ -45,7 +45,7 @@ class MealEntryModel extends MealEntry {
     return MealEntryModel(
       mealEntryId: docId ?? json['mealEntryId'] ?? '',
       mealPlanId: json['mealPlanId'],
-      uid: json['uid'],
+      uid: json['uid'] ?? '',
       foodId: json['foodId'],
       mealType: MealType.fromString(json['mealType'] ?? 'snack'),
       order: (json['order'] as num?)?.toInt() ?? 0,

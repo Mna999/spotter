@@ -32,7 +32,36 @@ class LogFoodUseCase implements UseCase<MealLog, LogFoodParams> {
     final grams = params.portion.grams * params.servingsCount;
     final computedKcal = food!.per100g.energyKcal * grams / 100;
 
-    // 3) Persist the log.
+    // 3) Refuse to log the same food twice for the same meal on the same day.
+    // The existing entry should be edited instead, so the diary never shows
+    // accidental duplicates (double taps, repeated taps on a plan entry).
+    var duplicate = false;
+    final day = DateTime(
+      params.loggetAt.year,
+      params.loggetAt.month,
+      params.loggetAt.day,
+    );
+    final existing = await mealLogRepo.listForDate(uid: params.uid, date: day);
+    existing.fold((_) {}, (logs) {
+      duplicate = logs.any(
+        (log) =>
+            log.foodId == params.foodId &&
+            log.mealType == params.mealType &&
+            (log.portion.grams - params.portion.grams).abs() < 0.01 &&
+            (log.servingsCount - params.servingsCount).abs() < 0.01,
+      );
+    });
+    if (duplicate) {
+      return const Left(
+        ServerFailure(
+          message:
+              'This food is already logged for that meal today. Edit the '
+              'existing entry if you need a different amount.',
+        ),
+      );
+    }
+
+    // 4) Persist the log.
     final now = DateTime.now();
     final log = MealLog(
       mealLogId: '', // assigned by Firestore on save
@@ -44,6 +73,7 @@ class LogFoodUseCase implements UseCase<MealLog, LogFoodParams> {
       computedKcal: computedKcal,
       loggedAt: params.loggetAt,
       note: params.note,
+      sourceMealEntryId: params.sourceMealEntryId,
       schemaVersion: 1,
       createdAt: now,
       updatedAt: now,

@@ -11,6 +11,9 @@ class LogFoodParams extends Equatable {
   final DateTime loggetAt;
   final String? note;
 
+  /// Set when the log comes from logging a planned meal entry.
+  final String? sourceMealEntryId;
+
   const LogFoodParams({
     required this.uid,
     required this.foodId,
@@ -19,6 +22,7 @@ class LogFoodParams extends Equatable {
     required this.servingsCount,
     required this.loggetAt,
     this.note,
+    this.sourceMealEntryId,
   });
 
   @override
@@ -30,5 +34,6 @@ class LogFoodParams extends Equatable {
     servingsCount,
     loggetAt,
     note,
+    sourceMealEntryId,
   ];
 }

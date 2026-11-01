@@ -12,6 +12,10 @@ class SearchFoodUsecase implements UseCase<List<FoodItem>, SearchParams> {
 
   @override
   Future<Either<Failure, List<FoodItem>>> call(SearchParams params) async {
-    return await foodRepo.search(query: params.query);
+    return await foodRepo.search(
+      query: params.query,
+      limit: params.limit,
+      cursor: params.cursor,
+    );
   }
 }

@@ -17,6 +17,7 @@ class NutritionSummaryCard extends StatelessWidget {
     this.budgetEgp,
     this.spentEgp,
     this.logCount,
+    this.countLabel = 'logged today',
   });
 
   final MacroNutrients consumed;
@@ -27,6 +28,9 @@ class NutritionSummaryCard extends StatelessWidget {
   final double? budgetEgp;
   final double? spentEgp;
   final int? logCount;
+
+  /// Suffix for [logCount], e.g. `in this plan` or `logged today`.
+  final String countLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +184,7 @@ class NutritionSummaryCard extends StatelessWidget {
           if (logCount != null) ...[
             const SizedBox(height: 10),
             Text(
-              '$logCount ${logCount == 1 ? 'item' : 'items'} logged today',
+              '$logCount ${logCount == 1 ? 'item' : 'items'} $countLabel',
               style: text.bodySmall!.copyWith(color: cs.onSurfaceVariant),
             ),
           ],

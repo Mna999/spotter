@@ -37,6 +37,7 @@ class FoodSearchScreen extends StatefulWidget {
 class _FoodSearchScreenState extends State<FoodSearchScreen> {
   final FoodSearchBloc _bloc = sl<FoodSearchBloc>();
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   final Set<String> _categories = {};
   Timer? _debounce;
   String? _selectedCategory;
@@ -44,6 +45,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _bloc.add(const FoodListRequested());
     });
@@ -52,9 +54,19 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   @override
   void dispose() {
     _debounce?.cancel();
+    _scrollController.dispose();
     _controller.dispose();
     _bloc.close();
     super.dispose();
+  }
+
+  /// Infinite scroll: ask for the next page slightly before the list ends.
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 320) {
+      _bloc.add(const FoodSearchMoreRequested());
+    }
   }
 
   void _onQueryChanged(String value) {
@@ -79,7 +91,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   }
 
   Future<void> _openDetail(FoodItem food) async {
-    await Routing.routePush(
+    final added = await Routing.routePush<bool>(
       FoodDetailScreen(
         uid: widget.uid,
         food: food,
@@ -90,6 +102,12 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       ),
       context,
     );
+    if (!mounted) return;
+    // Adding to a plan closes the catalogue so the plan screen can refresh
+    // its entries and totals immediately.
+    if (added == true && widget.mode == FoodActionMode.addToPlan) {
+      Navigator.pop(context, true);
+    }
   }
 
   @override
@@ -248,9 +266,14 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       );
     }
 
+    final hasMore = state is FoodSearchLoaded && state.hasMore;
+    final loadingMore = state is FoodSearchLoaded && state.loadingMore;
+    final showFooter = hasMore || loadingMore;
+
     return ListView.separated(
+      controller: _scrollController,
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      itemCount: foods.length + 1,
+      itemCount: foods.length + 1 + (showFooter ? 1 : 0),
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         if (index == 0) {
@@ -276,7 +299,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '${foods.length} FOUND',
+                  '${foods.length}${hasMore ? '+' : ''} FOUND',
                   style: text.labelSmall!.copyWith(color: cs.primary),
                 ),
                 const Spacer(),
@@ -285,6 +308,24 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
                   style: text.labelSmall!.copyWith(color: cs.outline),
                 ),
               ],
+            ),
+          );
+        }
+        if (index > foods.length) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            child: Center(
+              child: loadingMore
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : TextButton(
+                      onPressed: () =>
+                          _bloc.add(const FoodSearchMoreRequested()),
+                      child: const Text('LOAD MORE'),
+                    ),
             ),
           );
         }

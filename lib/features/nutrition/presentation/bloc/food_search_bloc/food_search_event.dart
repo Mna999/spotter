@@ -28,6 +28,13 @@ class FoodListRequested extends FoodSearchEvent {
   List<Object?> get props => [limit, cursor];
 }
 
+/// Asks for the next page of the current browse/search results.
+class FoodSearchMoreRequested extends FoodSearchEvent {
+  const FoodSearchMoreRequested();
+  @override
+  List<Object?> get props => [];
+}
+
 class CategoryFilterChanged extends FoodSearchEvent {
   final String? category;
   const CategoryFilterChanged(this.category);
