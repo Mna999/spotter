@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:spotter/features/nutrition/domain/entities/food_log_day.dart';
 import 'package:spotter/features/nutrition/domain/entities/macro_nutrients.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_log.dart';
 import 'package:spotter/features/nutrition/domain/params/date_params.dart';
@@ -7,8 +8,7 @@ import 'package:spotter/features/nutrition/domain/params/log_food_params.dart';
 import 'package:spotter/features/nutrition/domain/params/meal_log_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/update_meal_log_params.dart';
 import 'package:spotter/features/nutrition/domain/usecases/delete_meal_log_usecase.dart';
-import 'package:spotter/features/nutrition/domain/usecases/get_daily_totals_usecase.dart';
-import 'package:spotter/features/nutrition/domain/usecases/list_meal_logs_for_date_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_food_log_day_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/log_food_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/repeat_yesterday_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/update_meal_log_usecase.dart';
@@ -19,16 +19,14 @@ part 'food_log_state.dart';
 class FoodLogBloc extends Bloc<FoodLogEvent, FoodLogState> {
   final LogFoodUseCase logFood;
   final RepeatYesterdayUseCase repeatYesterday;
-  final GetDailyTotalsUseCase getDailyTotals;
-  final ListMealLogsForDateUseCase listMealLogsForDate;
+  final GetFoodLogDayUseCase getFoodLogDay;
   final UpdateMealLogUseCase updateMealLog;
   final DeleteMealLogUseCase deleteMealLog;
 
   FoodLogBloc({
     required this.logFood,
     required this.repeatYesterday,
-    required this.getDailyTotals,
-    required this.listMealLogsForDate,
+    required this.getFoodLogDay,
     required this.updateMealLog,
     required this.deleteMealLog,
   }) : super(const FoodLogEmpty()) {
@@ -49,23 +47,12 @@ class FoodLogBloc extends Bloc<FoodLogEvent, FoodLogState> {
     await result.fold((f) async => emit(FoodLogError(message: f.message)), (
       log,
     ) async {
-      final date = DateTime(
-        log.loggedAt.year,
-        log.loggedAt.month,
-        log.loggedAt.day,
-      );
-      final totals = await getDailyTotals(
-        DateParams(uid: event.params.uid, date: date),
-      );
-      totals.fold(
-        (f) => emit(FoodLogError(message: f.message)),
-        (value) => emit(
-          FoodLogLoaded(
-            logs: [log],
-            totals: value,
-            message: 'Food logged successfully.',
-          ),
-        ),
+      await _emitDay(
+        uid: event.params.uid,
+        date: DateTime(log.loggedAt.year, log.loggedAt.month, log.loggedAt.day),
+        emit: emit,
+        latestLog: log,
+        message: 'Food logged successfully.',
       );
     });
   }
@@ -76,32 +63,19 @@ class FoodLogBloc extends Bloc<FoodLogEvent, FoodLogState> {
   ) async {
     emit(const FoodLogLoading());
     final now = DateTime.now();
-    final yesterday = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    ).subtract(const Duration(days: 1));
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
     final result = await repeatYesterday(
       DateParams(uid: event.uid, date: yesterday),
     );
     await result.fold((f) async => emit(FoodLogError(message: f.message)), (
-      logs,
+      _,
     ) async {
-      final totals = await getDailyTotals(
-        DateParams(
-          uid: event.uid,
-          date: DateTime(now.year, now.month, now.day),
-        ),
-      );
-      totals.fold(
-        (f) => emit(FoodLogError(message: f.message)),
-        (value) => emit(
-          FoodLogLoaded(
-            logs: logs,
-            totals: value,
-            message: 'Yesterday’s meals repeated.',
-          ),
-        ),
+      await _emitDay(
+        uid: event.uid,
+        date: today,
+        emit: emit,
+        message: 'Yesterday’s meals repeated.',
       );
     });
   }
@@ -111,13 +85,7 @@ class FoodLogBloc extends Bloc<FoodLogEvent, FoodLogState> {
     Emitter<FoodLogState> emit,
   ) async {
     emit(const FoodLogLoading());
-    final result = await getDailyTotals(
-      DateParams(uid: event.uid, date: event.date),
-    );
-    result.fold(
-      (f) => emit(FoodLogError(message: f.message)),
-      (totals) => emit(FoodLogLoaded(totals: totals)),
-    );
+    await _emitDay(uid: event.uid, date: event.date, emit: emit);
   }
 
   Future<void> _onLogsForDateRequested(
@@ -125,25 +93,7 @@ class FoodLogBloc extends Bloc<FoodLogEvent, FoodLogState> {
     Emitter<FoodLogState> emit,
   ) async {
     emit(const FoodLogLoading());
-    final results = await listMealLogsForDate(
-      DateParams(uid: event.uid, date: event.date),
-    );
-
-    await results.fold((f) async => emit(FoodLogError(message: f.message)), (
-      logs,
-    ) async {
-      final totals = await getDailyTotals(
-        DateParams(uid: event.uid, date: event.date),
-      );
-      totals.fold(
-        (f) => emit(FoodLogError(message: f.message)),
-        (value) => emit(
-          logs.isEmpty
-              ? FoodLogEmpty(date: event.date, totals: value)
-              : FoodLogLoaded(logs: logs, totals: value),
-        ),
-      );
-    });
+    await _emitDay(uid: event.uid, date: event.date, emit: emit);
   }
 
   Future<void> _onMealLogUpdated(
@@ -152,19 +102,15 @@ class FoodLogBloc extends Bloc<FoodLogEvent, FoodLogState> {
   ) async {
     emit(const FoodLogLoading());
     final result = await updateMealLog(event.params);
-    result.fold(
-      (f) => emit(FoodLogError(message: f.message)),
-      (log) => add(
-        DailyTotalsRequested(
-          uid: event.params.uid,
-          date: DateTime(
-            log.loggedAt.year,
-            log.loggedAt.month,
-            log.loggedAt.day,
-          ),
-        ),
-      ),
-    );
+    await result.fold((f) async => emit(FoodLogError(message: f.message)), (
+      log,
+    ) async {
+      await _emitDay(
+        uid: event.params.uid,
+        date: DateTime(log.loggedAt.year, log.loggedAt.month, log.loggedAt.day),
+        emit: emit,
+      );
+    });
   }
 
   Future<void> _onMealLogDeleted(
@@ -175,29 +121,33 @@ class FoodLogBloc extends Bloc<FoodLogEvent, FoodLogState> {
     final result = await deleteMealLog(
       MealLogIdParams(uid: event.uid, mealLogId: event.mealLogId),
     );
-    await result.fold((f) async => emit(FoodLogError(message: f.message)), (
-      _,
-    ) async {
-      // Re-read the day so every listener (dashboard and meal plan detail)
-      // receives the remaining logs rather than only the new totals.
-      final logsResult = await listMealLogsForDate(
-        DateParams(uid: event.uid, date: event.date),
-      );
-      await logsResult.fold((f) async => emit(FoodLogError(message: f.message)), (
-        logs,
-      ) async {
-        final totalsResult = await getDailyTotals(
-          DateParams(uid: event.uid, date: event.date),
-        );
-        totalsResult.fold(
-          (f) => emit(FoodLogError(message: f.message)),
-          (totals) => emit(
-            logs.isEmpty
-                ? FoodLogEmpty(date: event.date, totals: totals)
-                : FoodLogLoaded(logs: logs, totals: totals),
-          ),
-        );
-      });
-    });
+    await result.fold(
+      (f) async => emit(FoodLogError(message: f.message)),
+      (_) async => _emitDay(uid: event.uid, date: event.date, emit: emit),
+    );
+  }
+
+  /// Loads a whole day and emits the matching state. The full day is emitted
+  /// so every listener gets the logs, foods and totals together.
+  Future<void> _emitDay({
+    required String uid,
+    required DateTime date,
+    required Emitter<FoodLogState> emit,
+    MealLog? latestLog,
+    String? message,
+  }) async {
+    final result = await getFoodLogDay(DateParams(uid: uid, date: date));
+    result.fold(
+      (failure) => emit(FoodLogError(message: failure.message)),
+      (day) => emit(
+        day.isEmpty && message == null
+            ? FoodLogEmpty(day: day)
+            : FoodLogLoaded(
+                day: day,
+                latestLog: latestLog,
+                message: message,
+              ),
+      ),
+    );
   }
 }

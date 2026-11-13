@@ -49,7 +49,7 @@ class FoodDetailScreen extends StatefulWidget {
 class _FoodDetailScreenState extends State<FoodDetailScreen> {
   late Portion _portion = defaultPortionFor(widget.food);
   double _servings = 1;
-  late MealType _mealType = _defaultMealType();
+  late MealType _mealType = MealType.forHour(DateTime.now().hour);
   final TextEditingController _noteController = TextEditingController();
   final MealPlanBloc _planBloc = sl<MealPlanBloc>();
   bool _submitting = false;
@@ -59,14 +59,6 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
     _noteController.dispose();
     _planBloc.close();
     super.dispose();
-  }
-
-  MealType _defaultMealType() {
-    final hour = DateTime.now().hour;
-    if (hour < 11) return MealType.breakfast;
-    if (hour < 16) return MealType.lunch;
-    if (hour < 21) return MealType.dinner;
-    return MealType.snack;
   }
 
   DateTime get _loggedAt {

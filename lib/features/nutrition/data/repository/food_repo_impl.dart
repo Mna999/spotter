@@ -32,6 +32,26 @@ class FoodRepoImpl implements FoodRepo {
   }
 
   @override
+  Future<Either<Failure, Map<String, FoodItem>>> getByIds({
+    required Set<String> foodIds,
+  }) async {
+    if (foodIds.isEmpty) return const Right(<String, FoodItem>{});
+    try {
+      final foodItems = await remoteDataSource.getByIds(foodIds: foodIds);
+      return Right({for (final food in foodItems) food.foodId: food});
+    } on ServerException catch (e) {
+      return Left(
+        ServerFailure(message: ExceptionHandler.serverExceptionHandler(e.code)),
+      );
+    } catch (e) {
+      log(e.toString());
+      return const Left(
+        ServerFailure(message: 'Something went wrong. Please try again.'),
+      );
+    }
+  }
+
+  @override
   Future<Either<Failure, List<FoodItem>>> list({
     required FoodFilterParams filter,
   }) async {

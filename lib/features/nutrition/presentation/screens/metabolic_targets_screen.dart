@@ -5,6 +5,7 @@ import 'package:spotter/core/date_formatter.dart';
 import 'package:spotter/core/snack_bar_builder.dart';
 import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
 import 'package:spotter/features/nutrition/domain/entities/dietary_preferences.dart';
+import 'package:spotter/features/nutrition/domain/entities/macro_split.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/nutrition_preferences_bloc/nutrition_preferences_bloc.dart';
 
 /// Shows the calorie and macro goals calculated from the user's profile
@@ -87,33 +88,17 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
   void _save() {
     if (_saving) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    final bloc = context.read<NutritionPreferencesBloc>();
-    final prefs = bloc.state.preferences;
-    final base =
-        prefs ??
-        DietaryPreferences(
-          uid: widget.uid,
-          prefsId: widget.uid,
-          excludedFoodIds: const <String>{},
-          excludedCategories: const <String>{},
-          schemaVersion: 1,
-          createdAt: DateTime.now(),
-        );
     final budgetText = _budgetController.text.trim();
     final dietTag = _dietTagController.text.trim();
-    final updated = DietaryPreferences(
-      uid: base.uid,
-      prefsId: base.prefsId,
-      excludedFoodIds: base.excludedFoodIds,
-      excludedCategories: base.excludedCategories,
-      budgetEgp: budgetText.isEmpty ? null : double.tryParse(budgetText),
-      dietTag: dietTag.isEmpty ? null : dietTag,
-      schemaVersion: base.schemaVersion,
-      createdAt: base.createdAt,
-      updatedAt: DateTime.now(),
-    );
     setState(() => _saving = true);
-    bloc.add(NutritionPreferencesSaved(uid: widget.uid, preferences: updated));
+    context.read<NutritionPreferencesBloc>().add(
+      NutritionPlannerSettingsUpdated(
+        uid: widget.uid,
+        prefsId: widget.uid,
+        budgetEgp: budgetText.isEmpty ? null : double.tryParse(budgetText),
+        dietTag: dietTag.isEmpty ? null : dietTag,
+      ),
+    );
   }
 
   @override
@@ -126,16 +111,11 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
         : null;
     final goals = metrics?.macroTargets;
     final kcal = goals?.calories ?? 0;
-    final protein = (goals?.proteinG ?? 0).toDouble();
-    final carbs = (goals?.carbsG ?? 0).toDouble();
-    final fat = (goals?.fatG ?? 0).toDouble();
-    final proteinKcal = protein * 4;
-    final carbsKcal = carbs * 4;
-    final fatKcal = fat * 9;
-    final splitTotal = proteinKcal + carbsKcal + fatKcal;
-    final proteinShare = splitTotal <= 0 ? 0.0 : proteinKcal / splitTotal;
-    final carbsShare = splitTotal <= 0 ? 0.0 : carbsKcal / splitTotal;
-    final fatShare = splitTotal <= 0 ? 0.0 : fatKcal / splitTotal;
+    final split = MacroSplit.fromGrams(
+      proteinG: (goals?.proteinG ?? 0).toDouble(),
+      carbsG: (goals?.carbsG ?? 0).toDouble(),
+      fatG: (goals?.fatG ?? 0).toDouble(),
+    );
 
     return Scaffold(
       appBar: AppBar(title: Text('Macro targets', style: text.headlineMedium)),
@@ -254,9 +234,9 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
                       ),
                       const SizedBox(height: 10),
                       _MacroSplitBar(
-                        proteinShare: proteinShare,
-                        carbsShare: carbsShare,
-                        fatShare: fatShare,
+                        proteinShare: split.proteinShare,
+                        carbsShare: split.carbsShare,
+                        fatShare: split.fatShare,
                         proteinColor: cs.primary,
                         carbsColor: cs.secondary,
                         fatColor: cs.outline,
@@ -264,23 +244,23 @@ class _MetabolicTargetsScreenState extends State<MetabolicTargetsScreen> {
                       const SizedBox(height: 12),
                       _MacroRow(
                         color: cs.primary,
-                        grams: protein,
+                        grams: split.proteinG,
                         label: 'Protein',
-                        share: proteinShare,
+                        share: split.proteinShare,
                       ),
                       const SizedBox(height: 8),
                       _MacroRow(
                         color: cs.secondary,
-                        grams: carbs,
+                        grams: split.carbsG,
                         label: 'Carbs',
-                        share: carbsShare,
+                        share: split.carbsShare,
                       ),
                       const SizedBox(height: 8),
                       _MacroRow(
                         color: cs.outline,
-                        grams: fat,
+                        grams: split.fatG,
                         label: 'Fats',
-                        share: fatShare,
+                        share: split.fatShare,
                       ),
                       const SizedBox(height: 12),
                       Row(

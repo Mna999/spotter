@@ -7,9 +7,9 @@ import 'package:spotter/core/snack_bar_builder.dart';
 import 'package:spotter/features/auth/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
 import 'package:spotter/features/nutrition/domain/entities/food_item.dart';
+import 'package:spotter/features/nutrition/domain/entities/food_log_day.dart';
 import 'package:spotter/features/nutrition/domain/entities/macro_nutrients.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_log.dart';
-import 'package:spotter/features/nutrition/domain/entities/meal_type.dart';
 import 'package:spotter/features/nutrition/domain/params/update_meal_log_params.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/food_log_bloc/food_log_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/nutrition_preferences_bloc/nutrition_preferences_bloc.dart';
@@ -37,11 +37,6 @@ class NutritionDashboardScreen extends StatefulWidget {
 class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
   String? _uid;
   DateTime _date = dateOnly(DateTime.now());
-  List<MealLog> _logs = const [];
-  MacroNutrients _totals = MacroNutrients.zero;
-  Map<String, FoodItem> _foods = const {};
-  bool _terminal = false;
-  bool _reloadAfterMutation = false;
 
   bool get _isToday => isSameDay(_date, DateTime.now());
 
@@ -73,72 +68,25 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
     );
   }
 
-  Future<void> _loadFoods(List<MealLog> logs) async {
-    final missing = logs
-        .map((log) => log.foodId)
-        .where((id) => !_foods.containsKey(id))
-        .toSet();
-    if (missing.isEmpty) return;
-    final foods = await fetchFoodsById(missing);
-    if (!mounted) return;
-    setState(() => _foods = {..._foods, ...foods});
-  }
-
   void _onFoodLogState(FoodLogState state) {
-    if (state is FoodLogLoaded) {
-      setState(() {
-        _logs = state.logs;
-        _totals = state.totals;
-        _terminal = true;
-      });
-      _loadFoods(state.logs);
-      if (_reloadAfterMutation) {
-        _reloadAfterMutation = false;
-        _loadLogs();
-      }
-      if (state.message != null && mounted) {
-        SnackBarBuilder.showSnackBar(
-          context,
-          state.message!,
-          false,
-          Theme.of(context).colorScheme,
-        );
-      }
-    } else if (state is FoodLogEmpty) {
-      setState(() {
-        _logs = const [];
-        _totals = state.totals ?? MacroNutrients.zero;
-        _foods = const {};
-        _terminal = true;
-      });
-      if (_reloadAfterMutation) {
-        _reloadAfterMutation = false;
-        _loadLogs();
-      }
-    } else if (state is FoodLogError) {
-      setState(() {
-        _terminal = true;
-        _reloadAfterMutation = false;
-      });
-      SnackBarBuilder.showSnackBar(
-        context,
-        state.message,
-        true,
-        Theme.of(context).colorScheme,
-      );
-    }
+    final message = switch (state) {
+      FoodLogLoaded(:final message) => message,
+      FoodLogError(:final message) => message,
+      _ => null,
+    };
+    if (message == null || !mounted) return;
+    SnackBarBuilder.showSnackBar(
+      context,
+      message,
+      state is FoodLogError,
+      Theme.of(context).colorScheme,
+    );
   }
 
   void _changeDate(int days) {
     final next = _date.add(Duration(days: days));
     if (next.isAfter(dateOnly(DateTime.now()))) return;
-    setState(() {
-      _date = next;
-      _logs = const [];
-      _totals = MacroNutrients.zero;
-      _foods = const {};
-      _terminal = false;
-    });
+    setState(() => _date = next);
     _loadLogs();
   }
 
@@ -150,31 +98,24 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
       lastDate: dateOnly(DateTime.now()),
     );
     if (picked == null || !mounted) return;
-    setState(() {
-      _date = dateOnly(picked);
-      _logs = const [];
-      _totals = MacroNutrients.zero;
-      _foods = const {};
-      _terminal = false;
-    });
+    setState(() => _date = dateOnly(picked));
     _loadLogs();
   }
 
-  Future<void> _editLog(MealLog log) async {
+  Future<void> _editLog(MealLog log, FoodItem? food) async {
     final uid = _uid;
     if (uid == null) return;
     final params = await showMealLogEditSheet(
       context,
       uid: uid,
       log: log,
-      food: _foods[log.foodId],
+      food: food,
     );
     if (params == null || !mounted) return;
     _updateLog(params);
   }
 
   void _updateLog(UpdateMealLogParams params) {
-    _reloadAfterMutation = true;
     context.read<FoodLogBloc>().add(MealLogUpdated(params));
   }
 
@@ -198,7 +139,6 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
             onPressed: () {
               Navigator.pop(dialogContext);
               if (!mounted) return;
-              _reloadAfterMutation = true;
               context.read<FoodLogBloc>().add(
                 MealLogDeleted(uid: uid, mealLogId: log.mealLogId, date: _date),
               );
@@ -213,18 +153,17 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
   void _repeatYesterday() {
     final uid = _uid;
     if (uid == null) return;
-    _reloadAfterMutation = true;
     context.read<FoodLogBloc>().add(YesterdayRepeated(uid: uid));
   }
 
-  Future<void> _openSearch() async {
+  Future<void> _openSearch(FoodLogDay? day) async {
     final uid = _uid;
     if (uid == null) return;
     await Routing.routePush(
       FoodSearchScreen(
         uid: uid,
         logDate: _date,
-        spentEgp: estimatedCostForLogs(_logs, _foods),
+        spentEgp: day?.spentEgp ?? 0,
       ),
       context,
     );
@@ -270,21 +209,23 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
     // Macro goals come from the user's profile (ProfileBloc), not from the
     // dietary preferences document.
     final goals = metrics?.macroTargets;
-    final targetKcal = goals?.calories.toDouble();
-    final targetProtein = goals?.proteinG.toDouble();
-    final targetCarbs = goals?.carbsG.toDouble();
-    final targetFat = goals?.fatG.toDouble();
-    final consumed = _logs.isEmpty ? _totals : macrosForLogs(_logs, _foods);
-    final spent = estimatedCostForLogs(_logs, _foods);
 
     return BlocConsumer<FoodLogBloc, FoodLogState>(
       listener: (context, state) => _onFoodLogState(state),
       builder: (context, state) {
-        if (!_terminal && (state is FoodLogLoading || state is FoodLogEmpty)) {
+        final day = switch (state) {
+          FoodLogLoaded(:final day) => day,
+          FoodLogEmpty(:final day) => day,
+          _ => null,
+        };
+        if (day == null && state is! FoodLogError) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
+
+        final logs = day?.logs ?? const <MealLog>[];
+        final consumed = day?.totals ?? MacroNutrients.zero;
 
         return Scaffold(
           appBar: AppBar(
@@ -324,13 +265,13 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
                 const SizedBox(height: 12),
                 NutritionSummaryCard(
                   consumed: consumed,
-                  targetKcal: targetKcal,
-                  targetProteinG: targetProtein,
-                  targetCarbsG: targetCarbs,
-                  targetFatG: targetFat,
+                  targetKcal: goals?.calories.toDouble(),
+                  targetProteinG: goals?.proteinG.toDouble(),
+                  targetCarbsG: goals?.carbsG.toDouble(),
+                  targetFatG: goals?.fatG.toDouble(),
                   budgetEgp: prefs?.budgetEgp,
-                  spentEgp: spent,
-                  logCount: _logs.length,
+                  spentEgp: day?.spentEgp ?? 0,
+                  logCount: logs.length,
                 ),
                 const SizedBox(height: 18),
                 const SectionTitle(title: 'QUICK ACTIONS'),
@@ -342,7 +283,7 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
                         icon: Icons.search,
                         title: 'Food database',
                         subtitle: 'Search Egyptian foods and log a portion.',
-                        onTap: _openSearch,
+                        onTap: () => _openSearch(day),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -383,18 +324,18 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
                 const SizedBox(height: 18),
                 SectionTitle(
                   title: 'MEALS',
-                  trailing: '${_logs.length} LOGGED',
+                  trailing: '${logs.length} LOGGED',
                 ),
                 const SizedBox(height: 8),
-                if (_logs.isEmpty)
-                  _EmptyMeals(onSearch: _openSearch)
+                if (logs.isEmpty)
+                  _EmptyMeals(onSearch: () => _openSearch(day))
                 else
-                  ..._mealGroups(),
+                  ..._mealGroups(day!),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
-                    onPressed: _openSearch,
+                    onPressed: () => _openSearch(day),
                     icon: const Icon(Icons.add),
                     label: const Text('ADD FOOD'),
                   ),
@@ -419,36 +360,21 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
     );
   }
 
-  List<Widget> _mealGroups() {
+  List<Widget> _mealGroups(FoodLogDay day) {
     final text = Theme.of(context).textTheme;
     final cs = Theme.of(context).colorScheme;
-    final groups = <MealType, List<MealLog>>{};
-    for (final log in _logs) {
-      groups.putIfAbsent(log.mealType, () => []).add(log);
-    }
-    final types = groups.keys.toList()
-      ..sort((a, b) => mealTypeOrder(a).compareTo(mealTypeOrder(b)));
 
     final widgets = <Widget>[];
-    for (final type in types) {
-      final logs = groups[type]!;
-      final kcal = logs.fold<double>(
-        0,
-        (sum, log) =>
-            sum +
-            (_foods[log.foodId] == null
-                ? log.computedKcal
-                : kcalFor(_foods[log.foodId]!, log.grams)),
-      );
+    for (final group in day.mealGroups) {
       widgets.add(
         Padding(
           padding: const EdgeInsets.only(top: 10, bottom: 6),
           child: Row(
             children: [
-              Icon(mealTypeIcon(type), size: 17, color: cs.primary),
+              Icon(mealTypeIcon(group.mealType), size: 17, color: cs.primary),
               const SizedBox(width: 6),
               Text(
-                mealTypeLabel(type).toUpperCase(),
+                mealTypeLabel(group.mealType).toUpperCase(),
                 style: text.labelSmall!.copyWith(
                   color: cs.onSurfaceVariant,
                   letterSpacing: 1,
@@ -456,21 +382,21 @@ class _NutritionDashboardScreenState extends State<NutritionDashboardScreen> {
               ),
               const Spacer(),
               Text(
-                '${kcal.round()} kcal',
+                '${group.kcal.round()} kcal',
                 style: text.labelSmall!.copyWith(color: cs.onSurfaceVariant),
               ),
             ],
           ),
         ),
       );
-      for (final log in logs) {
+      for (final log in group.logs) {
         widgets.add(
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: MealLogCard(
               log: log,
-              food: _foods[log.foodId],
-              onEdit: () => _editLog(log),
+              food: day.foods[log.foodId],
+              onEdit: () => _editLog(log, day.foods[log.foodId]),
               onDelete: () => _deleteLog(log),
             ),
           ),

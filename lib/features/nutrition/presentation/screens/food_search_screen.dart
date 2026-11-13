@@ -38,7 +38,6 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   final FoodSearchBloc _bloc = sl<FoodSearchBloc>();
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final Set<String> _categories = {};
   Timer? _debounce;
   String? _selectedCategory;
 
@@ -121,18 +120,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
         appBar: AppBar(
           title: Text('Food database', style: text.headlineMedium),
         ),
-        body: BlocConsumer<FoodSearchBloc, FoodSearchState>(
-          listener: (context, state) {
-            if (state is FoodSearchLoaded) {
-              final found = state.foods
-                  .map((food) => food.category.trim())
-                  .where((category) => category.isNotEmpty)
-                  .toSet();
-              if (found.difference(_categories).isNotEmpty) {
-                setState(() => _categories.addAll(found));
-              }
-            }
-          },
+        body: BlocBuilder<FoodSearchBloc, FoodSearchState>(
           builder: (context, state) {
             final query = switch (state) {
               FoodSearchLoaded(:final query) => query,
@@ -140,6 +128,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
               FoodSearchEmpty(:final query) => query,
               _ => '',
             };
+            final categories = state.categories;
 
             return Column(
               children: [
@@ -187,7 +176,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
                       ],
                     ),
                   ),
-                if (_categories.isNotEmpty)
+                if (categories.isNotEmpty)
                   SizedBox(
                     height: 42,
                     child: ListView(
@@ -199,7 +188,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
                           selected: _selectedCategory == null,
                           onTap: () => _selectCategory(null),
                         ),
-                        for (final category in _categories)
+                        for (final category in categories)
                           _CategoryChip(
                             label: category.toUpperCase(),
                             selected: _selectedCategory == category,

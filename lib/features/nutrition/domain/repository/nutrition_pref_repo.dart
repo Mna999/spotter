@@ -11,7 +11,8 @@ abstract class NutritionPrefRepo {
   Future<Either<Failure, DietaryPreferences>> updateExclusions({
     required String uid,
     required Set<String> excludedFoodIds,
-    required String prefsId
+    required String prefsId,
+    Set<String>? excludedCategories,
   });
   Future<Either<Failure, DietaryPreferences>> update({
     required String uid,

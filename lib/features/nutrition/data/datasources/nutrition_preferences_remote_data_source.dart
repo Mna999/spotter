@@ -23,6 +23,7 @@ abstract class NutritionPreferencesRemoteDataSource {
     required String uid,
     required Set<String> excludedFoodIds,
     required String prefsId,
+    Set<String>? excludedCategories,
   });
 
   /// Update partial preferences
@@ -95,6 +96,7 @@ class NutritionPreferencesRemoteDataSourceImpl
     required String uid,
     required String prefsId,
     required Set<String> excludedFoodIds,
+    Set<String>? excludedCategories,
   }) async {
     try {
       final docRef = _firestore
@@ -103,10 +105,15 @@ class NutritionPreferencesRemoteDataSourceImpl
           .collection('dietaryPreferences')
           .doc(_docId(uid: uid, prefsId: prefsId));
 
-      await docRef.set({
+      final partial = <String, dynamic>{
         'excludedFoodIds': excludedFoodIds.toList(),
         'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      };
+      if (excludedCategories != null) {
+        partial['excludedCategories'] = excludedCategories.toList();
+      }
+
+      await docRef.set(partial, SetOptions(merge: true));
 
       // Get updated document
       final doc = await docRef.get();

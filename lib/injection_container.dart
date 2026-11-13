@@ -40,6 +40,8 @@ import 'package:spotter/features/nutrition/domain/repository/meal_log_repo.dart'
 import 'package:spotter/features/nutrition/domain/repository/meal_plan_repo.dart';
 import 'package:spotter/features/nutrition/domain/repository/nutrition_pref_repo.dart';
 import 'package:spotter/features/nutrition/domain/usecases/add_meal_entry_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/build_meal_plan_totals_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/commit_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/create_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/delete_meal_log_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/delete_meal_entry_usecase.dart';
@@ -47,8 +49,13 @@ import 'package:spotter/features/nutrition/domain/usecases/delete_meal_plan_usec
 import 'package:spotter/features/nutrition/domain/usecases/generate_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_daily_totals_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_dietary_preferences_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_food_log_day_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_food_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_foods_by_ids_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_logged_meal_entries_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_meal_plan_entries_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_meal_plans_summary_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_food_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_meal_entries_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/list_meal_logs_for_date_usecase.dart';
@@ -60,8 +67,10 @@ import 'package:spotter/features/nutrition/domain/usecases/save_dietary_preferen
 import 'package:spotter/features/nutrition/domain/usecases/save_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/search_food_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/update_exclusions_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/update_meal_entry_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/update_meal_log_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/update_meal_plan_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/update_planner_settings_usecase.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/food_log_bloc/food_log_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/food_search_bloc/food_search_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/meal_plan_bloc/meal_plan_bloc.dart';
@@ -286,11 +295,10 @@ Future<void> initNutrition() async {
   sl.registerFactory(
     () => FoodLogBloc(
       logFood: sl(),
-      listMealLogsForDate: sl(),
-      getDailyTotals: sl(),
+      repeatYesterday: sl(),
+      getFoodLogDay: sl(),
       updateMealLog: sl(),
       deleteMealLog: sl(),
-      repeatYesterday: sl(),
     ),
   );
 
@@ -305,6 +313,7 @@ Future<void> initNutrition() async {
       getPreferences: sl(),
       savePreferences: sl(),
       updateExclusions: sl(),
+      updatePlannerSettings: sl(),
     ),
   );
 
@@ -320,8 +329,13 @@ Future<void> initNutrition() async {
       deleteMealPlan: sl(),
       listRecentMealPlans: sl(),
       addMealEntry: sl(),
+      updateMealEntry: sl(),
       deleteMealEntry: sl(),
-      listMealEntries: sl(),
+      getMealPlanEntries: sl(),
+      getMealPlansSummary: sl(),
+      buildMealPlanTotals: sl(),
+      commitMealPlan: sl(),
+      updateExclusions: sl(),
     ),
   );
 
@@ -336,12 +350,23 @@ Future<void> initNutrition() async {
   );
   sl.registerLazySingleton(() => DeleteMealLogUseCase(mealLogRepo: sl()));
   sl.registerLazySingleton(() => RepeatYesterdayUseCase(mealLogRepo: sl()));
+  sl.registerLazySingleton(() => GetFoodsByIdsUseCase(foodRepo: sl()));
+  sl.registerLazySingleton(
+    () => GetFoodLogDayUseCase(
+      mealLogRepo: sl(),
+      getFoodsByIds: sl(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => GetLoggedMealEntriesUseCase(mealLogRepo: sl()),
+  );
 
   // Register Use Cases for Food Search
   sl.registerLazySingleton(() => SearchFoodUsecase(foodRepo: sl()));
   sl.registerLazySingleton(() => GetFoodUsecase(foodRepo: sl()));
   sl.registerLazySingleton(() => ListFoodsUseCase(foodRepo: sl()));
   sl.registerLazySingleton(() => ListMealEntriesUseCase(sl()));
+
   // Register Use Cases for Nutrition Preferences
   sl.registerLazySingleton(
     () => GetDietaryPreferencesUseCase(nutritionPrefRepo: sl()),
@@ -351,6 +376,9 @@ Future<void> initNutrition() async {
   );
   sl.registerLazySingleton(
     () => UpdateExclusionsUseCase(nutritionPrefRepo: sl()),
+  );
+  sl.registerLazySingleton(
+    () => UpdatePlannerSettingsUseCase(nutritionPrefRepo: sl()),
   );
 
   // Register Use Cases for Meal Plan
@@ -373,7 +401,33 @@ Future<void> initNutrition() async {
     ),
   );
   sl.registerLazySingleton(() => AddMealEntryUseCase(mealEntryRepo: sl()));
+  sl.registerLazySingleton(() => UpdateMealEntryUseCase(mealEntryRepo: sl()));
   sl.registerLazySingleton(() => DeleteMealEntryUseCase(mealEntryRepo: sl()));
+  sl.registerLazySingleton(
+    () => GetMealPlanEntriesUseCase(
+      mealEntryRepo: sl(),
+      getFoodsByIds: sl(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => GetMealPlansSummaryUseCase(
+      mealEntryRepo: sl(),
+      getFoodsByIds: sl(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => BuildMealPlanTotalsUseCase(
+      mealEntryRepo: sl(),
+      mealPlanRepo: sl(),
+      getFoodsByIds: sl(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => CommitMealPlanUseCase(
+      mealPlanRepo: sl(),
+      getMealPlanEntries: sl(),
+    ),
+  );
 
   // Register Repositories
   sl.registerLazySingleton<FoodRepo>(

@@ -78,13 +78,14 @@ class NutritionPrefRepoImpl implements NutritionPrefRepo {
     required String uid,
     required String prefsId,
     required Set<String> excludedFoodIds,
-
+    Set<String>? excludedCategories,
   }) async {
     try {
       final updatedPrefs = await remoteDataSource.updateExclusions(
         uid: uid,
         excludedFoodIds: excludedFoodIds,
-        prefsId: prefsId
+        prefsId: prefsId,
+        excludedCategories: excludedCategories,
       );
       return Right(updatedPrefs);
     } on ServerException catch (e) {

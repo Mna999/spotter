@@ -4,17 +4,17 @@ import 'package:spotter/core/app_dialog.dart';
 import 'package:spotter/core/route/routing.dart';
 import 'package:spotter/core/snack_bar_builder.dart';
 import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
-import 'package:spotter/features/nutrition/domain/entities/food_item.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_entry.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_log.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
+import 'package:spotter/features/nutrition/domain/entities/meal_plan_entries.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_type.dart';
 import 'package:spotter/features/nutrition/domain/entities/plan_status.dart';
 import 'package:spotter/features/nutrition/domain/params/date_params.dart';
 import 'package:spotter/features/nutrition/domain/params/log_food_params.dart';
 import 'package:spotter/features/nutrition/domain/params/meal_entry_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/update_meal_plan_params.dart';
-import 'package:spotter/features/nutrition/domain/usecases/list_meal_logs_for_date_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_logged_meal_entries_usecase.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/food_log_bloc/food_log_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/meal_plan_bloc/meal_plan_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/nutrition_preferences_bloc/nutrition_preferences_bloc.dart';
@@ -45,8 +45,7 @@ class MealPlanDetailScreen extends StatefulWidget {
 class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   final MealPlanBloc _bloc = sl<MealPlanBloc>();
   late MealPlan _plan = widget.plan;
-  List<MealEntry> _entries = const [];
-  Map<String, FoodItem> _foods = const {};
+  MealPlanEntries _data = const MealPlanEntries();
   bool _loadingEntries = true;
   bool _savingPlan = false;
   bool _autoSavingDraft = false;
@@ -61,7 +60,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
 
   /// Today's logs created from a plan entry, keyed by the source entry id.
   /// Keeping the log lets the user undo a "LOG" action from this screen.
-  final Map<String, MealLog?> _loggedByEntry = {};
+  final Map<String, MealLog> _loggedByEntry = {};
 
   bool get _isDraft => _plan.mealPlanId.trim().isEmpty;
 
@@ -86,16 +85,11 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   /// entry id on the log lets us restore the "LOGGED" state after the screen
   /// is popped and opened again.
   Future<void> _loadLoggedEntries() async {
-    final result = await sl<ListMealLogsForDateUseCase>()(
+    final result = await sl<GetLoggedMealEntriesUseCase>()(
       DateParams(uid: widget.uid, date: dateOnly(DateTime.now())),
     );
     if (!mounted) return;
-    result.fold((_) {}, (logs) {
-      final logged = <String, MealLog?>{};
-      for (final log in logs) {
-        final entryId = log.sourceMealEntryId;
-        if (entryId != null && entryId.isNotEmpty) logged[entryId] = log;
-      }
+    result.fold((_) {}, (logged) {
       setState(() {
         _loggedByEntry
           ..clear()
@@ -124,8 +118,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     final planId = _plan.mealPlanId.trim();
     if (planId.isEmpty) {
       setState(() {
-        _entries = const [];
-        _foods = const {};
+        _data = const MealPlanEntries();
         _loadingEntries = false;
         _entryError = null;
       });
@@ -161,8 +154,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
       if (!_loadingEntries) setState(() => _loadingEntries = true);
     } else if (state is MealEntriesLoaded) {
       setState(() {
-        _entries = state.entries;
-        _foods = state.foods;
+        _data = state.data;
         _loadingEntries = false;
         _entryError = null;
       });
@@ -259,12 +251,14 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     if (!finished) return;
 
     if (loggingEntryId != null) {
-      final log = state is FoodLogLoaded && state.logs.isNotEmpty
-          ? state.logs.first
-          : null;
+      final log = state is FoodLogLoaded ? state.latestLog : null;
       setState(() {
         _loggingEntryId = null;
-        _loggedByEntry[loggingEntryId] = log;
+        if (log == null) {
+          _loggedByEntry.remove(loggingEntryId);
+        } else {
+          _loggedByEntry[loggingEntryId] = log;
+        }
       });
       SnackBarBuilder.showSnackBar(
         context,
@@ -299,21 +293,14 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
 
   void _savePlan() {
     if (_savingPlan) return;
-    // Persist the totals of the current entries so the plan list and the
-    // next visit show up-to-date numbers.
-    final consumed = macrosForEntries(_entries, _foods);
-    final estimatedCost = estimatedCostForEntries(_entries, _foods);
-    final plan = copyMealPlan(
-      _plan,
-      totalKcal: consumed.energyKcal > 0
-          ? consumed.energyKcal
-          : _plan.totalKcal,
-      costEgp: estimatedCost > 0 ? estimatedCost : _plan.costEgp,
-      // Saving is an explicit commit: the plan stops being a draft.
-      status: PlanStatus.committed,
-    );
     setState(() => _savingPlan = true);
-    _bloc.add(PlanSaved(uid: widget.uid, mealPlan: plan));
+    // Saving is an explicit commit: the plan stops being a draft.
+    _bloc.add(
+      PlanSaved(
+        uid: widget.uid,
+        mealPlan: _plan.copyWith(status: PlanStatus.committed),
+      ),
+    );
   }
 
   void _deletePlan() {
@@ -429,7 +416,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   /// Deletes a single unlogged food entry from this meal plan.
   void _deleteEntry(MealEntry entry) {
     if (_isDraft) return;
-    final food = _foods[entry.foodId];
+    final food = _data.foods[entry.foodId];
     final foodName = food?.nameEn ?? 'this food';
     final mealName = mealTypeLabel(entry.mealType);
     showAppDialog<void>(
@@ -534,8 +521,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
     final input = await _showEditPlanDialog();
     if (input == null || !mounted) return;
 
-    final updated = copyMealPlan(
-      _plan,
+    final updated = _plan.copyWith(
       name: input.name,
       date: input.date,
       budgetEgp: input.budget ?? 0,
@@ -668,13 +654,11 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
         ? profileState.bodyMetrics
         : null;
     final goals = metrics?.macroTargets;
-    final consumed = macrosForEntries(_entries, _foods);
-    final estimatedCost = estimatedCostForEntries(_entries, _foods);
     // Once entries exist they are the source of truth; a saved plan's stored
     // cost is only used while entries are still loading.
-    final spent = _entries.isEmpty
-        ? (_plan.costEgp > 0 ? _plan.costEgp : estimatedCost)
-        : estimatedCost;
+    final spent = _data.isEmpty
+        ? (_plan.costEgp > 0 ? _plan.costEgp : _data.spentEgp)
+        : _data.spentEgp;
     final targetKcal =
         goals?.calories.toDouble() ??
         (_plan.totalKcal > 0 ? _plan.totalKcal : null);
@@ -722,20 +706,20 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
                     _PlanHeader(plan: _plan, isDraft: _isDraft),
                     const SizedBox(height: 12),
                     NutritionSummaryCard(
-                      consumed: consumed,
+                      consumed: _data.totals,
                       targetKcal: targetKcal,
                       targetProteinG: goals?.proteinG.toDouble(),
                       targetCarbsG: goals?.carbsG.toDouble(),
                       targetFatG: goals?.fatG.toDouble(),
                       budgetEgp: budget,
                       spentEgp: spent,
-                      logCount: _entries.length,
+                      logCount: _data.itemCount,
                       countLabel: 'in this plan',
                     ),
                     const SizedBox(height: 18),
                     SectionTitle(
                       title: 'PLANNED MEALS',
-                      trailing: '${_entries.length} ITEMS',
+                      trailing: '${_data.itemCount} ITEMS',
                     ),
                     const SizedBox(height: 8),
                     if (_loadingEntries)
@@ -751,7 +735,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
                         isError: true,
                         onAction: _loadEntries,
                       )
-                    else if (_entries.isEmpty)
+                    else if (_data.isEmpty)
                       NutritionMessageView(
                         title: 'No foods planned yet',
                         message: _isDraft
@@ -813,16 +797,11 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
   List<Widget> _entryGroups() {
     final text = Theme.of(context).textTheme;
     final cs = Theme.of(context).colorScheme;
-    final groups = <MealType, List<MealEntry>>{};
-    for (final entry in _entries) {
-      groups.putIfAbsent(entry.mealType, () => []).add(entry);
-    }
-    final types = groups.keys.toList()
-      ..sort((a, b) => mealTypeOrder(a).compareTo(mealTypeOrder(b)));
 
     final widgets = <Widget>[];
-    for (final type in types) {
-      final entries = groups[type]!..sort((a, b) => a.order.compareTo(b.order));
+    for (final group in _data.mealGroups) {
+      final type = group.mealType;
+      final entries = group.entries;
       final unloggedEntries = entries
           .where((e) => !_loggedByEntry.containsKey(e.mealEntryId))
           .toList();
@@ -875,7 +854,7 @@ class _MealPlanDetailScreenState extends State<MealPlanDetailScreen> {
             padding: const EdgeInsets.only(bottom: 8),
             child: MealEntryCard(
               entry: entry,
-              food: _foods[entry.foodId],
+              food: _data.foods[entry.foodId],
               isLogging: _loggingEntryId == entry.mealEntryId,
               isLogged: isLogged,
               isUndoing: _undoingEntryId == entry.mealEntryId,

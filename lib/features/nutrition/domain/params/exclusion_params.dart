@@ -5,8 +5,21 @@ class ExclusionParams extends Equatable {
   final String prefsId;
   final Set<String> excludedFoodIds;
 
-  const ExclusionParams({required this.uid, required this.excludedFoodIds,required this.prefsId});
+  /// Null leaves the stored categories untouched.
+  final Set<String>? excludedCategories;
+
+  const ExclusionParams({
+    required this.uid,
+    required this.excludedFoodIds,
+    required this.prefsId,
+    this.excludedCategories,
+  });
 
   @override
-  List<Object?> get props => [uid, excludedFoodIds,prefsId];
+  List<Object?> get props => [
+    uid,
+    excludedFoodIds,
+    prefsId,
+    excludedCategories,
+  ];
 }

@@ -17,4 +17,12 @@ enum MealType {
       orElse: () => MealType.snack,
     );
   }
+
+  /// The meal that best matches a 24-hour clock [hour].
+  static MealType forHour(int hour) {
+    if (hour < 11) return MealType.breakfast;
+    if (hour < 16) return MealType.lunch;
+    if (hour < 21) return MealType.dinner;
+    return MealType.snack;
+  }
 }

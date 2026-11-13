@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotter/core/snack_bar_builder.dart';
-import 'package:spotter/features/nutrition/domain/entities/dietary_preferences.dart';
+import 'package:spotter/features/nutrition/domain/params/food_ids_params.dart';
+import 'package:spotter/features/nutrition/domain/usecases/get_foods_by_ids_usecase.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/nutrition_preferences_bloc/nutrition_preferences_bloc.dart';
-import 'package:spotter/features/nutrition/presentation/utils/nutrition_ui_helpers.dart';
 import 'package:spotter/features/workouts/presentation/widgets/section_title.dart';
+import 'package:spotter/injection_container.dart';
 
 /// Manages the dietary guardrails used by the meal planner. Exclusions are
 /// stored as free-form categories (and optional catalogue food ids).
@@ -68,12 +69,16 @@ class _DietaryExclusionsScreenState extends State<DietaryExclusionsScreen> {
 
   Future<void> _loadFoodNames() async {
     if (_foodIds.isEmpty) return;
-    final foods = await fetchFoodsById(_foodIds);
+    final result = await sl<GetFoodsByIdsUseCase>()(
+      FoodIdsParams(Set<String>.from(_foodIds)),
+    );
     if (!mounted) return;
-    setState(() {
-      for (final entry in foods.entries) {
-        _foodNames[entry.key] = entry.value.nameEn;
-      }
+    result.fold((_) {}, (foods) {
+      setState(() {
+        for (final entry in foods.entries) {
+          _foodNames[entry.key] = entry.value.nameEn;
+        }
+      });
     });
   }
 
@@ -117,31 +122,15 @@ class _DietaryExclusionsScreenState extends State<DietaryExclusionsScreen> {
 
   void _save() {
     if (_saving) return;
-    final bloc = context.read<NutritionPreferencesBloc>();
-    final prefs = bloc.state.preferences;
-    final base =
-        prefs ??
-        DietaryPreferences(
-          uid: widget.uid,
-          prefsId: widget.uid,
-          excludedFoodIds: const <String>{},
-          excludedCategories: const <String>{},
-          schemaVersion: 1,
-          createdAt: DateTime.now(),
-        );
-    final updated = DietaryPreferences(
-      uid: base.uid,
-      prefsId: base.prefsId,
-      excludedFoodIds: Set<String>.from(_foodIds),
-      excludedCategories: Set<String>.from(_categories),
-      budgetEgp: base.budgetEgp,
-      dietTag: base.dietTag,
-      schemaVersion: base.schemaVersion,
-      createdAt: base.createdAt,
-      updatedAt: DateTime.now(),
-    );
     setState(() => _saving = true);
-    bloc.add(NutritionPreferencesSaved(uid: widget.uid, preferences: updated));
+    context.read<NutritionPreferencesBloc>().add(
+      NutritionExclusionsUpdated(
+        uid: widget.uid,
+        prefsId: widget.uid,
+        excludedFoodIds: Set<String>.from(_foodIds),
+        excludedCategories: Set<String>.from(_categories),
+      ),
+    );
   }
 
   @override

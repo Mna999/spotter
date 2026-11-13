@@ -10,7 +10,6 @@ class MealPlanInitial extends MealPlanState {
   const MealPlanInitial();
 }
 
-
 class MealEntriesLoading extends MealPlanState {
   const MealEntriesLoading();
 
@@ -19,13 +18,18 @@ class MealEntriesLoading extends MealPlanState {
 }
 
 class MealEntriesLoaded extends MealPlanState {
-  final List<MealEntry> entries;
-  final Map<String, FoodItem> foods;
+  final MealPlanEntries data;
 
-  const MealEntriesLoaded({required this.entries, required this.foods});
+  const MealEntriesLoaded({required this.data});
+
+  List<MealEntry> get entries => data.entries;
+  Map<String, FoodItem> get foods => data.foods;
+  MacroNutrients get totals => data.totals;
+  double get spentEgp => data.spentEgp;
+  List<MealEntryGroup> get mealGroups => data.mealGroups;
 
   @override
-  List<Object?> get props => [entries, foods];
+  List<Object?> get props => [data];
 }
 
 class MealEntriesError extends MealPlanState {
@@ -36,6 +40,7 @@ class MealEntriesError extends MealPlanState {
   @override
   List<Object?> get props => [message];
 }
+
 class MealPlanEmpty extends MealPlanState {
   final String? message;
   const MealPlanEmpty({this.message});
@@ -50,16 +55,22 @@ class MealPlanLoading extends MealPlanState {
 class MealPlanLoaded extends MealPlanState {
   final MealPlan? mealPlan;
   final List<MealPlan> plans;
+
+  /// Aggregated totals of every listed plan.
+  final MealPlanSummary summary;
   final List<MealEntry> entries;
   final String? message;
+
   const MealPlanLoaded({
     this.mealPlan,
     this.plans = const [],
+    this.summary = const MealPlanSummary(),
     this.entries = const [],
     this.message,
   });
+
   @override
-  List<Object?> get props => [mealPlan, plans, entries, message];
+  List<Object?> get props => [mealPlan, plans, summary, entries, message];
 }
 
 class MealPlanSaved extends MealPlanState {

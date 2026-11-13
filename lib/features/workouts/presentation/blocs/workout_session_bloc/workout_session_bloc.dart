@@ -370,6 +370,56 @@ class WorkoutSessionBloc
 
             _startRestCountdown(event.restSec);
           });
+        case WorkoutResting(
+              :final workout,
+              :final plannedExercises,
+              :final completedSets,
+              :final currentIndex,
+              :final currentSetNumber,
+              :final restRemaining,
+            )
+            when currentIndex < plannedExercises.length:
+          final currentExercise = plannedExercises[currentIndex];
+
+          emit(const WorkoutLoading());
+
+          final res = await logSetUseCase(
+            LogSetParams(
+              workoutId: event.workoutId,
+              uid: event.uid,
+              exerciseId: event.exerciseId,
+              plannedExerciseId: currentExercise.plannedExerciseId,
+              order: event.order,
+              reps: event.reps,
+              load: event.load,
+              timeUnderTension: event.timeUnderTension,
+              restSec: event.restSec,
+            ),
+          );
+
+          res.fold((failure) => emit(WorkoutError(message: failure.message)), (
+            setSummary,
+          ) {
+            final (newIndex, newSetNumber) = _advancePosition(
+              plannedExercises,
+              currentIndex,
+              currentSetNumber,
+            );
+
+            emit(
+              WorkoutResting(
+                workout: workout,
+                plannedExercises: plannedExercises,
+                completedSets: [...completedSets, setSummary],
+                currentIndex: newIndex,
+                currentSetNumber: newSetNumber,
+                restRemaining: Duration(seconds: event.restSec),
+                lastSet: setSummary,
+              ),
+            );
+
+            _startRestCountdown(event.restSec);
+          });
         default:
           throw StateError(
             'Cannot complete a set from state ${previous.runtimeType}',

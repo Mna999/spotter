@@ -12,6 +12,12 @@ abstract class FoodRepo {
 
   Future<Either<Failure, FoodItem?>> getById({required String foodId});
 
+  /// Loads several foods at once, keyed by id. Foods that do not exist are
+  /// simply omitted from the result.
+  Future<Either<Failure, Map<String, FoodItem>>> getByIds({
+    required Set<String> foodIds,
+  });
+
   Future<Either<Failure, List<FoodItem>>> list({
     required FoodFilterParams filter,
   });

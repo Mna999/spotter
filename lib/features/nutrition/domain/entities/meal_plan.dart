@@ -51,6 +51,31 @@ class MealPlan extends Equatable {
     return budget != null && costEgp > budget;
   }
 
+  MealPlan copyWith({
+    String? mealPlanId,
+    String? name,
+    DateTime? date,
+    double? budgetEgp,
+    double? totalKcal,
+    double? costEgp,
+    PlanStatus? status,
+    DateTime? updatedAt,
+  }) {
+    return MealPlan(
+      mealPlanId: mealPlanId ?? this.mealPlanId,
+      uid: uid,
+      name: name ?? this.name,
+      date: date ?? this.date,
+      budgetEgp: budgetEgp ?? this.budgetEgp,
+      totalKcal: totalKcal ?? this.totalKcal,
+      costEgp: costEgp ?? this.costEgp,
+      status: status ?? this.status,
+      schemaVersion: schemaVersion,
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? DateTime.now(),
+    );
+  }
+
   @override
   List<Object?> get props => [
     mealPlanId,

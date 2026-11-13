@@ -34,13 +34,37 @@ class NutritionExclusionsUpdated extends NutritionPreferencesEvent {
   final String uid;
   final String prefsId;
   final Set<String> excludedFoodIds;
+  final Set<String>? excludedCategories;
 
   const NutritionExclusionsUpdated({
     required this.uid,
     required this.excludedFoodIds,
-    required this.prefsId
+    required this.prefsId,
+    this.excludedCategories,
   });
 
   @override
-  List<Object?> get props => [uid, excludedFoodIds,prefsId];
+  List<Object?> get props => [
+    uid,
+    excludedFoodIds,
+    prefsId,
+    excludedCategories,
+  ];
+}
+
+class NutritionPlannerSettingsUpdated extends NutritionPreferencesEvent {
+  final String uid;
+  final String prefsId;
+  final double? budgetEgp;
+  final String? dietTag;
+
+  const NutritionPlannerSettingsUpdated({
+    required this.uid,
+    required this.prefsId,
+    this.budgetEgp,
+    this.dietTag,
+  });
+
+  @override
+  List<Object?> get props => [uid, prefsId, budgetEgp, dietTag];
 }

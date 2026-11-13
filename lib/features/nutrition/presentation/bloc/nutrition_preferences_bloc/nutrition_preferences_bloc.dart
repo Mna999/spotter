@@ -4,9 +4,11 @@ import 'package:spotter/features/nutrition/domain/entities/dietary_preferences.d
 import 'package:spotter/features/nutrition/domain/params/exclusion_params.dart';
 import 'package:spotter/features/nutrition/domain/params/prefs_id_params.dart';
 import 'package:spotter/features/nutrition/domain/params/save_dietary_pref_params.dart';
+import 'package:spotter/features/nutrition/domain/params/update_planner_settings_params.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_dietary_preferences_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/save_dietary_preferences_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/update_exclusions_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/update_planner_settings_usecase.dart';
 
 part 'nutrition_preferences_event.dart';
 part 'nutrition_preferences_state.dart';
@@ -18,15 +20,18 @@ class NutritionPreferencesBloc
   final GetDietaryPreferencesUseCase getPreferences;
   final SaveDietaryPreferencesUseCase savePreferences;
   final UpdateExclusionsUseCase updateExclusions;
+  final UpdatePlannerSettingsUseCase updatePlannerSettings;
 
   NutritionPreferencesBloc({
     required this.getPreferences,
     required this.savePreferences,
     required this.updateExclusions,
+    required this.updatePlannerSettings,
   }) : super(const NutritionPreferencesInitial()) {
     on<NutritionPreferencesRequested>(_onRequested);
     on<NutritionPreferencesSaved>(_onSaved);
     on<NutritionExclusionsUpdated>(_onExclusionsUpdated);
+    on<NutritionPlannerSettingsUpdated>(_onPlannerSettingsUpdated);
   }
 
   Future<void> _onRequested(
@@ -66,7 +71,12 @@ class NutritionPreferencesBloc
   ) async {
     emit(const NutritionPreferencesLoading());
     final result = await updateExclusions(
-      ExclusionParams(uid: event.uid, excludedFoodIds: event.excludedFoodIds,prefsId: event.prefsId),
+      ExclusionParams(
+        uid: event.uid,
+        excludedFoodIds: event.excludedFoodIds,
+        excludedCategories: event.excludedCategories,
+        prefsId: event.prefsId,
+      ),
     );
     result.fold(
       (failure) => emit(NutritionPreferencesError(message: failure.message)),
@@ -74,6 +84,30 @@ class NutritionPreferencesBloc
         NutritionPreferencesSavedState(
           preferences: prefs,
           message: 'Dietary exclusions updated.',
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onPlannerSettingsUpdated(
+    NutritionPlannerSettingsUpdated event,
+    Emitter<NutritionPreferencesState> emit,
+  ) async {
+    emit(const NutritionPreferencesLoading());
+    final result = await updatePlannerSettings(
+      UpdatePlannerSettingsParams(
+        uid: event.uid,
+        prefsId: event.prefsId,
+        budgetEgp: event.budgetEgp,
+        dietTag: event.dietTag,
+      ),
+    );
+    result.fold(
+      (failure) => emit(NutritionPreferencesError(message: failure.message)),
+      (prefs) => emit(
+        NutritionPreferencesSavedState(
+          preferences: prefs,
+          message: 'Preferences saved.',
         ),
       ),
     );

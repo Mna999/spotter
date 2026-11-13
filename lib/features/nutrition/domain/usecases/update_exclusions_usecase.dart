@@ -5,7 +5,7 @@ import 'package:spotter/features/nutrition/domain/entities/dietary_preferences.d
 import 'package:spotter/features/nutrition/domain/params/exclusion_params.dart';
 import 'package:spotter/features/nutrition/domain/repository/nutrition_pref_repo.dart';
 
-/// UPDATE: replace the excluded food ids of a user's preferences.
+/// UPDATE: replace the excluded categories / food ids of a user's preferences.
 class UpdateExclusionsUseCase
     implements UseCase<DietaryPreferences, ExclusionParams> {
   final NutritionPrefRepo nutritionPrefRepo;
@@ -17,7 +17,8 @@ class UpdateExclusionsUseCase
     return nutritionPrefRepo.updateExclusions(
       uid: params.uid,
       excludedFoodIds: params.excludedFoodIds,
-      prefsId: params.prefsId
+      excludedCategories: params.excludedCategories,
+      prefsId: params.prefsId,
     );
   }
 }

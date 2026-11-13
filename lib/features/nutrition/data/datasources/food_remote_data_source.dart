@@ -17,6 +17,9 @@ abstract class FoodRemoteDataSource {
   /// Get a food item by ID
   Future<FoodItem?> getById({required String foodId});
 
+  /// Get several food items by ID in as few queries as possible.
+  Future<List<FoodItem>> getByIds({required Set<String> foodIds});
+
   /// List food items with optional filtering
   Future<List<FoodItem>> list({required FoodFilterParams filter});
 }
@@ -36,6 +39,34 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
 
       final model = FoodItemModel.fromJson(doc.data()!, docId: doc.id);
       return model.toEntity();
+    } on FirebaseException catch (e) {
+      throw ServerException(code: e.code);
+    }
+  }
+
+  @override
+  Future<List<FoodItem>> getByIds({required Set<String> foodIds}) async {
+    if (foodIds.isEmpty) return const <FoodItem>[];
+    final ids = foodIds.toList();
+    // Firestore allows a limited number of values in a `whereIn` clause, so
+    // the ids are fetched in small chunks and merged.
+    const chunkSize = 10;
+    final chunks = <List<String>>[];
+    for (var i = 0; i < ids.length; i += chunkSize) {
+      final end = i + chunkSize < ids.length ? i + chunkSize : ids.length;
+      chunks.add(ids.sublist(i, end));
+    }
+
+    try {
+      final snapshots = await Future.wait(
+        chunks.map(
+          (chunk) => _firestore
+              .collection('foods')
+              .where(FieldPath.documentId, whereIn: chunk)
+              .get(),
+        ),
+      );
+      return snapshots.expand(_toFoods).toList();
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }

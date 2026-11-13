@@ -26,6 +26,10 @@ class FoodSearchBloc extends Bloc<FoodSearchEvent, FoodSearchState> {
   /// Page size used for both browsing and searching.
   static const int _pageSize = 20;
 
+  /// Every category seen so far, so the filter chips survive searches and
+  /// pagination.
+  final Set<String> _categories = <String>{};
+
   FoodSearchBloc({
     required this.searchFood,
     required this.getFood,
@@ -50,22 +54,28 @@ class FoodSearchBloc extends Bloc<FoodSearchEvent, FoodSearchState> {
       add(const FoodListRequested());
       return;
     }
-    emit(FoodSearchLoading(query: query));
+    emit(FoodSearchLoading(query: query, categories: _categories));
     final result = await searchFood(
       SearchParams(query: query, language: language, limit: _pageSize),
     );
     result.fold(
-      (failure) => emit(FoodSearchError(message: failure.message)),
-      (foods) => emit(
-        foods.isEmpty
-            ? FoodSearchEmpty(query: query)
-            : FoodSearchLoaded(
-                foods: foods,
-                query: query,
-                pageSize: _pageSize,
-                hasMore: foods.length >= _pageSize,
-              ),
+      (failure) => emit(
+        FoodSearchError(message: failure.message, categories: _categories),
       ),
+      (foods) {
+        _rememberCategories(foods);
+        emit(
+          foods.isEmpty
+              ? FoodSearchEmpty(query: query, categories: _categories)
+              : FoodSearchLoaded(
+                  foods: foods,
+                  query: query,
+                  pageSize: _pageSize,
+                  hasMore: foods.length >= _pageSize,
+                  categories: _categories,
+                ),
+        );
+      },
     );
   }
 
@@ -74,17 +84,23 @@ class FoodSearchBloc extends Bloc<FoodSearchEvent, FoodSearchState> {
     Emitter<FoodSearchState> emit,
   ) async {
     final previous = state;
-    emit(FoodSearchLoading(query: event.foodId));
+    emit(FoodSearchLoading(query: event.foodId, categories: _categories));
     final result = await getFood(FoodIdParams(foodId: event.foodId));
     result.fold(
-      (failure) => emit(FoodSearchError(message: failure.message)),
+      (failure) => emit(
+        FoodSearchError(message: failure.message, categories: _categories),
+      ),
       (food) => emit(
         food == null
-            ? const FoodSearchError(message: 'Food was not found.')
+            ? FoodSearchError(
+                message: 'Food was not found.',
+                categories: _categories,
+              )
             : FoodSearchLoaded(
                 foods: [food],
                 selectedFood: food,
                 query: event.foodId,
+                categories: _categories,
               ),
       ),
     );
@@ -98,7 +114,7 @@ class FoodSearchBloc extends Bloc<FoodSearchEvent, FoodSearchState> {
     Emitter<FoodSearchState> emit,
   ) async {
     _query = '';
-    emit(const FoodSearchLoading());
+    emit(FoodSearchLoading(categories: _categories));
     final result = await listFoods(
       FoodFilterParams(
         category: category,
@@ -107,16 +123,22 @@ class FoodSearchBloc extends Bloc<FoodSearchEvent, FoodSearchState> {
       ),
     );
     result.fold(
-      (failure) => emit(FoodSearchError(message: failure.message)),
-      (foods) => emit(
-        foods.isEmpty
-            ? const FoodSearchEmpty()
-            : FoodSearchLoaded(
-                foods: foods,
-                pageSize: event.limit,
-                hasMore: foods.length >= event.limit,
-              ),
+      (failure) => emit(
+        FoodSearchError(message: failure.message, categories: _categories),
       ),
+      (foods) {
+        _rememberCategories(foods);
+        emit(
+          foods.isEmpty
+              ? FoodSearchEmpty(categories: _categories)
+              : FoodSearchLoaded(
+                  foods: foods,
+                  pageSize: event.limit,
+                  hasMore: foods.length >= event.limit,
+                  categories: _categories,
+                ),
+        );
+      },
     );
   }
 
@@ -157,6 +179,7 @@ class FoodSearchBloc extends Bloc<FoodSearchEvent, FoodSearchState> {
       // Keep what we already have; stop asking for more on failure.
       (_) => emit(current.copyWith(loadingMore: false, hasMore: false)),
       (foods) {
+        _rememberCategories(foods);
         final merged = [...current.foods];
         final known = merged.map((food) => food.foodId).toSet();
         var added = 0;
@@ -184,5 +207,13 @@ class FoodSearchBloc extends Bloc<FoodSearchEvent, FoodSearchState> {
     category = event.category;
     _query = '';
     add(const FoodListRequested());
+  }
+
+  /// Keeps the category chips in sync with everything the catalogue returned.
+  void _rememberCategories(Iterable<FoodItem> foods) {
+    for (final food in foods) {
+      final value = food.category.trim();
+      if (value.isNotEmpty) _categories.add(value);
+    }
   }
 }

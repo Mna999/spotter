@@ -2,22 +2,37 @@ part of 'food_search_bloc.dart';
 
 abstract class FoodSearchState extends Equatable {
   const FoodSearchState();
+
+  /// Every category seen so far in the catalogue, used to build the filter
+  /// chips without the screen having to accumulate them.
+  Set<String> get categories => const <String>{};
+
   @override
   List<Object?> get props => [];
 }
 
 class FoodSearchEmpty extends FoodSearchState {
   final String query;
-  const FoodSearchEmpty({this.query = ''});
+
   @override
-  List<Object?> get props => [query];
+  final Set<String> categories;
+
+  const FoodSearchEmpty({this.query = '', this.categories = const {}});
+
+  @override
+  List<Object?> get props => [query, categories];
 }
 
 class FoodSearchLoading extends FoodSearchState {
   final String query;
-  const FoodSearchLoading({this.query = ''});
+
   @override
-  List<Object?> get props => [query];
+  final Set<String> categories;
+
+  const FoodSearchLoading({this.query = '', this.categories = const {}});
+
+  @override
+  List<Object?> get props => [query, categories];
 }
 
 class FoodSearchLoaded extends FoodSearchState {
@@ -34,6 +49,9 @@ class FoodSearchLoaded extends FoodSearchState {
   /// True while the next page is being fetched (the list stays visible).
   final bool loadingMore;
 
+  @override
+  final Set<String> categories;
+
   const FoodSearchLoaded({
     required this.foods,
     this.selectedFood,
@@ -41,6 +59,7 @@ class FoodSearchLoaded extends FoodSearchState {
     this.pageSize = 20,
     this.hasMore = false,
     this.loadingMore = false,
+    this.categories = const {},
   });
 
   FoodSearchLoaded copyWith({
@@ -50,6 +69,7 @@ class FoodSearchLoaded extends FoodSearchState {
     int? pageSize,
     bool? hasMore,
     bool? loadingMore,
+    Set<String>? categories,
   }) {
     return FoodSearchLoaded(
       foods: foods ?? this.foods,
@@ -58,6 +78,7 @@ class FoodSearchLoaded extends FoodSearchState {
       pageSize: pageSize ?? this.pageSize,
       hasMore: hasMore ?? this.hasMore,
       loadingMore: loadingMore ?? this.loadingMore,
+      categories: categories ?? this.categories,
     );
   }
 
@@ -69,12 +90,18 @@ class FoodSearchLoaded extends FoodSearchState {
     pageSize,
     hasMore,
     loadingMore,
+    categories,
   ];
 }
 
 class FoodSearchError extends FoodSearchState {
   final String message;
-  const FoodSearchError({required this.message});
+
   @override
-  List<Object?> get props => [message];
+  final Set<String> categories;
+
+  const FoodSearchError({required this.message, this.categories = const {}});
+
+  @override
+  List<Object?> get props => [message, categories];
 }

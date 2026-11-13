@@ -4,11 +4,8 @@ import 'package:spotter/core/app_dialog.dart';
 import 'package:spotter/core/route/routing.dart';
 import 'package:spotter/core/snack_bar_builder.dart';
 import 'package:spotter/features/auth/presentation/bloc/profile_bloc/profile_bloc.dart';
-import 'package:spotter/features/nutrition/domain/entities/macro_nutrients.dart';
-import 'package:spotter/features/nutrition/domain/entities/meal_entry.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
-import 'package:spotter/features/nutrition/domain/params/list_meal_entries_params.dart';
-import 'package:spotter/features/nutrition/domain/usecases/list_meal_entries_usecase.dart';
+import 'package:spotter/features/nutrition/domain/entities/meal_plan_summary.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/meal_plan_bloc/meal_plan_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/bloc/nutrition_preferences_bloc/nutrition_preferences_bloc.dart';
 import 'package:spotter/features/nutrition/presentation/screens/meal_plan_detail_screen.dart';
@@ -33,10 +30,7 @@ class MealPlansScreen extends StatefulWidget {
 class _MealPlansScreenState extends State<MealPlansScreen> {
   final MealPlanBloc _bloc = sl<MealPlanBloc>();
   List<MealPlan> _plans = const [];
-  MacroNutrients _totals = MacroNutrients.zero;
-  double _totalSpentEgp = 0;
-  int _totalItems = 0;
-  int _totalsRequestId = 0;
+  MealPlanSummary _summary = const MealPlanSummary();
   bool _awaitingPlan = false;
   String? _deletingPlanId;
   TextEditingController budgetController = TextEditingController();
@@ -62,58 +56,14 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
     _bloc.add(MealPlanListRequested(uid: widget.uid));
   }
 
-  /// Sums the entries of every listed plan, so the single summary at the top
-  /// of the screen covers all planned meals of the day. Planned foods count
-  /// even before they are logged to the diary.
-  Future<void> _loadTotals(List<MealPlan> plans) async {
-    final ids = plans
-        .map((plan) => plan.mealPlanId.trim())
-        .where((id) => id.isNotEmpty)
-        .toList();
-    if (ids.isEmpty) {
-      setState(() {
-        _totals = MacroNutrients.zero;
-        _totalSpentEgp = 0;
-        _totalItems = 0;
-      });
-      return;
-    }
-
-    final request = ++_totalsRequestId;
-    final results = await Future.wait(
-      ids.map(
-        (id) => sl<ListMealEntriesUseCase>()(
-          ListMealEntriesParams(uid: widget.uid, mealPlanId: id),
-        ),
-      ),
-    );
-    if (!mounted || request != _totalsRequestId) return;
-
-    final entries = <MealEntry>[];
-    final foodIds = <String>{};
-    for (final result in results) {
-      result.fold((_) {}, (planEntries) {
-        entries.addAll(planEntries);
-        foodIds.addAll(planEntries.map((entry) => entry.foodId));
-      });
-    }
-
-    final foods = await fetchFoodsById(foodIds);
-    if (!mounted || request != _totalsRequestId) return;
-
-    setState(() {
-      _totals = macrosForEntries(entries, foods);
-      _totalSpentEgp = estimatedCostForEntries(entries, foods);
-      _totalItems = entries.length;
-    });
-  }
-
   void _onState(BuildContext context, MealPlanState state) {
     final cs = Theme.of(context).colorScheme;
     if (state is MealPlanLoaded) {
       if (state.plans.isNotEmpty) {
-        setState(() => _plans = state.plans);
-        _loadTotals(state.plans);
+        setState(() {
+          _plans = state.plans;
+          _summary = state.summary;
+        });
       }
       if (_awaitingPlan) {
         _awaitingPlan = false;
@@ -144,9 +94,7 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
       } else if (!_awaitingPlan) {
         setState(() {
           _plans = const [];
-          _totals = MacroNutrients.zero;
-          _totalSpentEgp = 0;
-          _totalItems = 0;
+          _summary = const MealPlanSummary();
         });
       }
       _awaitingPlan = false;
@@ -370,14 +318,14 @@ class _MealPlansScreenState extends State<MealPlansScreen> {
                 children: [
                   if (_plans.isNotEmpty) ...[
                     NutritionSummaryCard(
-                      consumed: _totals,
+                      consumed: _summary.totals,
                       targetKcal: goals?.calories.toDouble(),
                       targetProteinG: goals?.proteinG.toDouble(),
                       targetCarbsG: goals?.carbsG.toDouble(),
                       targetFatG: goals?.fatG.toDouble(),
                       budgetEgp: prefs?.budgetEgp,
-                      spentEgp: _totalSpentEgp,
-                      logCount: _totalItems,
+                      spentEgp: _summary.spentEgp,
+                      logCount: _summary.itemCount,
                       countLabel: 'planned across all plans',
                     ),
                     const SizedBox(height: 18),

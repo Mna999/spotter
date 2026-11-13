@@ -60,6 +60,15 @@ class PlanSaved extends MealPlanEvent {
   List<Object?> get props => [uid, mealPlan];
 }
 
+/// Persists the current totals and marks the plan as committed.
+class PlanCommitted extends MealPlanEvent {
+  final String uid;
+  final String mealPlanId;
+  const PlanCommitted({required this.uid, required this.mealPlanId});
+  @override
+  List<Object?> get props => [uid, mealPlanId];
+}
+
 class PlanLoaded extends MealPlanEvent {
   final String uid;
   final String mealPlanId;
@@ -105,10 +114,39 @@ class MealEntryAdded extends MealPlanEvent {
 }
 
 class MealEntryUpdated extends MealPlanEvent {
-  final String mealEntryId;
-  const MealEntryUpdated({required this.mealEntryId});
+  final UpdateMealEntryParams params;
+
+  /// When provided, its stored totals are refreshed after the update.
+  final MealPlan? mealPlan;
+
+  const MealEntryUpdated({required this.params, this.mealPlan});
+
+  MealEntryUpdated.fromId({
+    required String uid,
+    required String mealPlanId,
+    required String mealEntryId,
+    int? order,
+    Portion? portion,
+    double? servingsCount,
+    String? note,
+    MealPlan? mealPlan,
+  }) : this(
+         params: UpdateMealEntryParams(
+           uid: uid,
+           mealPlanId: mealPlanId,
+           mealEntryId: mealEntryId,
+           order: order,
+           portion: portion,
+           servingsCount: servingsCount,
+           note: note,
+         ),
+         mealPlan: mealPlan,
+       );
+
+  String get mealEntryId => params.mealEntryId;
+
   @override
-  List<Object?> get props => [mealEntryId];
+  List<Object?> get props => [params, mealPlan];
 }
 
 class MealEntryRemoved extends MealPlanEvent {
@@ -159,8 +197,32 @@ class UnloggedMealEntriesRemoved extends MealPlanEvent {
 
 class ExclusionsChanged extends MealPlanEvent {
   final String uid;
+
+  /// Defaults to [uid] when omitted.
+  final String? prefsId;
   final Set<String> excludedFoodIds;
-  const ExclusionsChanged({required this.uid, required this.excludedFoodIds});
+
+  /// Null leaves the stored categories untouched.
+  final Set<String>? excludedCategories;
+
+  /// When provided, it is echoed back so screens showing that plan still
+  /// render the confirmation message.
+  final MealPlan? mealPlan;
+
+  const ExclusionsChanged({
+    required this.uid,
+    required this.excludedFoodIds,
+    this.prefsId,
+    this.excludedCategories,
+    this.mealPlan,
+  });
+
   @override
-  List<Object?> get props => [uid, excludedFoodIds];
+  List<Object?> get props => [
+    uid,
+    prefsId,
+    excludedFoodIds,
+    excludedCategories,
+    mealPlan,
+  ];
 }

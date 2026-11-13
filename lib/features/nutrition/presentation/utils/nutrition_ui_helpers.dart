@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:spotter/features/nutrition/domain/entities/food_item.dart';
 import 'package:spotter/features/nutrition/domain/entities/macro_nutrients.dart';
-import 'package:spotter/features/nutrition/domain/entities/meal_entry.dart';
-import 'package:spotter/features/nutrition/domain/entities/meal_log.dart';
-import 'package:spotter/features/nutrition/domain/entities/meal_plan.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_type.dart';
 import 'package:spotter/features/nutrition/domain/entities/plan_status.dart';
 import 'package:spotter/features/nutrition/domain/entities/portion.dart';
-import 'package:spotter/features/nutrition/domain/entities/price_basis.dart';
-import 'package:spotter/features/nutrition/domain/repository/food_repo.dart';
-import 'package:spotter/injection_container.dart';
+import 'package:spotter/features/nutrition/domain/services/nutrition_calculator.dart';
 
 /// What the food detail screen should do with the selected food.
 enum FoodActionMode { log, addToPlan }
@@ -45,14 +40,7 @@ IconData mealTypeIcon(MealType type) => switch (type) {
   MealType.postWorkout => Icons.fitness_center,
 };
 
-int mealTypeOrder(MealType type) => switch (type) {
-  MealType.breakfast => 0,
-  MealType.lunch => 1,
-  MealType.dinner => 2,
-  MealType.snack => 3,
-  MealType.preWorkout => 4,
-  MealType.postWorkout => 5,
-};
+int mealTypeOrder(MealType type) => type.index;
 
 String planStatusLabel(PlanStatus status) => switch (status) {
   PlanStatus.draft => 'DRAFT',
@@ -70,39 +58,15 @@ double gramsFor(Portion portion, double servings) =>
     portion.grams * servings;
 
 MacroNutrients macrosFor(FoodItem food, double grams) =>
-    food.per100g.scale(grams / 100);
+    NutritionCalculator.macrosFor(food, grams);
 
 double kcalFor(FoodItem food, double grams) =>
-    food.per100g.energyKcal * grams / 100;
-
-/// Sums the macros of the logs whose food is present in [foods].
-MacroNutrients macrosForLogs(
-  Iterable<MealLog> logs,
-  Map<String, FoodItem> foods,
-) {
-  var total = MacroNutrients.zero;
-  for (final log in logs) {
-    final food = foods[log.foodId];
-    if (food == null) {
-      total = total + MacroNutrients.energyOnly(log.computedKcal);
-    } else {
-      total = total + macrosFor(food, gramsFor(log.portion, log.servingsCount));
-    }
-  }
-  return total;
-}
+    NutritionCalculator.kcalFor(food, grams);
 
 /// Rough EGP impact of a portion. Prices are indicative and depend on the
-/// catalogue's [PriceBasis].
-double? estimatedPrice(FoodItem food, double grams, double servings) {
-  final price = food.priceEgp;
-  if (price == null) return null;
-  return switch (food.priceBasis) {
-    PriceBasis.weight => price * grams / 1000,
-    PriceBasis.serving => price * servings,
-    PriceBasis.drink => price * servings,
-  };
-}
+/// catalogue's `PriceBasis`.
+double? estimatedPrice(FoodItem food, double grams, double servings) =>
+    NutritionCalculator.estimatedPrice(food, grams, servings);
 
 String egp(num? value) {
   if (value == null) return '—';
@@ -160,89 +124,4 @@ String friendlyDate(DateTime date) {
     'Dec',
   ];
   return '${date.day} ${months[date.month - 1]} ${date.year}';
-}
-
-MealPlan copyMealPlan(
-  MealPlan plan, {
-  String? mealPlanId,
-  String? name,
-  DateTime? date,
-  double? budgetEgp,
-  double? totalKcal,
-  double? costEgp,
-  PlanStatus? status,
-}) {
-  return MealPlan(
-    mealPlanId: mealPlanId ?? plan.mealPlanId,
-    uid: plan.uid,
-    name: name ?? plan.name,
-    date: date ?? plan.date,
-    budgetEgp: budgetEgp ?? plan.budgetEgp,
-    totalKcal: totalKcal ?? plan.totalKcal,
-    costEgp: costEgp ?? plan.costEgp,
-    status: status ?? plan.status,
-    schemaVersion: plan.schemaVersion,
-    createdAt: plan.createdAt,
-    updatedAt: DateTime.now(),
-  );
-}
-
-/// Sums the macros of the entries whose food is present in [foods].
-MacroNutrients macrosForEntries(
-  Iterable<MealEntry> entries,
-  Map<String, FoodItem> foods,
-) {
-  var total = MacroNutrients.zero;
-  for (final entry in entries) {
-    final food = foods[entry.foodId];
-    if (food == null) continue;
-    total = total + macrosFor(food, entry.grams);
-  }
-  return total;
-}
-
-/// Indicative EGP cost of the logs whose food is present in [foods].
-double estimatedCostForLogs(
-  Iterable<MealLog> logs,
-  Map<String, FoodItem> foods,
-) {
-  var total = 0.0;
-  for (final log in logs) {
-    final food = foods[log.foodId];
-    if (food == null) continue;
-    total += estimatedPrice(food, log.grams, log.servingsCount) ?? 0;
-  }
-  return total;
-}
-
-/// Indicative EGP cost of the entries whose food is present in [foods].
-double estimatedCostForEntries(
-  Iterable<MealEntry> entries,
-  Map<String, FoodItem> foods,
-) {
-  var total = 0.0;
-  for (final entry in entries) {
-    final food = foods[entry.foodId];
-    if (food == null) continue;
-    total += estimatedPrice(food, entry.grams, entry.servingsCount) ?? 0;
-  }
-  return total;
-}
-
-/// Fetches the foods with the given ids. Foods that are missing from the
-/// catalogue (or that fail to load) are simply omitted.
-Future<Map<String, FoodItem>> fetchFoodsById(Iterable<String> foodIds) async {
-  final ids = foodIds.toSet();
-  if (ids.isEmpty) return const {};
-  final repo = sl<FoodRepo>();
-  final results = await Future.wait(
-    ids.map((id) => repo.getById(foodId: id)),
-  );
-  final foods = <String, FoodItem>{};
-  for (final result in results) {
-    result.fold((_) {}, (food) {
-      if (food != null) foods[food.foodId] = food;
-    });
-  }
-  return foods;
 }

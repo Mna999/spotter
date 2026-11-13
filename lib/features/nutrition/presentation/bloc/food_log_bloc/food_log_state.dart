@@ -7,11 +7,13 @@ abstract class FoodLogState extends Equatable {
 }
 
 class FoodLogEmpty extends FoodLogState {
-  final DateTime? date;
-  final MacroNutrients? totals;
-  const FoodLogEmpty({this.date, this.totals});
+  /// Null while the first day is still being requested.
+  final FoodLogDay? day;
+  const FoodLogEmpty({this.day});
+
+  DateTime? get date => day?.date;
   @override
-  List<Object?> get props => [date, totals];
+  List<Object?> get props => [day];
 }
 
 class FoodLogLoading extends FoodLogState {
@@ -19,16 +21,19 @@ class FoodLogLoading extends FoodLogState {
 }
 
 class FoodLogLoaded extends FoodLogState {
-  final List<MealLog> logs;
-  final MacroNutrients totals;
+  final FoodLogDay day;
+
+  /// The log created by the most recent "log food" action, when there is one.
+  final MealLog? latestLog;
   final String? message;
-  const FoodLogLoaded({
-    this.logs = const [],
-    this.totals = MacroNutrients.zero,
-    this.message,
-  });
+
+  const FoodLogLoaded({required this.day, this.latestLog, this.message});
+
+  List<MealLog> get logs => day.logs;
+  MacroNutrients get totals => day.totals;
+
   @override
-  List<Object?> get props => [logs, totals, message];
+  List<Object?> get props => [day, latestLog, message];
 }
 
 class FoodLogError extends FoodLogState {
