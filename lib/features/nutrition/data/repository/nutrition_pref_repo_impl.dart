@@ -2,14 +2,18 @@ import 'package:dartz/dartz.dart';
 import 'package:spotter/core/error/exception.dart';
 import 'package:spotter/core/error/exception_handler.dart';
 import 'package:spotter/core/error/failure.dart';
+import 'package:spotter/core/network/network_info.dart';
 import 'package:spotter/features/nutrition/data/datasources/nutrition_preferences_remote_data_source.dart';
 import 'package:spotter/features/nutrition/domain/entities/dietary_preferences.dart';
 import 'package:spotter/features/nutrition/domain/repository/nutrition_pref_repo.dart';
 
 class NutritionPrefRepoImpl implements NutritionPrefRepo {
   final NutritionPreferencesRemoteDataSource remoteDataSource;
-
-  NutritionPrefRepoImpl({required this.remoteDataSource});
+  final NetworkInfo networkInfo;
+  NutritionPrefRepoImpl({
+    required this.remoteDataSource,
+    required this.networkInfo,
+  });
 
   @override
   Future<Either<Failure, DietaryPreferences?>> get({
@@ -17,7 +21,11 @@ class NutritionPrefRepoImpl implements NutritionPrefRepo {
     required String prefsId,
   }) async {
     try {
-      final prefs = await remoteDataSource.get(uid: uid, prefsId: prefsId);
+      final prefs = await remoteDataSource.get(
+        uid: uid,
+        prefsId: prefsId,
+        isLocal: !await networkInfo.isConnected,
+      );
       return Right(prefs);
     } on ServerException catch (e) {
       return Left(
@@ -36,7 +44,11 @@ class NutritionPrefRepoImpl implements NutritionPrefRepo {
     required DietaryPreferences prefs,
   }) async {
     try {
-      final savedPrefs = await remoteDataSource.save(uid: uid, prefs: prefs);
+      final savedPrefs = await remoteDataSource.save(
+        uid: uid,
+        prefs: prefs,
+        isLocal: !await networkInfo.isConnected,
+      );
       return Right(savedPrefs);
     } on ServerException catch (e) {
       return Left(
@@ -60,6 +72,7 @@ class NutritionPrefRepoImpl implements NutritionPrefRepo {
         uid: uid,
         prefsId: prefsId,
         partial: partial,
+        isLocal: !await networkInfo.isConnected,
       );
       return Right(updatedPrefs);
     } on ServerException catch (e) {
@@ -86,6 +99,7 @@ class NutritionPrefRepoImpl implements NutritionPrefRepo {
         excludedFoodIds: excludedFoodIds,
         prefsId: prefsId,
         excludedCategories: excludedCategories,
+        isLocal: !await networkInfo.isConnected,
       );
       return Right(updatedPrefs);
     } on ServerException catch (e) {

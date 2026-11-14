@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 abstract class NetworkInfo {
@@ -6,8 +7,21 @@ abstract class NetworkInfo {
 
 class NetworkInfoImpl implements NetworkInfo {
   final InternetConnection internetConnection;
-  NetworkInfoImpl({required this.internetConnection});
+  final Connectivity connectivity;
+
+  NetworkInfoImpl({
+    required this.internetConnection,
+    Connectivity? connectivity,
+  }) : connectivity = connectivity ?? Connectivity();
+
   @override
-  // TODO: implement isConnected
-  Future<bool> get isConnected => internetConnection.hasInternetAccess;
+  Future<bool> get isConnected async {
+    // Without a network interface there is no point probing remote hosts: the
+    // HTTP HEAD checks only time out, which delays every offline read/write.
+    final interfaces = await connectivity.checkConnectivity();
+    if (interfaces.every((result) => result == ConnectivityResult.none)) {
+      return false;
+    }
+    return internetConnection.hasInternetAccess;
+  }
 }

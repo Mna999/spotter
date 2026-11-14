@@ -2,15 +2,16 @@ import 'package:dartz/dartz.dart';
 import 'package:spotter/core/error/exception.dart';
 import 'package:spotter/core/error/exception_handler.dart';
 import 'package:spotter/core/error/failure.dart';
+import 'package:spotter/core/network/network_info.dart';
 import 'package:spotter/features/nutrition/data/datasources/meal_log_remote_data_source.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_log.dart';
 import 'package:spotter/features/nutrition/domain/repository/meal_log_repo.dart';
 
-
 class MealLogRepoImpl implements MealLogRepo {
   final MealLogRemoteDataSource remoteDataSource;
+  final NetworkInfo networkInfo;
 
-  MealLogRepoImpl({required this.remoteDataSource});
+  MealLogRepoImpl({required this.remoteDataSource, required this.networkInfo});
 
   @override
   Future<Either<Failure, Unit>> delete({
@@ -18,7 +19,11 @@ class MealLogRepoImpl implements MealLogRepo {
     required String mealLogId,
   }) async {
     try {
-      await remoteDataSource.delete(uid: uid, mealLogId: mealLogId);
+      await remoteDataSource.delete(
+        uid: uid,
+        mealLogId: mealLogId,
+        isLocal: !await networkInfo.isConnected,
+      );
       return const Right(unit);
     } on ServerException catch (e) {
       return Left(
@@ -37,7 +42,11 @@ class MealLogRepoImpl implements MealLogRepo {
     required String mealLogId,
   }) async {
     try {
-      final mealLog = await remoteDataSource.get(uid: uid, mealLogId: mealLogId);
+      final mealLog = await remoteDataSource.get(
+        uid: uid,
+        mealLogId: mealLogId,
+        isLocal: !await networkInfo.isConnected,
+      );
       return Right(mealLog);
     } on ServerException catch (e) {
       return Left(
@@ -47,7 +56,7 @@ class MealLogRepoImpl implements MealLogRepo {
       return const Left(
         ServerFailure(message: 'Something went wrong. Please try again.'),
       );
-    } 
+    }
   }
 
   @override
@@ -57,7 +66,12 @@ class MealLogRepoImpl implements MealLogRepo {
     required DateTime end,
   }) async {
     try {
-      final mealLogs = await remoteDataSource.inRange(uid: uid, start: start, end: end);
+      final mealLogs = await remoteDataSource.inRange(
+        uid: uid,
+        start: start,
+        end: end,
+        isLocal: !await networkInfo.isConnected,
+      );
       return Right(mealLogs);
     } on ServerException catch (e) {
       return Left(
@@ -76,7 +90,11 @@ class MealLogRepoImpl implements MealLogRepo {
     required DateTime date,
   }) async {
     try {
-      final mealLogs = await remoteDataSource.listForDate(uid: uid, date: date);
+      final mealLogs = await remoteDataSource.listForDate(
+        uid: uid,
+        date: date,
+        isLocal: !await networkInfo.isConnected,
+      );
       return Right(mealLogs);
     } on ServerException catch (e) {
       return Left(
@@ -95,7 +113,11 @@ class MealLogRepoImpl implements MealLogRepo {
     required MealLog log,
   }) async {
     try {
-      final savedLog = await remoteDataSource.save(uid: uid, log: log);
+      final savedLog = await remoteDataSource.save(
+        uid: uid,
+        log: log,
+        isLocal: !await networkInfo.isConnected,
+      );
       return Right(savedLog);
     } on ServerException catch (e) {
       return Left(
@@ -119,6 +141,7 @@ class MealLogRepoImpl implements MealLogRepo {
         uid: uid,
         mealLogId: mealLogId,
         partial: partial,
+        isLocal: !await networkInfo.isConnected,
       );
       return Right(updatedLog);
     } on ServerException catch (e) {
@@ -129,6 +152,6 @@ class MealLogRepoImpl implements MealLogRepo {
       return const Left(
         ServerFailure(message: 'Something went wrong. Please try again.'),
       );
-    } 
+    }
   }
 }

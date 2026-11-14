@@ -2,14 +2,19 @@ import 'package:dartz/dartz.dart';
 import 'package:spotter/core/error/exception.dart';
 import 'package:spotter/core/error/exception_handler.dart';
 import 'package:spotter/core/error/failure.dart';
+import 'package:spotter/core/network/network_info.dart';
 import 'package:spotter/features/nutrition/data/datasources/meal_entry_remote_data_source.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_entry.dart';
 import 'package:spotter/features/nutrition/domain/repository/meal_entry_repo.dart';
 
 class MealEntryRepoImpl implements MealEntryRepo {
   final MealEntryRemoteDataSource remoteDataSource;
+  final NetworkInfo networkInfo;
 
-  MealEntryRepoImpl({required this.remoteDataSource});
+  MealEntryRepoImpl({
+    required this.remoteDataSource,
+    required this.networkInfo,
+  });
 
   @override
   Future<Either<Failure, Unit>> delete({
@@ -22,6 +27,7 @@ class MealEntryRepoImpl implements MealEntryRepo {
         uid: uid,
         mealPlanId: mealPlanId,
         mealEntryId: mealEntryId,
+        isLocal: !await networkInfo.isConnected,
       );
       return const Right(unit);
     } on ServerException catch (e) {
@@ -32,7 +38,7 @@ class MealEntryRepoImpl implements MealEntryRepo {
       return const Left(
         ServerFailure(message: 'Something went wrong. Please try again.'),
       );
-    } 
+    }
   }
 
   @override
@@ -46,6 +52,7 @@ class MealEntryRepoImpl implements MealEntryRepo {
         uid: uid,
         mealPlanId: mealPlanId,
         mealEntryId: mealEntryId,
+        isLocal: !await networkInfo.isConnected,
       );
       return Right(mealEntry);
     } on ServerException catch (e) {
@@ -56,7 +63,7 @@ class MealEntryRepoImpl implements MealEntryRepo {
       return const Left(
         ServerFailure(message: 'Something went wrong. Please try again.'),
       );
-    } 
+    }
   }
 
   @override
@@ -68,6 +75,7 @@ class MealEntryRepoImpl implements MealEntryRepo {
       final mealEntries = await remoteDataSource.list(
         uid: uid,
         mealPlanId: mealPlanId,
+        isLocal: !await networkInfo.isConnected,
       );
       return Right(mealEntries);
     } on ServerException catch (e) {
@@ -92,6 +100,7 @@ class MealEntryRepoImpl implements MealEntryRepo {
         uid: uid,
         mealPlanId: mealPlanId,
         entry: entry,
+        isLocal: !await networkInfo.isConnected,
       );
       return Right(savedEntry);
     } on ServerException catch (e) {
@@ -118,6 +127,7 @@ class MealEntryRepoImpl implements MealEntryRepo {
         mealPlanId: mealPlanId,
         mealEntryId: mealEntryId,
         partial: partial,
+        isLocal: !await networkInfo.isConnected,
       );
       return Right(updatedEntry);
     } on ServerException catch (e) {
@@ -128,6 +138,6 @@ class MealEntryRepoImpl implements MealEntryRepo {
       return const Left(
         ServerFailure(message: 'Something went wrong. Please try again.'),
       );
-    } 
+    }
   }
 }

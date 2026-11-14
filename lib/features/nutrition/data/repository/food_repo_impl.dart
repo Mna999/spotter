@@ -4,6 +4,7 @@ import 'package:dartz/dartz.dart';
 import 'package:spotter/core/error/exception.dart';
 import 'package:spotter/core/error/exception_handler.dart';
 import 'package:spotter/core/error/failure.dart';
+import 'package:spotter/core/network/network_info.dart';
 import 'package:spotter/features/nutrition/data/datasources/food_remote_data_source.dart';
 import 'package:spotter/features/nutrition/domain/entities/food_item.dart';
 import 'package:spotter/features/nutrition/domain/params/food_filter_params.dart';
@@ -11,13 +12,17 @@ import 'package:spotter/features/nutrition/domain/repository/food_repo.dart';
 
 class FoodRepoImpl implements FoodRepo {
   final FoodRemoteDataSource remoteDataSource;
+  final NetworkInfo networkInfo;
 
-  FoodRepoImpl({required this.remoteDataSource});
+  FoodRepoImpl({required this.remoteDataSource, required this.networkInfo});
 
   @override
   Future<Either<Failure, FoodItem?>> getById({required String foodId}) async {
     try {
-      final foodItem = await remoteDataSource.getById(foodId: foodId);
+      final foodItem = await remoteDataSource.getById(
+        foodId: foodId,
+        isLocal: !await networkInfo.isConnected,
+      );
       return Right(foodItem);
     } on ServerException catch (e) {
       return Left(
@@ -37,7 +42,10 @@ class FoodRepoImpl implements FoodRepo {
   }) async {
     if (foodIds.isEmpty) return const Right(<String, FoodItem>{});
     try {
-      final foodItems = await remoteDataSource.getByIds(foodIds: foodIds);
+      final foodItems = await remoteDataSource.getByIds(
+        foodIds: foodIds,
+        isLocal: !await networkInfo.isConnected,
+      );
       return Right({for (final food in foodItems) food.foodId: food});
     } on ServerException catch (e) {
       return Left(
@@ -56,7 +64,10 @@ class FoodRepoImpl implements FoodRepo {
     required FoodFilterParams filter,
   }) async {
     try {
-      final foodItems = await remoteDataSource.list(filter: filter);
+      final foodItems = await remoteDataSource.list(
+        filter: filter,
+        isLocal: !await networkInfo.isConnected,
+      );
       return Right(foodItems);
     } on ServerException catch (e) {
       return Left(
@@ -81,6 +92,7 @@ class FoodRepoImpl implements FoodRepo {
         query: query,
         limit: limit,
         cursor: cursor,
+        isLocal: !await networkInfo.isConnected,
       );
       return Right(foodItems);
     } on ServerException catch (e) {

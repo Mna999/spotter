@@ -43,8 +43,8 @@ import 'package:spotter/features/nutrition/domain/usecases/add_meal_entry_usecas
 import 'package:spotter/features/nutrition/domain/usecases/build_meal_plan_totals_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/commit_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/create_meal_plan_usecase.dart';
-import 'package:spotter/features/nutrition/domain/usecases/delete_meal_log_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/delete_meal_entry_usecase.dart';
+import 'package:spotter/features/nutrition/domain/usecases/delete_meal_log_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/delete_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/generate_meal_plan_usecase.dart';
 import 'package:spotter/features/nutrition/domain/usecases/get_daily_totals_usecase.dart';
@@ -352,10 +352,7 @@ Future<void> initNutrition() async {
   sl.registerLazySingleton(() => RepeatYesterdayUseCase(mealLogRepo: sl()));
   sl.registerLazySingleton(() => GetFoodsByIdsUseCase(foodRepo: sl()));
   sl.registerLazySingleton(
-    () => GetFoodLogDayUseCase(
-      mealLogRepo: sl(),
-      getFoodsByIds: sl(),
-    ),
+    () => GetFoodLogDayUseCase(mealLogRepo: sl(), getFoodsByIds: sl()),
   );
   sl.registerLazySingleton(
     () => GetLoggedMealEntriesUseCase(mealLogRepo: sl()),
@@ -404,16 +401,10 @@ Future<void> initNutrition() async {
   sl.registerLazySingleton(() => UpdateMealEntryUseCase(mealEntryRepo: sl()));
   sl.registerLazySingleton(() => DeleteMealEntryUseCase(mealEntryRepo: sl()));
   sl.registerLazySingleton(
-    () => GetMealPlanEntriesUseCase(
-      mealEntryRepo: sl(),
-      getFoodsByIds: sl(),
-    ),
+    () => GetMealPlanEntriesUseCase(mealEntryRepo: sl(), getFoodsByIds: sl()),
   );
   sl.registerLazySingleton(
-    () => GetMealPlansSummaryUseCase(
-      mealEntryRepo: sl(),
-      getFoodsByIds: sl(),
-    ),
+    () => GetMealPlansSummaryUseCase(mealEntryRepo: sl(), getFoodsByIds: sl()),
   );
   sl.registerLazySingleton(
     () => BuildMealPlanTotalsUseCase(
@@ -423,27 +414,24 @@ Future<void> initNutrition() async {
     ),
   );
   sl.registerLazySingleton(
-    () => CommitMealPlanUseCase(
-      mealPlanRepo: sl(),
-      getMealPlanEntries: sl(),
-    ),
+    () => CommitMealPlanUseCase(mealPlanRepo: sl(), getMealPlanEntries: sl()),
   );
 
   // Register Repositories
   sl.registerLazySingleton<FoodRepo>(
-    () => FoodRepoImpl(remoteDataSource: sl()),
+    () => FoodRepoImpl(remoteDataSource: sl(), networkInfo: sl()),
   );
   sl.registerLazySingleton<MealLogRepo>(
-    () => MealLogRepoImpl(remoteDataSource: sl()),
+    () => MealLogRepoImpl(remoteDataSource: sl(), networkInfo: sl()),
   );
   sl.registerLazySingleton<MealPlanRepo>(
-    () => MealPlanRepoImpl(remoteDataSource: sl()),
+    () => MealPlanRepoImpl(remoteDataSource: sl(), networkInfo: sl()),
   );
   sl.registerLazySingleton<MealEntryRepo>(
-    () => MealEntryRepoImpl(remoteDataSource: sl()),
+    () => MealEntryRepoImpl(remoteDataSource: sl(), networkInfo: sl()),
   );
   sl.registerLazySingleton<NutritionPrefRepo>(
-    () => NutritionPrefRepoImpl(remoteDataSource: sl()),
+    () => NutritionPrefRepoImpl(remoteDataSource: sl(), networkInfo: sl()),
   );
 
   // Register Data Sources

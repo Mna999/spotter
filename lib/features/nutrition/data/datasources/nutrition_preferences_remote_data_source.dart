@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:spotter/core/error/exception.dart';
+import 'package:spotter/core/firestore_local_write.dart';
 import 'package:spotter/features/nutrition/data/models/dietary_preferences_model.dart';
 import 'package:spotter/features/nutrition/domain/entities/dietary_preferences.dart';
 
@@ -10,12 +11,14 @@ abstract class NutritionPreferencesRemoteDataSource {
   Future<DietaryPreferences?> get({
     required String uid,
     required String prefsId,
+    bool isLocal = false,
   });
 
   /// Save dietary preferences for a user
   Future<DietaryPreferences> save({
     required String uid,
     required DietaryPreferences prefs,
+    bool isLocal = false,
   });
 
   /// Update excluded food IDs
@@ -24,6 +27,7 @@ abstract class NutritionPreferencesRemoteDataSource {
     required Set<String> excludedFoodIds,
     required String prefsId,
     Set<String>? excludedCategories,
+    bool isLocal = false,
   });
 
   /// Update partial preferences
@@ -31,6 +35,7 @@ abstract class NutritionPreferencesRemoteDataSource {
     required String uid,
     required Map<String, dynamic> partial,
     required String prefsId,
+    bool isLocal = false,
   });
 }
 
@@ -51,6 +56,7 @@ class NutritionPreferencesRemoteDataSourceImpl
   Future<DietaryPreferences?> get({
     required String uid,
     required String prefsId,
+    bool isLocal = false,
   }) async {
     try {
       final doc = await _firestore
@@ -58,7 +64,9 @@ class NutritionPreferencesRemoteDataSourceImpl
           .doc(uid)
           .collection('dietaryPreferences')
           .doc(_docId(uid: uid, prefsId: prefsId))
-          .get();
+          .get(
+            GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+          );
 
       final data = doc.data();
       if (data == null || data.isEmpty) return null;
@@ -73,17 +81,23 @@ class NutritionPreferencesRemoteDataSourceImpl
   Future<DietaryPreferences> save({
     required String uid,
     required DietaryPreferences prefs,
+    bool isLocal = false,
   }) async {
     try {
       final docId = _docId(uid: uid, prefsId: prefs.prefsId);
       final model = DietaryPreferencesModel.fromEntity(prefs).withId(docId);
 
-      await _firestore
+      final docRef = _firestore
           .collection('users')
           .doc(uid)
           .collection('dietaryPreferences')
-          .doc(docId)
-          .set(model.toJson());
+          .doc(docId);
+
+      await applyFirestoreWrite(
+        docRef.set(model.toJson()),
+        document: docRef,
+        isLocal: isLocal,
+      );
 
       return model.toEntity();
     } on FirebaseException catch (e) {
@@ -97,6 +111,7 @@ class NutritionPreferencesRemoteDataSourceImpl
     required String prefsId,
     required Set<String> excludedFoodIds,
     Set<String>? excludedCategories,
+    bool isLocal = false,
   }) async {
     try {
       final docRef = _firestore
@@ -113,10 +128,16 @@ class NutritionPreferencesRemoteDataSourceImpl
         partial['excludedCategories'] = excludedCategories.toList();
       }
 
-      await docRef.set(partial, SetOptions(merge: true));
+      await applyFirestoreWrite(
+        docRef.set(partial, SetOptions(merge: true)),
+        document: docRef,
+        isLocal: isLocal,
+      );
 
       // Get updated document
-      final doc = await docRef.get();
+      final doc = await docRef.get(
+        GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+      );
       final model = DietaryPreferencesModel.fromJson(
         doc.data()!,
         docId: doc.id,
@@ -132,6 +153,7 @@ class NutritionPreferencesRemoteDataSourceImpl
     required String uid,
     required String prefsId,
     required Map<String, dynamic> partial,
+    bool isLocal = false,
   }) async {
     try {
       final docRef = _firestore
@@ -144,10 +166,16 @@ class NutritionPreferencesRemoteDataSourceImpl
       partial['updatedAt'] = FieldValue.serverTimestamp();
 
       // Merge so a partial update also creates the document the first time.
-      await docRef.set(partial, SetOptions(merge: true));
+      await applyFirestoreWrite(
+        docRef.set(partial, SetOptions(merge: true)),
+        document: docRef,
+        isLocal: isLocal,
+      );
 
       // Get updated document
-      final doc = await docRef.get();
+      final doc = await docRef.get(
+        GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+      );
       final model = DietaryPreferencesModel.fromJson(
         doc.data()!,
         docId: doc.id,

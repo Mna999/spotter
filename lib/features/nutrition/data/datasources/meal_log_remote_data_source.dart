@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:spotter/core/error/exception.dart';
+import 'package:spotter/core/firestore_local_write.dart';
 import 'package:spotter/features/nutrition/data/models/meal_log_model.dart';
 import 'package:spotter/features/nutrition/data/models/portion_model.dart';
 import 'package:spotter/features/nutrition/domain/entities/meal_log.dart';
@@ -9,15 +10,24 @@ import 'package:spotter/features/nutrition/domain/entities/portion.dart';
 
 abstract class MealLogRemoteDataSource {
   /// Save a meal log
-  Future<MealLog> save({required String uid, required MealLog log});
+  Future<MealLog> save({
+    required String uid,
+    required MealLog log,
+    bool isLocal = false,
+  });
 
   /// Get a meal log by ID
-  Future<MealLog?> get({required String uid, required String mealLogId});
+  Future<MealLog?> get({
+    required String uid,
+    required String mealLogId,
+    bool isLocal = false,
+  });
 
   /// Get meal logs for a specific date
   Future<List<MealLog>> listForDate({
     required String uid,
     required DateTime date,
+    bool isLocal = false,
   });
 
   /// Get meal logs within a date range
@@ -25,6 +35,7 @@ abstract class MealLogRemoteDataSource {
     required String uid,
     required DateTime start,
     required DateTime end,
+    bool isLocal = false,
   });
 
   /// Update partial meal log fields
@@ -32,10 +43,15 @@ abstract class MealLogRemoteDataSource {
     required String uid,
     required String mealLogId,
     required Map<String, dynamic> partial,
+    bool isLocal = false,
   });
 
   /// Delete a meal log
-  Future<void> delete({required String uid, required String mealLogId});
+  Future<void> delete({
+    required String uid,
+    required String mealLogId,
+    bool isLocal = false,
+  });
 }
 
 class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
@@ -43,26 +59,40 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
 
   MealLogRemoteDataSourceImpl({required this.firebaseFirestore});
 
-  CollectionReference<Map<String, dynamic>> _logsRef({
-    required String uid,
-  }) => firebaseFirestore
-      .collection('users')
-      .doc(uid)
-      .collection('mealLogs');
+  CollectionReference<Map<String, dynamic>> _logsRef({required String uid}) =>
+      firebaseFirestore.collection('users').doc(uid).collection('mealLogs');
 
   @override
-  Future<void> delete({required String uid, required String mealLogId}) async {
+  Future<void> delete({
+    required String uid,
+    required String mealLogId,
+    bool isLocal = false,
+  }) async {
     try {
-      await _logsRef(uid: uid).doc(mealLogId).delete();
+      final docRef = _logsRef(uid: uid).doc(mealLogId);
+      await applyFirestoreWrite(
+        docRef.delete(),
+        document: docRef,
+        isLocal: isLocal,
+        isApplied: (snapshot) => !snapshot.exists,
+      );
     } on FirebaseException catch (e) {
       throw ServerException(code: e.code);
     }
   }
 
   @override
-  Future<MealLog?> get({required String uid, required String mealLogId}) async {
+  Future<MealLog?> get({
+    required String uid,
+    required String mealLogId,
+    bool isLocal = false,
+  }) async {
     try {
-      final doc = await _logsRef(uid: uid).doc(mealLogId).get();
+      final doc = await _logsRef(uid: uid)
+          .doc(mealLogId)
+          .get(
+            GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+          );
 
       final data = doc.data();
 
@@ -80,6 +110,7 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
     required String uid,
     required DateTime start,
     required DateTime end,
+    bool isLocal = false,
   }) async {
     try {
       // Create date range filters
@@ -90,7 +121,9 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
           .where('loggedAt', isGreaterThanOrEqualTo: startOfDay)
           .where('loggedAt', isLessThanOrEqualTo: endOfDay)
           .orderBy('loggedAt', descending: true)
-          .get();
+          .get(
+            GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+          );
 
       return snapshot.docs
           .map((doc) => MealLogModel.fromJson(doc.data(), docId: doc.id))
@@ -105,6 +138,7 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
   Future<List<MealLog>> listForDate({
     required String uid,
     required DateTime date,
+    bool isLocal = false,
   }) async {
     try {
       // Create start and end of day
@@ -115,7 +149,9 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
           .where('loggedAt', isGreaterThanOrEqualTo: startOfDay)
           .where('loggedAt', isLessThanOrEqualTo: endOfDay)
           .orderBy('loggedAt', descending: true)
-          .get();
+          .get(
+            GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+          );
 
       return snapshot.docs
           .map((doc) => MealLogModel.fromJson(doc.data(), docId: doc.id))
@@ -127,7 +163,11 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
   }
 
   @override
-  Future<MealLog> save({required String uid, required MealLog log}) async {
+  Future<MealLog> save({
+    required String uid,
+    required MealLog log,
+    bool isLocal = false,
+  }) async {
     try {
       final collection = _logsRef(uid: uid);
       // New logs arrive with an empty id; let Firestore assign one.
@@ -136,7 +176,11 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
           : collection.doc(log.mealLogId);
       final model = MealLogModel.fromEntity(log).withId(docRef.id);
 
-      await docRef.set(model.toJson());
+      await applyFirestoreWrite(
+        docRef.set(model.toJson()),
+        document: docRef,
+        isLocal: isLocal,
+      );
 
       return model.toEntity();
     } on FirebaseException catch (e) {
@@ -149,6 +193,7 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
     required String uid,
     required String mealLogId,
     required Map<String, dynamic> partial,
+    bool isLocal = false,
   }) async {
     try {
       final docRef = _logsRef(uid: uid).doc(mealLogId);
@@ -162,10 +207,16 @@ class MealLogRemoteDataSourceImpl implements MealLogRemoteDataSource {
       // Add timestamp for update
       partial['updatedAt'] = FieldValue.serverTimestamp();
 
-      await docRef.update(partial);
+      await applyFirestoreWrite(
+        docRef.update(partial),
+        document: docRef,
+        isLocal: isLocal,
+      );
 
       // Get updated document
-      final doc = await docRef.get();
+      final doc = await docRef.get(
+        GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+      );
       final model = MealLogModel.fromJson(doc.data()!, docId: doc.id);
       return model.toEntity();
     } on FirebaseException catch (e) {

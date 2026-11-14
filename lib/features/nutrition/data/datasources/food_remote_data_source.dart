@@ -12,16 +12,23 @@ abstract class FoodRemoteDataSource {
     required String query,
     int limit = 20,
     String? cursor,
+    bool isLocal = false,
   });
 
   /// Get a food item by ID
-  Future<FoodItem?> getById({required String foodId});
+  Future<FoodItem?> getById({required String foodId, bool isLocal = false});
 
   /// Get several food items by ID in as few queries as possible.
-  Future<List<FoodItem>> getByIds({required Set<String> foodIds});
+  Future<List<FoodItem>> getByIds({
+    required Set<String> foodIds,
+    bool isLocal = false,
+  });
 
   /// List food items with optional filtering
-  Future<List<FoodItem>> list({required FoodFilterParams filter});
+  Future<List<FoodItem>> list({
+    required FoodFilterParams filter,
+    bool isLocal = false,
+  });
 }
 
 class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
@@ -30,9 +37,17 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
   FoodRemoteDataSourceImpl({required this._firestore});
 
   @override
-  Future<FoodItem?> getById({required String foodId}) async {
+  Future<FoodItem?> getById({
+    required String foodId,
+    bool isLocal = false,
+  }) async {
     try {
-      final doc = await _firestore.collection('foods').doc(foodId).get();
+      final doc = await _firestore
+          .collection('foods')
+          .doc(foodId)
+          .get(
+            GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+          );
 
       final data = doc.data();
       if (data == null || data.isEmpty) return null;
@@ -45,7 +60,10 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
   }
 
   @override
-  Future<List<FoodItem>> getByIds({required Set<String> foodIds}) async {
+  Future<List<FoodItem>> getByIds({
+    required Set<String> foodIds,
+    bool isLocal = false,
+  }) async {
     if (foodIds.isEmpty) return const <FoodItem>[];
     final ids = foodIds.toList();
     // Firestore allows a limited number of values in a `whereIn` clause, so
@@ -63,7 +81,11 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
           (chunk) => _firestore
               .collection('foods')
               .where(FieldPath.documentId, whereIn: chunk)
-              .get(),
+              .get(
+                GetOptions(
+                  source: isLocal ? Source.cache : Source.serverAndCache,
+                ),
+              ),
         ),
       );
       return snapshots.expand(_toFoods).toList();
@@ -73,7 +95,10 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
   }
 
   @override
-  Future<List<FoodItem>> list({required FoodFilterParams filter}) async {
+  Future<List<FoodItem>> list({
+    required FoodFilterParams filter,
+    bool isLocal = false,
+  }) async {
     try {
       // Order first, then paginate from the last document of the previous
       // page. Using the document snapshot (instead of a raw value) keeps
@@ -90,13 +115,21 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
         final cursorDoc = await _firestore
             .collection('foods')
             .doc(filter.cursor)
-            .get();
+            .get(
+              GetOptions(
+                source: isLocal ? Source.cache : Source.serverAndCache,
+              ),
+            );
         if (cursorDoc.exists) {
           query = query.startAfterDocument(cursorDoc);
         }
       }
 
-      final snapshot = await query.limit(filter.limit).get();
+      final snapshot = await query
+          .limit(filter.limit)
+          .get(
+            GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+          );
       return snapshot.docs
           .map((doc) => FoodItemModel.fromJson(doc.data(), docId: doc.id))
           .map((model) => model.toEntity())
@@ -111,6 +144,7 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
     required String query,
     int limit = 20,
     String? cursor,
+    bool isLocal = false,
   }) async {
     final needle = query.trim().toLowerCase();
     if (needle.isEmpty) return const [];
@@ -130,7 +164,11 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
         final cursorDoc = await _firestore
             .collection('foods')
             .doc(cursor)
-            .get();
+            .get(
+              GetOptions(
+                source: isLocal ? Source.cache : Source.serverAndCache,
+              ),
+            );
         if (cursorDoc.exists) {
           request = request.startAfterDocument(cursorDoc);
         }
@@ -159,7 +197,9 @@ class FoodRemoteDataSourceImpl implements FoodRemoteDataSource {
           .collection('foods')
           .orderBy('nameEn')
           .limit(500)
-          .get();
+          .get(
+            GetOptions(source: isLocal ? Source.cache : Source.serverAndCache),
+          );
 
       return _toFoods(page).where((food) => _matches(food, needle)).toList();
     } on FirebaseException catch (e) {
